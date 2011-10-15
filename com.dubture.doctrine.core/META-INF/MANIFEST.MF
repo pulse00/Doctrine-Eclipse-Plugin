@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core
+Bundle-SymbolicName: com.dubture.doctrine.core;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.dubture.doctrine.core.DoctrineCorePlugin
+Bundle-Vendor: DUBTURE
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.dltk.core,
+ org.eclipse.php.core,
+ com.dubture.symfony.annotation
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: com.dubture.doctrine.core

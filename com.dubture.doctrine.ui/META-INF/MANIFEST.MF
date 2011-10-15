@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ui
+Bundle-SymbolicName: com.dubture.doctrine.ui; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.dubture.doctrine.ui.DoctrineUIPlugin
+Bundle-Vendor: DUBTURE
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui.ide,
+ com.dubture.doctrine.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

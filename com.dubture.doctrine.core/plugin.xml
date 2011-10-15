@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="doctrineNature"
+         name="Doctrine Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.dubture.doctrine.core.DoctrineNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.php.core.phpIndexingVisitors">
+      <visitor
+            class="com.dubture.doctrine.core.index.DoctrineIndexingVisitorExtension">
+      </visitor>
+   </extension>
+
+</plugin>
