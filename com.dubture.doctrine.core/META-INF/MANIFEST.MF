@@ -12,4 +12,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.dubture.symfony.annotation
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: com.dubture.doctrine.core
+Export-Package: com.dubture.doctrine.core,
+ com.dubture.doctrine.core.model

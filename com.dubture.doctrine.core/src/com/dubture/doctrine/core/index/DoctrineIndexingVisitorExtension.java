@@ -73,18 +73,27 @@ public class DoctrineIndexingVisitorExtension extends
 		if (phpDoc == null)
 			return;
 		
+		String comment = "";
 		
-		BufferedReader buffer = new BufferedReader(new StringReader(phpDoc.getLongDescription()));
+		comment = phpDoc.getLongDescription();
+		
+		if (comment == null || comment.length() == 0)
+			comment = phpDoc.getShortDescription();
+		
+		BufferedReader buffer = new BufferedReader(new StringReader(comment));
 
 		try {
 
 			String line;
 
 			while((line = buffer.readLine()) != null) {
-				
+		
 				int start = line.indexOf('@');
 				int end = line.length()-1;
 				
+				if (start == -1) {
+					continue;
+				}
 				String annotation = line.substring(start, end+1);
 				CharStream content = new ANTLRStringStream(annotation);
 				
@@ -116,6 +125,11 @@ public class DoctrineIndexingVisitorExtension extends
 				tree.accept(visitor);
 				
 				if ("Entity".equals(visitor.getClassName())) {
+
+					ReferenceInfo entityInfo = new ReferenceInfo(IDoctrineModelElement.ENTITY, clazz.sourceStart(), clazz.sourceEnd(), clazz.getName(), null, null);
+					
+					System.err.println("indexing entity: " + clazz.getName()); 
+					requestor.addReference(entityInfo);
 					
 					String repo = visitor.getArgument("repositoryClass");
 					
@@ -131,6 +145,7 @@ public class DoctrineIndexingVisitorExtension extends
 			}			
 		} catch (Exception e) {			
 			e.printStackTrace();
+			System.err.println(clazz.getName());
 		}
 	}
 }

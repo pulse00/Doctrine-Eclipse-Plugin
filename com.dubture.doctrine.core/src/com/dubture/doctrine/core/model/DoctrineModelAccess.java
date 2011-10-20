@@ -28,6 +28,16 @@ import org.eclipse.php.internal.core.model.PhpModelAccess;
 public class DoctrineModelAccess extends PhpModelAccess {
 
 	
+	private static DoctrineModelAccess modelInstance = null;	
+	
+	
+	public static DoctrineModelAccess getDefault() {
+
+		if (modelInstance == null)
+			modelInstance = new DoctrineModelAccess();
+
+		return modelInstance;
+	}
 	
 	/**
 	 * 
@@ -67,5 +77,34 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		
 		return null;
 
+	}
+	
+	public List<String> getEntities(IScriptProject project) {
+
+		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
+
+		if(scope == null) {
+			return null;
+		}
+		
+		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
+		final List<String> entities = new ArrayList<String>();
+		
+		engine.search(IDoctrineModelElement.ENTITY, null, null, 0, 0, 100, SearchFor.REFERENCES, MatchRule.PREFIX, scope, new ISearchRequestor() {
+			
+			@Override
+			public void match(int elementType, int flags, int offset, int length,
+					int nameOffset, int nameLength, String elementName,
+					String metadata, String doc, String qualifier, String parent,
+					ISourceModule sourceModule, boolean isReference) {
+				
+				entities.add(elementName);
+
+			}
+		}, null);
+		
+		
+		return entities;
+		
 	}
 }
