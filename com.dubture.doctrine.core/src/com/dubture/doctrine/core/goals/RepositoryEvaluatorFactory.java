@@ -94,7 +94,8 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 								
 								for (Entity e : entities) {
 									
-									if (et.equals(e.getElementName())) {
+
+									if (et.equals(e.getFullyQualifiedName())) {
 									
 										String qualifier = null;										
 										INamespace ns = e.getNamespace();

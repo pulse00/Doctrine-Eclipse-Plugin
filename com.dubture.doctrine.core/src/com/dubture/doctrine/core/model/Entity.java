@@ -25,7 +25,20 @@ public class Entity extends SourceType {
 
 	public Entity(ModelElement parent, String name) {
 		super(parent, name);
-
+		
+	}
+	
+	
+	@Override
+	public String getElementName() {
+	
+		if (this.name.contains("\\")) {			
+			String[] parts = this.name.split("\\\\");			
+			return parts[parts.length-1];
+			
+		}
+		
+		return super.getElementName();
 	}
 
 	@Override
@@ -74,6 +87,8 @@ public class Entity extends SourceType {
 	}
 	
 	
+	
+	
 	@Override
 	public INamespace getNamespace() throws ModelException {
 
@@ -88,5 +103,16 @@ public class Entity extends SourceType {
 			}
 		}
 		return super.getNamespace();
+	}
+	
+	
+	@Override
+	public String getFullyQualifiedName() {
+
+		if (this.name.contains("\\")) {
+			return this.name;
+		}
+		
+		return super.getFullyQualifiedName();
 	}
 }
