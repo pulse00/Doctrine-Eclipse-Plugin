@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
@@ -16,11 +15,11 @@ import org.eclipse.dltk.core.index2.search.ISearchRequestor;
 import org.eclipse.dltk.core.index2.search.ModelAccess;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
+import org.eclipse.dltk.internal.core.util.LRUCache;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 
 import com.dubture.doctrine.core.goals.IEntityResolver;
-import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
 
 /**
  * 
@@ -36,6 +35,10 @@ public class DoctrineModelAccess extends PhpModelAccess {
 	private static final String ENTITYRESOLVER_ID = "com.dubture.doctrine.core.entityResolvers";
 	
 	private static DoctrineModelAccess modelInstance = null;	
+	private List<IEntityResolver> resolvers = null;
+	
+	private LRUCache entityCache = new LRUCache();
+	private LRUCache repoCache = new LRUCache();
 	
 	
 	public static DoctrineModelAccess getDefault() {
@@ -56,6 +59,11 @@ public class DoctrineModelAccess extends PhpModelAccess {
 	 */
 	public String getRepositoryClass(String className, String qualifier, IScriptProject project) {
 		
+		String key = className + project.getElementName();
+		
+		if (repoCache.get(key) != null)
+			return (String) repoCache.get(key);
+
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
 		if(scope == null) {
@@ -82,7 +90,10 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		
 		
 		if (repos.size() == 1) {
-			return repos.get(0);
+			
+			String repo = repos.get(0);			
+			repoCache.put(key, repo);			
+			return repo;
 		}
 		
 		return null;
@@ -126,23 +137,54 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		
 	}
 	
+	
+	/**
+	 * Resolve a classname via registered entityResolver extensions.
+	 * 
+	 * @param classname
+	 * @param project
+	 * @return
+	 */
 	public IType getExtensionType(String classname, IScriptProject project) {
+
+		if (entityCache.get(classname) != null)
+			return (IType) entityCache.get(classname);
+					
+		IType type = null;
 		
+		for (IEntityResolver resolver : getResolvers()) {
+			
+			type = resolver.resolve(classname, project);
+			// first extension wins
+			if (type != null) {
+				entityCache.put(classname, type);
+				return type;
+			}
+		}
+
+		return type;
+
+	}
+	
+	private List<IEntityResolver> getResolvers() {
 		
-		// let the extensions try to resolve the entity
-		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ENTITYRESOLVER_ID);		
+		if (resolvers != null) {			
+			return resolvers;			
+		}
 		
-		try {											
+		resolvers = new ArrayList<IEntityResolver>();
+		
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+				.getConfigurationElementsFor(ENTITYRESOLVER_ID);		
+		
+		try {							
+			
 			for (IConfigurationElement element : config) {
 				
-				final Object object = element.createExecutableExtension("class");
+				final Object extension = element.createExecutableExtension("class");
 				
-				if (object instanceof IEntityResolver) {
-					
-					IEntityResolver resolver = (IEntityResolver) object;													
-					IType type = resolver.resolve(classname, project);
-					
-					return type;
+				if (extension instanceof IEntityResolver) {					
+					resolvers.add((IEntityResolver) extension);
 				}
 			}
 			
@@ -150,9 +192,8 @@ public class DoctrineModelAccess extends PhpModelAccess {
 			e1.printStackTrace();
 		}
 		
-		return null;
+		return resolvers;		
 		
 	}
-	
 	
 }

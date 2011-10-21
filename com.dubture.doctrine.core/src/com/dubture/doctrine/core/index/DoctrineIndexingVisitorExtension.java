@@ -9,18 +9,13 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.core.ISourceModule;
-import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.ReferenceInfo;
-import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
-import org.eclipse.dltk.core.search.SearchEngine;
 import org.eclipse.php.core.index.PhpIndexingVisitorExtension;
 import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
 
 import com.dubture.doctrine.core.log.Logger;
-import com.dubture.doctrine.core.model.DoctrineModelAccess;
 import com.dubture.doctrine.core.model.IDoctrineModelElement;
 import com.dubture.symfony.annotation.parser.antlr.AnnotationCommonTree;
 import com.dubture.symfony.annotation.parser.antlr.AnnotationCommonTreeAdaptor;
@@ -32,8 +27,9 @@ import com.dubture.symfony.annotation.parser.antlr.error.IAnnotationErrorReporte
 
 /**
  * Visits Doctrine Annotations.
- * 
- * 
+ *
+ * Currently indexes Entity classes and their corresponding
+ * repositoryClass. 
  * 
  * @author Robert Gruendler <r.gruendler@gmail.com>
  *
@@ -43,22 +39,13 @@ public class DoctrineIndexingVisitorExtension extends
 		PhpIndexingVisitorExtension {
 
 	private NamespaceDeclaration namespace;
-	private DoctrineModelAccess dmodel = DoctrineModelAccess.getDefault();
-	
-	public DoctrineIndexingVisitorExtension() {
-
-	}
 	
 	@Override
 	public void setSourceModule(ISourceModule module) {
 
 		super.setSourceModule(module);
 
-		
-
 	}
-	
-	
 	
 	@Override
 	public boolean visit(TypeDeclaration s) throws Exception {
@@ -73,7 +60,6 @@ public class DoctrineIndexingVisitorExtension extends
 			NamespaceDeclaration ns = (NamespaceDeclaration) s;
 			namespace = ns;
 		}
-		
 		
 		return true;
 	}
