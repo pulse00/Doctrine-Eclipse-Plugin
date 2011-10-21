@@ -20,6 +20,7 @@ import org.eclipse.php.internal.core.PHPLanguageToolkit;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 
 import com.dubture.doctrine.core.goals.IEntityResolver;
+import com.dubture.doctrine.core.index.ICleanListener;
 
 /**
  * 
@@ -30,7 +31,7 @@ import com.dubture.doctrine.core.goals.IEntityResolver;
  *
  */
 @SuppressWarnings("restriction")
-public class DoctrineModelAccess extends PhpModelAccess {
+public class DoctrineModelAccess extends PhpModelAccess implements ICleanListener {
 
 	private static final String ENTITYRESOLVER_ID = "com.dubture.doctrine.core.entityResolvers";
 	
@@ -147,8 +148,10 @@ public class DoctrineModelAccess extends PhpModelAccess {
 	 */
 	public IType getExtensionType(String classname, IScriptProject project) {
 
-		if (entityCache.get(classname) != null)
-			return (IType) entityCache.get(classname);
+		String key = classname + project.getElementName();
+		
+		if (entityCache.get(key) != null)
+			return (IType) entityCache.get(key);
 					
 		IType type = null;
 		
@@ -157,7 +160,7 @@ public class DoctrineModelAccess extends PhpModelAccess {
 			type = resolver.resolve(classname, project);
 			// first extension wins
 			if (type != null) {
-				entityCache.put(classname, type);
+				entityCache.put(key, type);
 				return type;
 			}
 		}
@@ -193,6 +196,14 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		}
 		
 		return resolvers;		
+		
+	}
+
+	@Override
+	public void clean() {
+
+		entityCache.flush();
+		repoCache.flush();
 		
 	}
 	
