@@ -119,6 +119,7 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 									return null;
 								
 								String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
+								
 								IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 								IType[] types = phpmodel.findTypes(repo, MatchRule.EXACT, 0, 0, scope, null);
 								
@@ -127,8 +128,17 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 									return new RepositoryGoalEvaluator(goal, ttype);
 								}
 								
+								IType repoType = model.getExtensionType(repo, project);
 								
+								if (repoType == null)
+									return null;
+
+								types = phpmodel.findTypes(repoType.getTypeQualifiedName("\\"), MatchRule.EXACT, 0, 0, scope, null);
 								
+								if (types.length == 1) {											
+									IType ttype = types[0];
+									return new RepositoryGoalEvaluator(goal, ttype);
+								}
 							}							
 						}
 					} catch (Exception e) {

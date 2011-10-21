@@ -154,25 +154,6 @@ public class DoctrineIndexingVisitorExtension extends
 					if (repo == null)
 						return;
 
-					PhpModelAccess model = PhpModelAccess.getDefault();
-					
-					IType[] types = model.findTypes(repo, MatchRule.EXACT, 0, 0, SearchEngine.createSearchScope(sourceModule.getScriptProject()), null);
-					
-					
-					
-					// repo class not found, check extensions
-					if (types.length == 0) {
-						
-						IType type = dmodel.getExtensionType(repo, sourceModule.getScriptProject());
-						
-						// can't resolve repo class
-						if (type == null)
-							return;
-					
-						repo = type.getFullyQualifiedName("\\");
-						
-					}
-					
 					ReferenceInfo info = new ReferenceInfo(IDoctrineModelElement.REPOSITORY_CLASS, clazz.sourceStart(), clazz.sourceEnd(), clazz.getName(), repo, qualifier);
 					
 					Logger.debugMSG("indexing repository class: " + clazz.getName() + " => " + repo); 
