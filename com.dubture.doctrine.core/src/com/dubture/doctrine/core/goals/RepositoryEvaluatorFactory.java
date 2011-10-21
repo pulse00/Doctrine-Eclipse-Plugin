@@ -2,8 +2,6 @@ package com.dubture.doctrine.core.goals;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.core.INamespace;
@@ -43,7 +41,7 @@ import com.dubture.doctrine.core.model.Entity;
 @SuppressWarnings("restriction")
 public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 
-	private static final String ENTITYRESOLVER_ID = "com.dubture.doctrine.core.entityResolvers";
+
 	
 
 	@SuppressWarnings("unchecked")
@@ -115,36 +113,21 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 									}
 								}
 								
-								// let the extensions try to resolve the entity
-								IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ENTITYRESOLVER_ID);		
+								IType type = model.getExtensionType(et, project);
 								
-								try {											
-									for (IConfigurationElement element : config) {
-										
-										final Object object = element.createExecutableExtension("class");
-										
-										if (object instanceof IEntityResolver) {
-											
-											IEntityResolver resolver = (IEntityResolver) object;													
-											IType type = resolver.resolve(et, project);
-											
-											if (type == null)
-												continue;
-											
-											String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
-											IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
-											IType[] types = phpmodel.findTypes(repo, MatchRule.EXACT, 0, 0, scope, null);
-											
-											if (types.length == 1) {											
-												IType ttype = types[0];
-												return new RepositoryGoalEvaluator(goal, ttype);
-											}
-										}
-									}
-									
-								} catch (Exception e1) {
-									e1.printStackTrace();
-								}												
+								if (type == null)
+									return null;
+								
+								String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
+								IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
+								IType[] types = phpmodel.findTypes(repo, MatchRule.EXACT, 0, 0, scope, null);
+								
+								if (types.length == 1) {											
+									IType ttype = types[0];
+									return new RepositoryGoalEvaluator(goal, ttype);
+								}
+								
+								
 								
 							}							
 						}

@@ -3,9 +3,12 @@ package com.dubture.doctrine.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.index2.search.ISearchEngine;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.SearchFor;
@@ -15,6 +18,9 @@ import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
+
+import com.dubture.doctrine.core.goals.IEntityResolver;
+import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
 
 /**
  * 
@@ -27,6 +33,7 @@ import org.eclipse.php.internal.core.model.PhpModelAccess;
 @SuppressWarnings("restriction")
 public class DoctrineModelAccess extends PhpModelAccess {
 
+	private static final String ENTITYRESOLVER_ID = "com.dubture.doctrine.core.entityResolvers";
 	
 	private static DoctrineModelAccess modelInstance = null;	
 	
@@ -118,4 +125,34 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		return entities;
 		
 	}
+	
+	public IType getExtensionType(String classname, IScriptProject project) {
+		
+		
+		// let the extensions try to resolve the entity
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ENTITYRESOLVER_ID);		
+		
+		try {											
+			for (IConfigurationElement element : config) {
+				
+				final Object object = element.createExecutableExtension("class");
+				
+				if (object instanceof IEntityResolver) {
+					
+					IEntityResolver resolver = (IEntityResolver) object;													
+					IType type = resolver.resolve(classname, project);
+					
+					return type;
+				}
+			}
+			
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
+		return null;
+		
+	}
+	
+	
 }
