@@ -59,7 +59,7 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		final List<String> repos = new ArrayList<String>();
 		
 		
-		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, "Doctor", 0, 0, 100, SearchFor.REFERENCES, MatchRule.EXACT, scope, new ISearchRequestor() {
+		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, className, 0, 0, 100, SearchFor.REFERENCES, MatchRule.EXACT, scope, new ISearchRequestor() {
 			
 			@Override
 			public void match(int elementType, int flags, int offset, int length,
