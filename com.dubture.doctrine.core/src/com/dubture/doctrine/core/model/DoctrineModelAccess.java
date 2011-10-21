@@ -47,7 +47,7 @@ public class DoctrineModelAccess extends PhpModelAccess {
 	 * @param project
 	 * @return
 	 */
-	public String getRepositoryClass(String className, IScriptProject project) {
+	public String getRepositoryClass(String className, String qualifier, IScriptProject project) {
 		
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
@@ -58,7 +58,8 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
 		final List<String> repos = new ArrayList<String>();
 		
-		engine.search(IModelElement.USER_ELEMENT, null, null, 0, 0, 100, SearchFor.REFERENCES, MatchRule.PREFIX, scope, new ISearchRequestor() {
+		
+		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, "Doctor", 0, 0, 100, SearchFor.REFERENCES, MatchRule.EXACT, scope, new ISearchRequestor() {
 			
 			@Override
 			public void match(int elementType, int flags, int offset, int length,
@@ -66,20 +67,22 @@ public class DoctrineModelAccess extends PhpModelAccess {
 					String metadata, String doc, String qualifier, String parent,
 					ISourceModule sourceModule, boolean isReference) {
 				
-				repos.add(qualifier);
+				if (metadata != null)
+					repos.add(metadata);
 
 			}
 		}, null);
 		
 		
-		if (repos.size() == 1)
+		if (repos.size() == 1) {
 			return repos.get(0);
+		}
 		
 		return null;
 
 	}
 	
-	public List<String> getEntities(IScriptProject project) {
+	public List<Entity> getEntities(IScriptProject project) {
 
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
@@ -88,7 +91,7 @@ public class DoctrineModelAccess extends PhpModelAccess {
 		}
 		
 		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
-		final List<String> entities = new ArrayList<String>();
+		final List<Entity> entities = new ArrayList<Entity>();
 		
 		engine.search(IDoctrineModelElement.ENTITY, null, null, 0, 0, 100, SearchFor.REFERENCES, MatchRule.PREFIX, scope, new ISearchRequestor() {
 			
@@ -98,7 +101,15 @@ public class DoctrineModelAccess extends PhpModelAccess {
 					String metadata, String doc, String qualifier, String parent,
 					ISourceModule sourceModule, boolean isReference) {
 				
-				entities.add(elementName);
+				String name = "";
+				
+				if (qualifier != null)
+					name = qualifier + "\\";
+					
+				name += elementName;
+				Entity e = new Entity(null, name);
+				
+				entities.add(e);
 
 			}
 		}, null);

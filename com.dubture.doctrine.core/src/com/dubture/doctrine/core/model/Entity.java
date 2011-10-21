@@ -3,9 +3,11 @@ package com.dubture.doctrine.core.model;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dltk.ast.Modifiers;
 import org.eclipse.dltk.core.IModelElement;
+import org.eclipse.dltk.core.INamespace;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.internal.core.ModelElement;
+import org.eclipse.dltk.internal.core.SourceNamespace;
 import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.dltk.internal.core.SourceTypeElementInfo;
 import org.eclipse.dltk.internal.core.hierarchy.FakeType;
@@ -69,5 +71,22 @@ public class Entity extends SourceType {
 
 			return "";
 		}		
+	}
+	
+	
+	@Override
+	public INamespace getNamespace() throws ModelException {
+
+		if (getElementName().contains("\\")) {
+
+			String[] parts = getElementName().split("\\\\");
+			
+			if (parts.length > 1) {
+				String[] ns = new String[parts.length -1];				
+				System.arraycopy(parts, 0, ns, 0, ns.length);				
+				return new SourceNamespace(ns);
+			}
+		}
+		return super.getNamespace();
 	}
 }

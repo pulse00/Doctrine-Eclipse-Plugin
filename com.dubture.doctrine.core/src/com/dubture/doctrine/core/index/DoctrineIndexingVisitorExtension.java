@@ -13,6 +13,7 @@ import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.ReferenceInfo;
 import org.eclipse.php.core.index.PhpIndexingVisitorExtension;
 import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
+import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 
 import com.dubture.doctrine.core.model.IDoctrineModelElement;
@@ -36,6 +37,9 @@ import com.dubture.symfony.annotation.parser.antlr.error.IAnnotationErrorReporte
 public class DoctrineIndexingVisitorExtension extends
 		PhpIndexingVisitorExtension {
 
+	
+	private NamespaceDeclaration namespace;
+	
 	public DoctrineIndexingVisitorExtension() {
 
 	}
@@ -59,6 +63,10 @@ public class DoctrineIndexingVisitorExtension extends
 			ClassDeclaration clazz = (ClassDeclaration) s;		
 			parseClassDocBlock(clazz);
 			
+		} else if (s instanceof NamespaceDeclaration) {
+			
+			NamespaceDeclaration ns = (NamespaceDeclaration) s;
+			namespace = ns;
 		}
 		
 		
@@ -126,9 +134,14 @@ public class DoctrineIndexingVisitorExtension extends
 				
 				if ("Entity".equals(visitor.getClassName())) {
 
-					ReferenceInfo entityInfo = new ReferenceInfo(IDoctrineModelElement.ENTITY, clazz.sourceStart(), clazz.sourceEnd(), clazz.getName(), null, null);
+					String qualifier = null;
+					if (namespace != null) {						
+						qualifier = namespace.getName();
+					}
 					
-					System.err.println("indexing entity: " + clazz.getName()); 
+					ReferenceInfo entityInfo = new ReferenceInfo(IDoctrineModelElement.ENTITY, clazz.sourceStart(), clazz.sourceEnd(), clazz.getName(), null, qualifier);
+					
+					System.err.println("indexing entity: " + clazz.getName() + " => " + qualifier); 
 					requestor.addReference(entityInfo);
 					
 					String repo = visitor.getArgument("repositoryClass");
@@ -136,7 +149,7 @@ public class DoctrineIndexingVisitorExtension extends
 					if (repo == null)
 						return;
 					
-					ReferenceInfo info = new ReferenceInfo(IDoctrineModelElement.REPOSITORY_CLASS, clazz.sourceStart(), clazz.sourceEnd(), clazz.getName(), null, repo);
+					ReferenceInfo info = new ReferenceInfo(IDoctrineModelElement.REPOSITORY_CLASS, clazz.sourceStart(), clazz.sourceEnd(), clazz.getName(), repo, qualifier);
 					
 					System.err.println("indexing repository class: " + clazz.getName() + " => " + repo); 
 					requestor.addReference(info);

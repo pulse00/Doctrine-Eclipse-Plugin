@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="entityResolvers" name="Doctrine Entity Resolvers" schema="schema/entityResolvers.exsd"/>
    <extension
          id="doctrineNature"
          name="Doctrine Project Nature"
@@ -16,6 +17,13 @@
       <visitor
             class="com.dubture.doctrine.core.index.DoctrineIndexingVisitorExtension">
       </visitor>
+   </extension>
+   <extension
+         point="org.eclipse.php.core.goalEvaluatorFactories">
+      <factory
+            class="com.dubture.doctrine.core.goals.RepositoryEvaluatorFactory"
+            priority="100">
+      </factory>
    </extension>
 
 </plugin>
