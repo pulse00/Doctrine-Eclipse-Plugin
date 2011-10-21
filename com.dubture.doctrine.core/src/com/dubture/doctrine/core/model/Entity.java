@@ -10,6 +10,14 @@ import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.dltk.internal.core.SourceTypeElementInfo;
 import org.eclipse.dltk.internal.core.hierarchy.FakeType;
 
+/**
+ * 
+ * A Doctrine2 Entity implemented as {@link SourceType}.
+ * 
+ * 
+ * @author Robert Gruendler <r.gruendler@gmail.com>
+ *
+ */
 @SuppressWarnings("restriction")
 public class Entity extends SourceType {
 
@@ -27,7 +35,6 @@ public class Entity extends SourceType {
 	@Override
 	public Object getElementInfo() throws ModelException {
 
-		System.err.println("element info");
 		return new FakeTypeElementInfo();
 	}
 
