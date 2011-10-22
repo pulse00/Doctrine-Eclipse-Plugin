@@ -8,7 +8,14 @@ Bundle-Vendor: DUBTURE
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
- com.dubture.doctrine.core
+ com.dubture.doctrine.core,
+ org.eclipse.dltk.core,
+ org.eclipse.php.core,
+ org.eclipse.php.ui,
+ org.eclipse.dltk.ui,
+ org.eclipse.jface.text,
+ org.eclipse.wst.sse.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
