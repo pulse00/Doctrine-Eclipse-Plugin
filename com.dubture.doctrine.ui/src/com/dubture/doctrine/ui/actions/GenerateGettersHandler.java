@@ -37,11 +37,13 @@ import org.eclipse.php.internal.core.ast.nodes.Assignment;
 import org.eclipse.php.internal.core.ast.nodes.Block;
 import org.eclipse.php.internal.core.ast.nodes.ClassDeclaration;
 import org.eclipse.php.internal.core.ast.nodes.ExpressionStatement;
+import org.eclipse.php.internal.core.ast.nodes.FieldAccess;
 import org.eclipse.php.internal.core.ast.nodes.FormalParameter;
 import org.eclipse.php.internal.core.ast.nodes.FunctionDeclaration;
 import org.eclipse.php.internal.core.ast.nodes.Identifier;
 import org.eclipse.php.internal.core.ast.nodes.MethodDeclaration;
 import org.eclipse.php.internal.core.ast.nodes.Program;
+import org.eclipse.php.internal.core.ast.nodes.ReturnStatement;
 import org.eclipse.php.internal.core.ast.nodes.Statement;
 import org.eclipse.php.internal.core.ast.nodes.Variable;
 import org.eclipse.php.internal.ui.actions.SelectionHandler;
@@ -259,8 +261,14 @@ public class GenerateGettersHandler extends SelectionHandler implements
 		
 		for (GetterSetterEntry entry : entries) {
 			
-			List<FormalParameter> params = new ArrayList<FormalParameter>();
-			Block block = ast.newBlock();
+			List<FormalParameter> params = new ArrayList<FormalParameter>();			
+			List<Statement> statements = new ArrayList<Statement>();
+			
+			Variable left = ast.newVariable("this");
+			Variable right = ast.newVariable(entry.getRawFieldName());
+			right.setIsDollared(false);
+			FieldAccess access = ast.newFieldAccess(left, right);
+
 			
 			if (!entry.isGetter) {
 				
@@ -271,18 +279,23 @@ public class GenerateGettersHandler extends SelectionHandler implements
 				params.add(param);
 				
 				Assignment assignment = ast.newAssignment();
-				assignment.setLeftHandSide(ast.newVariable("this->" + entry.getRawFieldName()));
+				
+				assignment.setLeftHandSide(access);
 				assignment.setOperator(Assignment.OP_EQUAL);
 				assignment.setRightHandSide(ast.newVariable(entry.getRawFieldName()));
 								
-				List<Statement> statements = new ArrayList<Statement>();
 				ExpressionStatement statement = ast.newExpressionStatement(assignment);
 				statements.add(statement);
 				
-				block = ast.newBlock(statements);
+				
+			} else {
+				
+				ReturnStatement returnStatement = ast.newReturnStatement(access);
+				statements.add(returnStatement);
 				
 			}
 			
+			Block block = ast.newBlock(statements);
 			
 			String identifier = entry.getIdentifier();
 			Identifier methodIdentifier = ast.newIdentifier(identifier);
@@ -309,31 +322,28 @@ public class GenerateGettersHandler extends SelectionHandler implements
 						.getScriptProject()
 						.getProject()),
 						InstanceScope.INSTANCE, DefaultScope.INSTANCE };
+		
 		for (int i = 0; i < contents.length; i++) {
+			
 			IScopeContext scopeContext = contents[i];
-			IEclipsePreferences inode = scopeContext
-					.getNode(PHPCorePlugin.ID);
+			IEclipsePreferences inode = scopeContext.getNode(PHPCorePlugin.ID);
+			
 			if (inode != null) {
-				if (!options
-						.containsKey(PHPCoreConstants.FORMATTER_USE_TABS)) {
-					String useTabs = inode
-							.get(PHPCoreConstants.FORMATTER_USE_TABS,
-									null);
+				
+				if (!options.containsKey(PHPCoreConstants.FORMATTER_USE_TABS)) {
+					
+					String useTabs = inode.get(PHPCoreConstants.FORMATTER_USE_TABS,null);
 					if (useTabs != null) {
-						options.put(
-								PHPCoreConstants.FORMATTER_USE_TABS,
-								useTabs);
+						options.put(PHPCoreConstants.FORMATTER_USE_TABS, useTabs);
 					}
 				}
-				if (!options
-						.containsKey(PHPCoreConstants.FORMATTER_INDENTATION_SIZE)) {
-					String size = inode
-							.get(PHPCoreConstants.FORMATTER_INDENTATION_SIZE,
-									null);
+				
+				if (!options.containsKey(PHPCoreConstants.FORMATTER_INDENTATION_SIZE)) {
+					
+					String size = inode.get(PHPCoreConstants.FORMATTER_INDENTATION_SIZE,null);
+					
 					if (size != null) {
-						options.put(
-								PHPCoreConstants.FORMATTER_INDENTATION_SIZE,
-								size);
+						options.put(PHPCoreConstants.FORMATTER_INDENTATION_SIZE,size);
 					}
 				}
 			}
