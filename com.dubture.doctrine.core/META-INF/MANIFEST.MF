@@ -14,4 +14,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.dubture.doctrine.core,
  com.dubture.doctrine.core.goals,
- com.dubture.doctrine.core.model
+ com.dubture.doctrine.core.model,
+ com.dubture.doctrine.core.util
