@@ -10,6 +10,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -245,7 +246,7 @@ public class GenerateGettersHandler extends SelectionHandler implements
 		ASTParser parser = ASTParser.newParser(source);
 		parser.setSource(document.get().toCharArray());
 		
-		Program program = parser.createAST(null);			
+		Program program = parser.createAST(new NullProgressMonitor());			
 		program.recordModifications();		
 		AST ast = program.getAST();		
 

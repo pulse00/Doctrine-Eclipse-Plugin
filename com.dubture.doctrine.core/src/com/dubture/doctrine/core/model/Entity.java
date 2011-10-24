@@ -26,6 +26,7 @@ public class Entity extends SourceType {
 	public Entity(ModelElement parent, String name) {
 		super(parent, name);
 		
+		
 	}
 	
 	
@@ -109,9 +110,14 @@ public class Entity extends SourceType {
 	@Override
 	public String getFullyQualifiedName() {
 
+		
 		if (this.name.contains("\\")) {
 			return this.name;
 		}
+		
+		if (this.parent == null)
+			return "";
+
 		
 		return super.getFullyQualifiedName();
 	}
