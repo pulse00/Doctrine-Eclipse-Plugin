@@ -273,8 +273,13 @@ public class GenerateGettersHandler extends SelectionHandler implements
 			
 			if (!entry.isGetter) {
 				
-				String type = entry.getType();
-				Identifier paramID = ast.newIdentifier(type);
+				
+				String type = entry.getType();				
+				Identifier paramID = null;
+				
+				if (type != null)
+					paramID = ast.newIdentifier(type);
+ 				
 				Variable var = ast.newVariable(entry.getRawFieldName());
 				FormalParameter param = ast.newFormalParameter(paramID, var, null, true);
 				params.add(param);
