@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dltk.ast.references.SimpleReference;
-import org.eclipse.dltk.core.Flags;
 import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.IType;
@@ -18,6 +17,8 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocTag;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPFieldDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
+
+import com.dubture.doctrine.ui.templates.CodeGeneration;
 
 /**
  * 
@@ -145,13 +146,17 @@ public class GetterSetterUtil {
 		String fieldName= field.getElementName();
 		IType parentType= field.getDeclaringType();
 		
+		
 		String typeName= "function";
-		String accessorName = "accessorName";
+		String accessorName = field.getType();
+		
+		if (accessorName == null)
+			accessorName = "unknown_type";
 		
 		String lineDelim= "\n"; // Use default line delimiter, as generated stub has to be formatted anyway //$NON-NLS-1$
 		StringBuffer buf= new StringBuffer();
 		if (addComments) {
-			String comment= org.eclipse.php.ui.CodeGeneration.getGetterComment(field.getScriptProject(), parentType.getFullyQualifiedName(), getterName, field.getElementName(), typeName, accessorName, lineDelim);
+			String comment= CodeGeneration.getGetterComment(field.getScriptProject(), parentType.getFullyQualifiedName(), getterName, field.getElementName(), typeName, accessorName, lineDelim);
 			if (comment != null) {
 				buf.append(comment);
 				buf.append(lineDelim);
@@ -194,12 +199,15 @@ public class GetterSetterUtil {
 		String fieldName= field.getElementName();
 		IType parentType= field.getDeclaringType();
 		IScriptProject project= field.getScriptProject();
-		String accessorName = "accessor";
+		String accessorName = fieldName;
+		
+		String commentTypeName = typeName != null ? typeName : "unknown_type";
+			
 
 		String lineDelim= "\n"; // Use default line delimiter, as generated stub has to be formatted anyway //$NON-NLS-1$
 		StringBuffer buf= new StringBuffer();
 		if (addComments) {
-			String comment= org.eclipse.php.ui.CodeGeneration.getSetterComment(project, parentType.getFullyQualifiedName(), setterName, field.getElementName(), typeName, fieldName, accessorName, lineDelim);
+			String comment= org.eclipse.php.ui.CodeGeneration.getSetterComment(project, parentType.getFullyQualifiedName(), setterName, field.getElementName(), commentTypeName, fieldName, accessorName, lineDelim);
 			if (comment != null) {
 				buf.append(comment);
 				buf.append(lineDelim);

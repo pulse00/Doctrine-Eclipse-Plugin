@@ -15,8 +15,6 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
-import org.eclipse.php.internal.ui.corext.template.php.CodeTemplateContext;
-import org.eclipse.php.internal.ui.corext.template.php.CodeTemplateContextType;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -27,21 +25,24 @@ import com.dubture.doctrine.ui.DoctrineUIPlugin;
 public class StubUtility {
 
 	
-	public static String getGetterMethodBodyContent(IScriptProject project,
-			String destTypeName, String methodName, String fieldName,
-			String lineDelimiter) throws CoreException {
-		String templateName = CodeTemplateContextType.GETTERSTUB_ID;
-		Template template = getCodeTemplate(templateName, project);
+	/*
+	 * Don't use this method directly, use CodeGeneration.
+	 * 
+	 * @see org.eclipse.jdt.ui.CodeGeneration#getGetterComment(ICompilationUnit,
+	 * String, String, String, String, String, String)
+	 */
+	public static String getGetterComment(IScriptProject sp, String typeName,
+			String methodName, String fieldName, String fieldType,
+			String bareFieldName, String lineDelimiter) throws CoreException {
+		String templateName = CodeTemplateContextType.GETTERCOMMENT_ID;
+		Template template = getCodeTemplate(templateName, sp);
 		if (template == null) {
 			return null;
 		}
 		CodeTemplateContext context = new CodeTemplateContext(template
-				.getContextTypeId(), project, lineDelimiter);
-		context.setVariable(CodeTemplateContextType.ENCLOSING_METHOD,
-				methodName);
-		context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE,
-				destTypeName);
-		context.setVariable(CodeTemplateContextType.FIELD, fieldName);
+				.getContextTypeId(), sp, lineDelimiter);
+		context.setVariable(CodeTemplateContextType.FIELD_TYPE, fieldType);
+		context.setVariable(CodeTemplateContextType.BARE_FIELD_NAME, bareFieldName);
 
 		return evaluateTemplate(context, template);
 	}
@@ -149,6 +150,5 @@ public class StubUtility {
 		return null;
 	}
 	
-
 
 }

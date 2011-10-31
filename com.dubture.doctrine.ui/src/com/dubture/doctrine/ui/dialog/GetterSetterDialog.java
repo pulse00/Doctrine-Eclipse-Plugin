@@ -36,6 +36,7 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
 	
 	private final IType type;	
 	private int visibility;
+	private boolean comments;
 	private Button generateComments;
 	
 	private static class ExistingGetterSetterFilter extends ViewerFilter {
@@ -128,7 +129,15 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
          }		
          
          generateComments = new Button(parent, SWT.CHECK);
-         generateComments.setText("Generate element comments");                  
+         generateComments.setText("Generate element comments");
+         
+         generateComments.addSelectionListener(new SelectionAdapter() {
+        	 
+        	 @Override
+        	public void widgetSelected(SelectionEvent e) {
+        		 comments = generateComments.getSelection();
+        	}
+         });
          
 		return control;		
 		
@@ -137,7 +146,7 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
 	
 	public boolean doGenerateComments() {
 		
-		return generateComments.getSelection();
+		return comments;
 		
 	}
 	

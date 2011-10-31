@@ -23,10 +23,15 @@ public class CodeTemplateContextType extends ScriptTemplateContextType {
 	
 	
 	private static final String CODETEMPLATES_PREFIX = "com.dubture.doctrine.codetemplates."; //$NON-NLS-1$
+	public static final String COMMENT_SUFFIX = "comment"; //$NON-NLS-1$
 	
 	public static final String GETTER_STUB_ID = CODETEMPLATES_PREFIX
-			+ "getter_stub"; //$NON-NLS-1$
-
+			+ "getter_stub"; //$NON-NLS-1$	
+	public static final String GETTERCOMMENT_ID = CODETEMPLATES_PREFIX
+			+ "getter" + COMMENT_SUFFIX; //$NON-NLS-1$
+	
+	public static final String FIELD_TYPE = "field_name";  //$NON-NLS-1$
+	public static final String BARE_FIELD_NAME = "bare_field_name";  //$NON-NLS-1$
 	
 
 	public CodeTemplateContextType(String contextName) {
