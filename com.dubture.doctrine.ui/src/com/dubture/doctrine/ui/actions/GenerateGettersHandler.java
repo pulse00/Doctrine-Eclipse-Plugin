@@ -32,22 +32,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.php.internal.core.PHPCoreConstants;
 import org.eclipse.php.internal.core.PHPCorePlugin;
-import org.eclipse.php.internal.core.ast.nodes.AST;
 import org.eclipse.php.internal.core.ast.nodes.ASTNode;
 import org.eclipse.php.internal.core.ast.nodes.ASTParser;
-import org.eclipse.php.internal.core.ast.nodes.Assignment;
 import org.eclipse.php.internal.core.ast.nodes.Block;
 import org.eclipse.php.internal.core.ast.nodes.ClassDeclaration;
-import org.eclipse.php.internal.core.ast.nodes.ExpressionStatement;
-import org.eclipse.php.internal.core.ast.nodes.FieldAccess;
-import org.eclipse.php.internal.core.ast.nodes.FormalParameter;
-import org.eclipse.php.internal.core.ast.nodes.FunctionDeclaration;
-import org.eclipse.php.internal.core.ast.nodes.Identifier;
-import org.eclipse.php.internal.core.ast.nodes.MethodDeclaration;
 import org.eclipse.php.internal.core.ast.nodes.Program;
-import org.eclipse.php.internal.core.ast.nodes.ReturnStatement;
 import org.eclipse.php.internal.core.ast.nodes.Statement;
-import org.eclipse.php.internal.core.ast.nodes.Variable;
+import org.eclipse.php.internal.core.format.FormatPreferencesSupport;
 import org.eclipse.php.internal.ui.actions.SelectionHandler;
 import org.eclipse.php.internal.ui.editor.PHPStructuredEditor;
 import org.eclipse.swt.graphics.Image;
@@ -56,9 +47,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.dubture.doctrine.core.util.GetterSetterUtil;
 import com.dubture.doctrine.ui.dialog.GetterSetterDialog;
-import com.dubture.doctrine.ui.templates.CodeGeneration;
+import com.dubture.doctrine.ui.util.GetterSetterUtil;
 
 /**
  * 
@@ -77,15 +67,12 @@ public class GenerateGettersHandler extends SelectionHandler implements
 	private Map options;
 	private SourceType type;
 	private String lineDelim;
-
 	
 	
 	@SuppressWarnings("rawtypes")
 	private static class GetterSetterContentProvider implements ITreeContentProvider {
 
-		
 		private Map fields;
-
 		private static final Object[] EMPTY = new Object[0];
 		
 		public GetterSetterContentProvider(Map fields) {
@@ -101,8 +88,7 @@ public class GenerateGettersHandler extends SelectionHandler implements
 
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			
-			
+						
 		}
 
 		@Override
@@ -139,8 +125,6 @@ public class GenerateGettersHandler extends SelectionHandler implements
 			return getChildren(element).length > 0;
 
 		}
-		
-		
 	}
 	
 	private class GetterSetterLabelProvider extends LabelProvider {
@@ -224,7 +208,7 @@ public class GenerateGettersHandler extends SelectionHandler implements
 					}
 				}
 				
-				generate(entries, dialog.getModifier());
+				generate(entries, dialog.getModifier(), dialog.doGenerateComments());
 				
 			}
 			
@@ -237,7 +221,7 @@ public class GenerateGettersHandler extends SelectionHandler implements
 	}
 	
 	
-	private void generate(final List<GetterSetterEntry> entries, final int modifier) throws Exception {
+	private void generate(final List<GetterSetterEntry> entries, final int modifier, final boolean generateComments) throws Exception {
 
 		ISourceModule source = type.getSourceModule();			
 		String name = type.getElementName().replace("$", "");			
@@ -249,8 +233,8 @@ public class GenerateGettersHandler extends SelectionHandler implements
 		parser.setSource(document.get().toCharArray());
 		
 		Program program = parser.createAST(new NullProgressMonitor());			
-		program.recordModifications();		
-		AST ast = program.getAST();		
+//		program.recordModifications();		
+//		AST ast = program.getAST();		
 
 		ISourceRange range = type.getSourceRange();		
 		ASTNode node = program.getElementAt(range.getOffset());
@@ -259,92 +243,53 @@ public class GenerateGettersHandler extends SelectionHandler implements
 			return ;				
 		}
 		
+		char indentChar = FormatPreferencesSupport.getInstance().getIndentationChar(document);
+		String indent = String.valueOf(indentChar);
+		
 		ClassDeclaration clazz = (ClassDeclaration) node;
 		Block body = clazz.getBody();
-		
 		List<Statement> bodyStatements = body.statements();
 		
 		int end = bodyStatements.get(bodyStatements.size()-1).getEnd();
-
 		lineDelim = TextUtilities.getDefaultLineDelimiter(document);
 		
+		
+		int i = 0;
 		for (GetterSetterEntry entry : entries) {
 			
-			List<FormalParameter> params = new ArrayList<FormalParameter>();			
-			List<Statement> statements = new ArrayList<Statement>();
-			
-			Variable left = ast.newVariable("this");
-			Variable right = ast.newVariable(entry.getRawFieldName());
-			right.setIsDollared(false);
-			FieldAccess access = ast.newFieldAccess(left, right);
-
+			String code = "";
 			
 			if (!entry.isGetter) {
-				
-				
-				String type = entry.getType();				
-				Identifier paramID = null;
-				
-				if (type != null)
-					paramID = ast.newIdentifier(type);
- 				
-				Variable var = ast.newVariable(entry.getRawFieldName());
-				FormalParameter param = ast.newFormalParameter(paramID, var, null, true);
-				params.add(param);
-				
-				Assignment assignment = ast.newAssignment();
-				
-				assignment.setLeftHandSide(access);
-				assignment.setOperator(Assignment.OP_EQUAL);
-				assignment.setRightHandSide(ast.newVariable(entry.getRawFieldName()));
-								
-				ExpressionStatement statement = ast.newExpressionStatement(assignment);
-				statements.add(statement);
-				
+				code = GetterSetterUtil.getSetterStub(entry.field, 
+						entry.getIdentifier(), entry.getType(), generateComments, modifier, indent);
 				
 			} else {
-				
-				ReturnStatement returnStatement = ast.newReturnStatement(access);
-				statements.add(returnStatement);
-				
+				code = GetterSetterUtil.getGetterStub(entry.field, 
+						entry.getIdentifier(), generateComments, modifier, indent);				
+			}		
+			
+			code = lineDelim + code;
+			String formatted = indentPattern(code, indent, lineDelim);
+			
+			if (i++ == 0) {
+				formatted = lineDelim + formatted;
 			}
 			
-			Block block = ast.newBlock(statements);
+			document.replace(end, 0, formatted);
+			end += formatted.length();
 			
-			String identifier = entry.getIdentifier();
-			Identifier methodIdentifier = ast.newIdentifier(identifier);
-			FunctionDeclaration function = ast.newFunctionDeclaration(methodIdentifier, params, block, false);
-			
-			MethodDeclaration method = ast.newMethodDeclaration(modifier, function);			
-			body.statements().add(method);
-			
-			StringBuffer b = new StringBuffer();
-			String tab = "\\t"; 
-			method.toString(b, tab);
-			
-			
-			
-			
-//			String generated = CodeGeneration.getGetterMethodBodyContent(type.getScriptProject(), type.getElementName(), access.toString(), entry.getName(), lineDelim);
-//						
-//
-//			document.replace(end, 0, generated);
-			
-//			System.err.println(generated);
-			
-			
-		}
-		
-		String code = CodeGeneration.getMethodBodyContent(true, type.getScriptProject(), type.getElementName(), "some", "statement", lineDelim);
-		
-		System.err.println("code:");
-		System.err.println(code);
-		
-		
-//		TextEdit edits = program.rewrite(document, options);
-//		edits.apply(document);		
-		
+		}				
 	}
+	
+	private String indentPattern(String originalPattern, String indentation,
+			String lineDelim) {
+		
+		String delimPlusIndent = lineDelim + indentation;
+		String indentedPattern = originalPattern.replaceAll(lineDelim,delimPlusIndent) + delimPlusIndent;
+
+		return indentedPattern;
+	}
+	
 
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
