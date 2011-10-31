@@ -69,5 +69,16 @@
          </command>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="com.dubture.doctrine.ui.templates.DoctrineContextType"
+            id="doctrine">
+      </contextType>
+      <include
+            file="templates/doctrinedefault-templates.xml"
+            translations="templates/doctrinedefault-templates.properties">
+      </include>
+   </extension>
 
 </plugin>

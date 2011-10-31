@@ -25,6 +25,7 @@ import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.dltk.ui.DLTKUIPlugin;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -51,13 +52,13 @@ import org.eclipse.php.internal.ui.actions.SelectionHandler;
 import org.eclipse.php.internal.ui.editor.PHPStructuredEditor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.dubture.doctrine.core.util.GetterSetterUtil;
 import com.dubture.doctrine.ui.dialog.GetterSetterDialog;
+import com.dubture.doctrine.ui.templates.CodeGeneration;
 
 /**
  * 
@@ -75,6 +76,7 @@ public class GenerateGettersHandler extends SelectionHandler implements
 	private IDocument document;
 	private Map options;
 	private SourceType type;
+	private String lineDelim;
 
 	
 	
@@ -260,6 +262,12 @@ public class GenerateGettersHandler extends SelectionHandler implements
 		ClassDeclaration clazz = (ClassDeclaration) node;
 		Block body = clazz.getBody();
 		
+		List<Statement> bodyStatements = body.statements();
+		
+		int end = bodyStatements.get(bodyStatements.size()-1).getEnd();
+
+		lineDelim = TextUtilities.getDefaultLineDelimiter(document);
+		
 		for (GetterSetterEntry entry : entries) {
 			
 			List<FormalParameter> params = new ArrayList<FormalParameter>();			
@@ -310,10 +318,31 @@ public class GenerateGettersHandler extends SelectionHandler implements
 			MethodDeclaration method = ast.newMethodDeclaration(modifier, function);			
 			body.statements().add(method);
 			
+			StringBuffer b = new StringBuffer();
+			String tab = "\\t"; 
+			method.toString(b, tab);
+			
+			
+			
+			
+//			String generated = CodeGeneration.getGetterMethodBodyContent(type.getScriptProject(), type.getElementName(), access.toString(), entry.getName(), lineDelim);
+//						
+//
+//			document.replace(end, 0, generated);
+			
+//			System.err.println(generated);
+			
+			
 		}
 		
-		TextEdit edits = program.rewrite(document, options);
-		edits.apply(document);		
+		String code = CodeGeneration.getMethodBodyContent(true, type.getScriptProject(), type.getElementName(), "some", "statement", lineDelim);
+		
+		System.err.println("code:");
+		System.err.println(code);
+		
+		
+//		TextEdit edits = program.rewrite(document, options);
+//		edits.apply(document);		
 		
 	}
 

@@ -1,0 +1,6 @@
+<templates>
+<!-- Code templates : -->
+
+<template name="getter_stub" id="com.dubture.doctrine.codetemplates.getter_stub" description="%CodeTemplates.gettercomment" context="doctrine_getter_stub_context" enabled="true">/** * @return %CodeTemplates.gettercomment.returntagcontent */</template>
+</templates>
+
