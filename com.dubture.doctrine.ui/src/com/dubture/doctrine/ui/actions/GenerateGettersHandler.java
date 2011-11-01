@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IMember;
+import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceRange;
@@ -67,6 +68,9 @@ public class GenerateGettersHandler extends SelectionHandler implements
 	private Map options;
 	private SourceType type;
 	private String lineDelim;
+	private boolean insertFirst = false;
+	private boolean insertLast = false;
+	private IMethod insertAfter = null;
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -208,6 +212,12 @@ public class GenerateGettersHandler extends SelectionHandler implements
 					}
 				}
 				
+				if (dialog.insertAsFirstMember())
+					insertFirst = true;
+				else if (dialog.insertAsLastMember())
+					insertLast = true;
+				else insertAfter = dialog.getInsertionPoint();
+				
 				generate(entries, dialog.getModifier(), dialog.doGenerateComments());
 				
 			}
@@ -249,8 +259,20 @@ public class GenerateGettersHandler extends SelectionHandler implements
 		ClassDeclaration clazz = (ClassDeclaration) node;
 		Block body = clazz.getBody();
 		List<Statement> bodyStatements = body.statements();
-		
+				
 		int end = bodyStatements.get(bodyStatements.size()-1).getEnd();
+		
+		if (insertFirst) {			
+			end = bodyStatements.get(0).getStart();
+		} else if (insertAfter != null) {		
+			for (IMethod method : type.getMethods()) {				
+				if (method == insertAfter) {
+					ISourceRange r = method.getSourceRange();
+					end = r.getOffset() + r.getLength();
+				}
+			}
+		}
+		
 		lineDelim = TextUtilities.getDefaultLineDelimiter(document);
 		
 		

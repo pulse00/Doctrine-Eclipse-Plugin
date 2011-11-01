@@ -15,9 +15,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.CheckedTreeSelectionDialog;
 
@@ -38,6 +40,8 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
 	private int visibility;
 	private boolean comments;
 	private Button generateComments;
+	private Combo insertionPoint;
+	private int insertAfter;
 	
 	private static class ExistingGetterSetterFilter extends ViewerFilter {
 
@@ -79,17 +83,40 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
 		}		
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.dialogs.CheckedTreeSelectionDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		// TODO Auto-generated method stub
+
 		Control control = super.createDialogArea(parent);
 		
+		Label insertLabel = new Label(parent, SWT.NONE);
+		insertLabel.setText("Insertion point");
+        insertionPoint = new Combo(parent, SWT.READ_ONLY);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        insertionPoint.setLayoutData(gd);
+        
+        insertionPoint.add("First member");
+        insertionPoint.add("Last member");
+        
+        try {
+       	 for (IMethod method : type.getMethods()) {
+       		 insertionPoint.add(String.format("after '%s()'", method.getElementName()));
+       	 }
+        } catch (ModelException e1) {
+
+        }
+        
+        insertionPoint.addSelectionListener(new SelectionAdapter() {
+       	 
+			@Override
+       	public void widgetSelected(SelectionEvent e) {        		
+       		 insertAfter = insertionPoint.getSelectionIndex();        		 
+       	}
+        });
+        
+        insertionPoint.select(1);
+		
 		Group group = new Group(parent, SWT.NONE);
-		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd = new GridData(GridData.FILL_BOTH);
         group.setLayoutData(gd);
 		group.setText("Access modifiers");
 		GridLayout layout = new GridLayout();
@@ -106,7 +133,7 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
                  new Integer(Modifiers.AccProtected),
                  new Integer(Modifiers.AccPrivate) };
          
-         
+                  
          visibility = Modifiers.AccPublic;
          Integer initialVisibility = new Integer(visibility);
          
@@ -178,5 +205,35 @@ public class GetterSetterDialog extends CheckedTreeSelectionDialog {
 
 		return visibility;
 
+	}
+	
+	public IMethod getInsertionPoint() {
+
+		try {
+			int i = insertAfter - 2;
+			
+			IMethod[] methods = type.getMethods();
+			
+			if (insertAfter > 1)
+				return methods[i];
+			
+		} catch (ModelException e) {
+
+			e.printStackTrace();
+		}
+
+		return null;
+		
+	}
+	
+	public boolean insertAsFirstMember() {
+		
+		return insertAfter == 0;
+	}
+	
+	public boolean insertAsLastMember() {
+		
+		return insertAfter == 1;
+		
 	}
 }
