@@ -3,7 +3,7 @@
       id="com.dubture.doctrine.feature"
       label="Doctrine Feature"
       version="1.0.0.qualifier"
-      provider-name="dubture.com">
+      provider-name="https://github.com/pulse00">
 
    <description url="https://github.com/pulse00/Doctrine-Eclipse-Plugin">
       Adds some codeassist capabilities for the Doctrine ORM.

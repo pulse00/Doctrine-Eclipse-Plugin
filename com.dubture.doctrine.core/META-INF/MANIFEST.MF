@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Core
+Bundle-Name: Doctrine Core Plugin
 Bundle-SymbolicName: com.dubture.doctrine.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.dubture.doctrine.core.DoctrineCorePlugin
-Bundle-Vendor: dubture.com
+Bundle-Vendor: https://github.com/pulse00
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.dltk.core,

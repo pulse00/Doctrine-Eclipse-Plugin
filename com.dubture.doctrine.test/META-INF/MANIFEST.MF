@@ -6,5 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: https://github.com/pulse00
 Fragment-Host: com.dubture.doctrine.core;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="4.8.2",
- com.dubture.doctrine.ui;bundle-version="1.0.0"
+Require-Bundle: org.junit;bundle-version="4.8.2"
