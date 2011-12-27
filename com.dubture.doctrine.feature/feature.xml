@@ -2,7 +2,7 @@
 <feature
       id="com.dubture.doctrine.feature"
       label="Doctrine Feature"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="https://github.com/pulse00">
 
    <description url="https://github.com/pulse00/Doctrine-Eclipse-Plugin">
@@ -21,14 +21,14 @@
          id="com.dubture.doctrine.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="com.dubture.doctrine.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.1.qualifier"
          unpack="false"/>
 
 </feature>
