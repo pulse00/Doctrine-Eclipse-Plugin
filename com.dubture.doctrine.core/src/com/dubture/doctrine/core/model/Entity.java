@@ -34,8 +34,26 @@ public class Entity extends SourceType {
 	public String getElementName() {
 	
 		if (this.name.contains("\\")) {			
-			String[] parts = this.name.split("\\\\");			
-			return parts[parts.length-1];
+			String[] parts = this.name.split("\\\\");
+			
+			StringBuilder builder = new StringBuilder();
+			
+			boolean build = false;
+			for (int i=0; i < parts.length; i++) {
+			    
+			    if (parts[i].equals("Entity")) {
+			        build = true;
+			        continue;
+			    }
+			    
+			    if (build) {
+			        builder.append(parts[i]);
+			        builder.append("\\");
+			    }			    
+			}
+			
+			String name = builder.toString();
+			return name.substring(0, name.length()-1);
 			
 		}
 		

@@ -2,6 +2,8 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+    <!-- this is pretty useless so far -->
+    <!--
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
@@ -25,6 +27,7 @@
          </action>
       </objectContribution>
    </extension>
+   -->
 
    <extension
          point="org.eclipse.ui.editors.templates">
