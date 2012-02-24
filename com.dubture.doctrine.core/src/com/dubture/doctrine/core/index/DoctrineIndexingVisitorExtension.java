@@ -17,12 +17,12 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.IDoctrineModelElement;
-import com.dubture.symfony.annotation.parser.antlr.AnnotationCommonTree;
-import com.dubture.symfony.annotation.parser.antlr.AnnotationCommonTreeAdaptor;
 import com.dubture.symfony.annotation.parser.antlr.AnnotationLexer;
-import com.dubture.symfony.annotation.parser.antlr.AnnotationNodeVisitor;
 import com.dubture.symfony.annotation.parser.antlr.AnnotationParser;
 import com.dubture.symfony.annotation.parser.antlr.error.IAnnotationErrorReporter;
+import com.dubture.symfony.annotation.parser.tree.AnnotationCommonTree;
+import com.dubture.symfony.annotation.parser.tree.AnnotationCommonTreeAdaptor;
+import com.dubture.symfony.annotation.parser.tree.visitor.AnnotationNodeVisitor;
 
 
 /**
