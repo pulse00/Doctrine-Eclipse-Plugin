@@ -16,6 +16,7 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
 
 import com.dubture.doctrine.core.log.Logger;
+import com.dubture.doctrine.core.model.Entity;
 import com.dubture.doctrine.core.model.IDoctrineModelElement;
 import com.dubture.symfony.annotation.model.Annotation;
 import com.dubture.symfony.annotation.model.ArgumentValueType;
@@ -50,6 +51,25 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
 
         this.sourceModule = module;
         this.parser = createParser(PHPDOC_TAGS_EXTRA);
+        indexPendingEntities();
+        
+    }
+    
+    protected void indexPendingEntities() 
+    {
+        List<Entity> pending = DoctrineBuilder.getPendingEntities();
+        
+        for (Entity entity : pending) {
+
+            ReferenceInfo entityInfo = new ReferenceInfo(IDoctrineModelElement.ENTITY,
+                    0,
+                    0,
+                    entity.getElementName(),
+                    null,
+                    entity.getFullyQualifiedName());
+            
+            requestor.addReference(entityInfo);
+        }
     }
 
     @Override

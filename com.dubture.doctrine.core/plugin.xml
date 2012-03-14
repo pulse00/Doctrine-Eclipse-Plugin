@@ -11,6 +11,9 @@
                class="com.dubture.doctrine.core.DoctrineNature">
          </run>
       </runtime>
+      <builder
+            id="com.dubture.doctrine.core.doctrineBuilder">
+      </builder>
    </extension>
    <extension
          point="org.eclipse.php.core.phpIndexingVisitors">
@@ -24,6 +27,17 @@
             class="com.dubture.doctrine.core.goals.RepositoryEvaluatorFactory"
             priority="100">
       </factory>
+   </extension>
+   <extension
+         id="doctrineBuilder"
+         name="Doctrine Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="com.dubture.doctrine.core.index.DoctrineBuilder">
+         </run>
+      </builder>
    </extension>
 
 </plugin>

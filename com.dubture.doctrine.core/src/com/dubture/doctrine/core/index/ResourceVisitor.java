@@ -1,0 +1,51 @@
+package com.dubture.doctrine.core.index;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
+
+/**
+ * 
+ */
+public class ResourceVisitor implements IResourceVisitor, IResourceDeltaVisitor
+{
+
+    @Override
+    public boolean visit(IResource resource) throws CoreException
+    {
+        if (resource instanceof IFile) {
+            handleResource((IFile) resource);
+            return false;
+        }
+        
+        return true;
+    }
+
+    @Override
+    public boolean visit(IResourceDelta delta) throws CoreException
+    {
+        IResource resource = delta.getResource();
+        if (resource instanceof IFile) {
+            handleResource((IFile) resource);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    
+    protected void handleResource(IFile resource)
+    {
+        try {
+            if ("xml".equals(resource.getFileExtension())) {
+                XmlMappingParser parser = new XmlMappingParser(resource.getContents());
+                parser.parse();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
