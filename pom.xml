@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.dubture.doctrine</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.3.qualifier</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>com.dubture.doctrine.core</module>
+    <module>com.dubture.doctrine.ui</module>
+    <module>com.dubture.doctrine.feature</module> 
+  </modules>
+
+  <properties>
+    <tycho-version>0.13.0</tycho-version>
+  </properties>
+
+  <repositories>
+   <repository>
+     <id>indigo</id>
+     <layout>p2</layout>
+     <url>http://download.eclipse.org/releases/indigo</url>
+   </repository>	
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
+  
+
+</project>
