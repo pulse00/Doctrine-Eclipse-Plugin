@@ -41,11 +41,7 @@ import com.dubture.doctrine.core.model.Entity;
 @SuppressWarnings("restriction")
 public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 
-
-	
-
 	@SuppressWarnings("unchecked")
-	@Override
 	public GoalEvaluator createEvaluator(IGoal goal) {
 
 		Class<?>goalClass = goal.getClass();

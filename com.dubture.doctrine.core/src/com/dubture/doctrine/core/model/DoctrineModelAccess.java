@@ -76,8 +76,10 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 		
 		
 		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, className, 0, 0, 100, SearchFor.REFERENCES, MatchRule.EXACT, scope, new ISearchRequestor() {
-			
-			@Override
+
+		    /**
+		     * FIXME: Override annotation removed due to failing tycho build
+		     */
 			public void match(int elementType, int flags, int offset, int length,
 					int nameOffset, int nameLength, String elementName,
 					String metadata, String doc, String qualifier, String parent,
@@ -114,7 +116,6 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 		
 		engine.search(IDoctrineModelElement.ENTITY, null, null, 0, 0, 100, SearchFor.REFERENCES, MatchRule.PREFIX, scope, new ISearchRequestor() {
 			
-			@Override
 			public void match(int elementType, int flags, int offset, int length,
 					int nameOffset, int nameLength, String elementName,
 					String metadata, String doc, String qualifier, String parent,
@@ -199,12 +200,8 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 		
 	}
 
-	@Override
 	public void clean() {
-
 		entityCache.flush();
 		repoCache.flush();
-		
 	}
-	
 }

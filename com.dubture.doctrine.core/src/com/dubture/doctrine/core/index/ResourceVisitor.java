@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.CoreException;
 public class ResourceVisitor implements IResourceVisitor, IResourceDeltaVisitor
 {
 
-    @Override
     public boolean visit(IResource resource) throws CoreException
     {
         if (resource instanceof IFile) {
@@ -24,7 +23,6 @@ public class ResourceVisitor implements IResourceVisitor, IResourceDeltaVisitor
         return true;
     }
 
-    @Override
     public boolean visit(IResourceDelta delta) throws CoreException
     {
         IResource resource = delta.getResource();

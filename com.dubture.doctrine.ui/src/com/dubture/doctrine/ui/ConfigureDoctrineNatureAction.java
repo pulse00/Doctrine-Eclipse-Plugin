@@ -23,8 +23,6 @@ public class ConfigureDoctrineNatureAction implements IObjectActionDelegate
     private ISelection selection;
     private Object[] fTarget;
 
-
-    @Override
     public void setActivePart(IAction action, IWorkbenchPart targetPart)
     {
     }
