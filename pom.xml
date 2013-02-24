@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dubture.doctrine</groupId>
   <artifactId>parent</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <packaging>pom</packaging>
   <modules>
     <module>com.dubture.doctrine.core</module>
@@ -12,14 +12,14 @@
   </modules>
 
   <properties>
-    <tycho-version>0.15.0</tycho-version>
+    <tycho-version>0.16.0</tycho-version>
   </properties>
 
   <repositories>
    <repository>
-     <id>indigo</id>
+     <id>kepler</id>
      <layout>p2</layout>
-     <url>http://download.eclipse.org/releases/indigo</url>
+     <url>http://download.eclipse.org/releases/kepler</url>
    </repository>	
   </repositories>
 

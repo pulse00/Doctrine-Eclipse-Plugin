@@ -67,7 +67,7 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 					try {
 						
 						CallArgumentsList args = expr.getArgs();
-						List<Object> children = args.getChilds();
+						List<?> children = args.getChilds();
 						
 						if (children.size() > 0) {
 							
