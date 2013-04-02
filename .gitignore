@@ -1,9 +1,6 @@
 .DS_Store
-com.dubture.doctrine.core/bin/*
-com.dubture.doctrine.ui/bin/*
-
-com.dubture.doctrine.core/target/*
-com.dubture.doctrine.ui/target/*
-
-com.dubture.doctrine.feature/target/*
-
+bin/
+target/
+.settings/
+.project
+.classpath
