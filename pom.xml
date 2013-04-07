@@ -3,10 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dubture.doctrine</groupId>
   <artifactId>parent</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
     <module>com.dubture.doctrine.core</module>
+    <module>com.dubture.doctrine.annotation</module>
     <module>com.dubture.doctrine.ui</module>
     <module>com.dubture.doctrine.feature</module> 
   </modules>

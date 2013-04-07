@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Doctrine Annotation Plugin
+Bundle-SymbolicName: com.dubture.doctrine.annotation;singleton:=true
+Bundle-Version: 1.0.6.qualifier
+Bundle-Activator: com.dubture.doctrine.annotation.SymfonyAnnotationPlugin
+Bundle-Vendor: https://github.com/pulse00
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.dltk.core,
+ org.antlr.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.dubture.doctrine.annotation,
+ com.dubture.doctrine.annotation.model,
+ com.dubture.doctrine.annotation.parser,
+ com.dubture.doctrine.annotation.parser.antlr,
+ com.dubture.doctrine.annotation.parser.antlr.error,
+ com.dubture.doctrine.annotation.parser.tree,
+ com.dubture.doctrine.annotation.parser.tree.visitor
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .

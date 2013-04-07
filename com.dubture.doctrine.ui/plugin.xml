@@ -2,33 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-    <!-- this is pretty useless so far -->
-    <!--
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="com.dubture.doctrine.ui.addnature"
-            objectClass="org.eclipse.core.resources.IProject">
-         <menu
-               label="Doctrine"
-               path="additions"
-               id="com.dubture.doctrine.ui.menu1">
-            <separator
-                  name="project">
-            </separator>
-         </menu>
-         <action
-               label="Add/Remove Doctrine Nature"
-               class="com.dubture.doctrine.ui.popup.actions.AddDoctrineNature"
-               menubarPath="com.dubture.doctrine.ui.menu1/group1"
-               enablesFor="1"
-               id="com.dubture.doctrine.ui.newAction">
-         </action>
-      </objectContribution>
-   </extension>
-   -->
-
    <extension
          point="org.eclipse.ui.editors.templates">
       <contextType

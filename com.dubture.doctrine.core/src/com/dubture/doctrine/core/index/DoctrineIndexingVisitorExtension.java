@@ -15,13 +15,13 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
 
+import com.dubture.doctrine.annotation.model.Annotation;
+import com.dubture.doctrine.annotation.model.ArgumentValueType;
+import com.dubture.doctrine.annotation.model.IArgumentValue;
+import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.Entity;
 import com.dubture.doctrine.core.model.IDoctrineModelElement;
-import com.dubture.symfony.annotation.model.Annotation;
-import com.dubture.symfony.annotation.model.ArgumentValueType;
-import com.dubture.symfony.annotation.model.IArgumentValue;
-import com.dubture.symfony.annotation.parser.AnnotationCommentParser;
 
 
 /**
