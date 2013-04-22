@@ -7,6 +7,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -35,21 +36,16 @@ public class XmlMappingParser
         NodeList routeNodes = getNodes(servicePath);
 
         for (int i = 0; i < routeNodes.getLength(); i++) {
-
             Node node = routeNodes.item(i);             
             NamedNodeMap atts = node.getAttributes();
-
-            //TODO: index repository class
-            String repo = null;
             String phpClass = null;
 
             for (int j = 0; j < atts.getLength(); j++) {
 
                 Attr attr = (Attr) atts.item(j);
                 String key = attr.getName();
-                if (key.equals("repository-class"))
-                    repo = attr.getValue();
-                else if (key.equals("name"))
+                if (key.equals("repository-class")) {
+				} else if (key.equals("name"))
                     phpClass = attr.getValue();
 
             }

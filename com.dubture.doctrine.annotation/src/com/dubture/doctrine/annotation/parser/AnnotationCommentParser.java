@@ -309,10 +309,12 @@ public class AnnotationCommentParser {
                 excluded = true;
             }
 
+            /*
             if (!excluded && hasIncludeRestriction && !includedClassNames.contains(fullyQualifiedName)) {
                 iterator.remove();
                 excluded = true;
             }
+            */
         }
 
         return annotations;

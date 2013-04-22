@@ -20,6 +20,7 @@ import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.context.MethodContext;
 
 import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
+import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.DoctrineModelAccess;
 import com.dubture.doctrine.core.model.Entity;
 
@@ -41,7 +42,6 @@ import com.dubture.doctrine.core.model.Entity;
 @SuppressWarnings("restriction")
 public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 
-	@SuppressWarnings("unchecked")
 	public GoalEvaluator createEvaluator(IGoal goal) {
 
 		Class<?>goalClass = goal.getClass();
@@ -49,14 +49,14 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 		if (!(goal.getContext() instanceof MethodContext)) {
 			return null;
 		}
-
+		
 		MethodContext context = (MethodContext) goal.getContext();
-
+		
 		if (goalClass == ExpressionTypeGoal.class) {
 
 			ExpressionTypeGoal expGoal = (ExpressionTypeGoal) goal;			
 			ASTNode expression = expGoal.getExpression();
-			
+
 			if (expression instanceof PHPCallExpression) {
 				
 				PHPCallExpression expr = (PHPCallExpression) expression;
@@ -76,24 +76,19 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 								Scalar entity = (Scalar) children.get(0);
 								String et = entity.getValue().replace("'", "").replace("\"", "");
 								
-								if (et == null)
+								if (et == null) {
 									return null;
+								}
 								
 								DoctrineModelAccess model = DoctrineModelAccess.getDefault();
-								
 								IScriptProject project = context.getSourceModule().getScriptProject();
 								List<Entity> entities = model.getEntities(project);
 								PhpModelAccess phpmodel = PhpModelAccess.getDefault();
 								
-								
 								for (Entity e : entities) {
-									
-
 									if (et.equals(e.getFullyQualifiedName())) {
-									
 										String qualifier = null;										
 										INamespace ns = e.getNamespace();
-										
 										if (ns != null) {											
 											qualifier = ns.getQualifiedName("\\");
 										}
@@ -111,11 +106,11 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 								
 								IType type = model.getExtensionType(et, project);
 								
-								if (type == null)
+								if (type == null) {
 									return null;
+								}
 								
 								String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
-								
 								IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 								IType[] types = phpmodel.findTypes(repo, MatchRule.EXACT, 0, 0, scope, null);
 								
@@ -126,8 +121,9 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 								
 								IType repoType = model.getExtensionType(repo, project);
 								
-								if (repoType == null)
+								if (repoType == null) {
 									return null;
+								}
 
 								types = phpmodel.findTypes(repoType.getTypeQualifiedName("\\"), MatchRule.EXACT, 0, 0, scope, null);
 								
@@ -138,11 +134,20 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 							}							
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						Logger.logException(e);
 					}					
 				}				
 			}
-		}
+		}/* else if (goalClass == PHPDocMethodReturnTypeGoal.class) {
+			PHPDocMethodReturnTypeGoal returnTypeGoal = (PHPDocMethodReturnTypeGoal) goal;
+			if (!"getRepository".equals(returnTypeGoal.getMethodName())) {
+				return null;
+			}
+			
+			return new RepositoryGoalEvaluator(goal);
+		}*/
+		
+		
 		return null;
 	}
 }

@@ -21,6 +21,7 @@ import org.eclipse.php.internal.core.model.PhpModelAccess;
 
 import com.dubture.doctrine.core.goals.IEntityResolver;
 import com.dubture.doctrine.core.index.ICleanListener;
+import com.dubture.doctrine.core.log.Logger;
 
 /**
  * 
@@ -28,20 +29,19 @@ import com.dubture.doctrine.core.index.ICleanListener;
  * 
  * 
  * @author Robert Gruendler <r.gruendler@gmail.com>
- *
+ * 
  */
 @SuppressWarnings("restriction")
 public class DoctrineModelAccess extends PhpModelAccess implements ICleanListener {
 
 	private static final String ENTITYRESOLVER_ID = "com.dubture.doctrine.core.entityResolvers";
-	
-	private static DoctrineModelAccess modelInstance = null;	
+
+	private static DoctrineModelAccess modelInstance = null;
 	private List<IEntityResolver> resolvers = null;
-	
+
 	private LRUCache entityCache = new LRUCache();
 	private LRUCache repoCache = new LRUCache();
-	
-	
+
 	public static DoctrineModelAccess getDefault() {
 
 		if (modelInstance == null)
@@ -49,7 +49,7 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 
 		return modelInstance;
 	}
-	
+
 	/**
 	 * 
 	 * Find the repositoryClass for a doctrine entity
@@ -59,87 +59,84 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	 * @return
 	 */
 	public String getRepositoryClass(String className, String qualifier, IScriptProject project) {
-		
+
 		String key = className + project.getElementName();
-		
+
 		if (repoCache.get(key) != null)
 			return (String) repoCache.get(key);
 
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
-		if(scope == null) {
+		if (scope == null) {
 			return null;
 		}
-		
+
 		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
 		final List<String> repos = new ArrayList<String>();
-		
-		
-		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, className, 0, 0, 100, SearchFor.REFERENCES, MatchRule.EXACT, scope, new ISearchRequestor() {
 
-		    /**
-		     * FIXME: Override annotation removed due to failing tycho build
-		     */
-			public void match(int elementType, int flags, int offset, int length,
-					int nameOffset, int nameLength, String elementName,
-					String metadata, String doc, String qualifier, String parent,
-					ISourceModule sourceModule, boolean isReference) {
-				
-				if (metadata != null)
-					repos.add(metadata);
+		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, className, 0, 0, 100, SearchFor.REFERENCES,
+				MatchRule.EXACT, scope, new ISearchRequestor() {
 
-			}
-		}, null);
-		
-		
+					/**
+					 * FIXME: Override annotation removed due to failing tycho
+					 * build
+					 */
+					public void match(int elementType, int flags, int offset, int length, int nameOffset,
+							int nameLength, String elementName, String metadata, String doc, String qualifier,
+							String parent, ISourceModule sourceModule, boolean isReference) {
+
+						if (metadata != null)
+							repos.add(metadata);
+
+					}
+				}, null);
+
 		if (repos.size() == 1) {
-			
-			String repo = repos.get(0);			
-			repoCache.put(key, repo);			
+
+			String repo = repos.get(0);
+			repoCache.put(key, repo);
 			return repo;
 		}
-		
+
 		return null;
 
 	}
-	
+
 	public List<Entity> getEntities(IScriptProject project) {
 
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
-		if(scope == null) {
+		if (scope == null) {
 			return null;
 		}
-		
+
 		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
 		final List<Entity> entities = new ArrayList<Entity>();
-		
-		engine.search(IDoctrineModelElement.ENTITY, null, null, 0, 0, 100, SearchFor.REFERENCES, MatchRule.PREFIX, scope, new ISearchRequestor() {
-			
-			public void match(int elementType, int flags, int offset, int length,
-					int nameOffset, int nameLength, String elementName,
-					String metadata, String doc, String qualifier, String parent,
-					ISourceModule sourceModule, boolean isReference) {
-				
-				String name = "";
-				
-				if (qualifier != null)
-					name = qualifier + "\\";
-					
-				name += elementName;
-				Entity e = new Entity(null, name);
-				
-				entities.add(e);
 
-			}
-		}, null);
-		
-		
+		engine.search(IDoctrineModelElement.ENTITY, null, null, 0, 0, 100, SearchFor.REFERENCES, MatchRule.PREFIX,
+				scope, new ISearchRequestor() {
+
+					public void match(int elementType, int flags, int offset, int length, int nameOffset,
+							int nameLength, String elementName, String metadata, String doc, String qualifier,
+							String parent, ISourceModule sourceModule, boolean isReference) {
+
+						String name = "";
+
+						if (qualifier != null)
+							name = qualifier + "\\";
+
+						name += elementName;
+						Entity e = new Entity(null, name);
+
+						entities.add(e);
+
+					}
+				}, null);
+
 		return entities;
-		
+
 	}
-	
-	
+
 	/**
 	 * Resolve a classname via registered entityResolver extensions.
 	 * 
@@ -150,14 +147,17 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	public IType getExtensionType(String classname, IScriptProject project) {
 
 		String key = classname + project.getElementName();
-		
-		if (entityCache.get(key) != null)
+
+		if (entityCache.get(key) != null) {
+			System.err.println("return cached");
 			return (IType) entityCache.get(key);
-					
+		}
+
 		IType type = null;
-		
+
+		System.err.println("resolvers " + getResolvers().size());
 		for (IEntityResolver resolver : getResolvers()) {
-			
+
 			type = resolver.resolve(classname, project);
 			// first extension wins
 			if (type != null) {
@@ -169,35 +169,30 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 		return type;
 
 	}
-	
+
 	private List<IEntityResolver> getResolvers() {
-		
-		if (resolvers != null) {			
-			return resolvers;			
+
+		if (resolvers != null) {
+			return resolvers;
 		}
-		
+
 		resolvers = new ArrayList<IEntityResolver>();
-		
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(ENTITYRESOLVER_ID);		
-		
-		try {							
-			
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ENTITYRESOLVER_ID);
+
+		try {
 			for (IConfigurationElement element : config) {
-				
 				final Object extension = element.createExecutableExtension("class");
-				
-				if (extension instanceof IEntityResolver) {					
+				if (extension instanceof IEntityResolver) {
 					resolvers.add((IEntityResolver) extension);
 				}
 			}
-			
+
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			Logger.logException(e1);
 		}
-		
-		return resolvers;		
-		
+
+		return resolvers;
+
 	}
 
 	public void clean() {

@@ -92,9 +92,18 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
             return;
         }
 
-        // Take only the last annotation
-        Annotation annotation = annotations.get(annotations.size() - 1);
+        Annotation annotation = null;
+        for (Annotation a : annotations) {
+        	if (a.getClassName().equals("Entity")) {
+        		annotation = a;
+        		break;
+        	}
+        }
 
+        if (annotation == null) {
+        	return;
+        }
+        
         String qualifier = null;
         if (namespace != null) {
             qualifier = namespace.getName();

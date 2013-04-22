@@ -76,7 +76,6 @@ public class ConfigureDoctrineNatureAction implements IObjectActionDelegate
                 }
 
                 try {
-                    System.err.println(project.hasNature(DoctrineNature.NATURE_ID));
                     if (!project.isAccessible()
                             || project.hasNature(DoctrineNature.NATURE_ID)) {
                         enabled = false;

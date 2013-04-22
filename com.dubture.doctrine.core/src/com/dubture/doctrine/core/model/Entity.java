@@ -25,8 +25,6 @@ public class Entity extends SourceType {
 
 	public Entity(ModelElement parent, String name) {
 		super(parent, name);
-		
-		
 	}
 	
 	
@@ -53,8 +51,12 @@ public class Entity extends SourceType {
 			}
 			
 			String name = builder.toString();
-			return name.substring(0, name.length()-1);
 			
+			if (name.length() == 0) {
+				return super.getElementName();
+			}
+			
+			return name.substring(0, name.length()-1);
 		}
 		
 		return super.getElementName();
@@ -62,27 +64,21 @@ public class Entity extends SourceType {
 
 	@Override
 	public int getFlags() throws ModelException {
-
 		return Modifiers.AccPublic;
 	}
 
 	@Override
 	public Object getElementInfo() throws ModelException {
-
 		return new FakeTypeElementInfo();
 	}
 
 	@Override
-	protected Object openWhenClosed(Object info, IProgressMonitor monitor)
-			throws ModelException {
-
+	protected Object openWhenClosed(Object info, IProgressMonitor monitor)throws ModelException {
 		return new FakeTypeElementInfo();
-
 	}
 
 	@Override
 	public ISourceModule getSourceModule() {
-
 		return super.getSourceModule();
 	}
 
@@ -93,28 +89,20 @@ public class Entity extends SourceType {
 		// popup row, ie:
 		// AcmeDemoBundle - AcmeDemoBundle
 		return new FakeType(parent, "");		
-
 	}
 	
 	public class FakeTypeElementInfo extends SourceTypeElementInfo {
-		
 		@Override
 		public String getFileName() {
-
 			return "";
 		}		
 	}
-	
-	
-	
 	
 	@Override
 	public INamespace getNamespace() throws ModelException {
 
 		if (getElementName().contains("\\")) {
-
 			String[] parts = getElementName().split("\\\\");
-			
 			if (parts.length > 1) {
 				String[] ns = new String[parts.length -1];				
 				System.arraycopy(parts, 0, ns, 0, ns.length);				
@@ -124,19 +112,16 @@ public class Entity extends SourceType {
 		return super.getNamespace();
 	}
 	
-	
 	@Override
 	public String getFullyQualifiedName() {
-
-		
 		if (this.name.contains("\\")) {
 			return this.name;
 		}
 		
-		if (this.parent == null)
+		if (this.parent == null) {
 			return "";
+		}
 
-		
 		return super.getFullyQualifiedName();
 	}
 }
