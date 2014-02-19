@@ -1,5 +1,6 @@
 package com.dubture.doctrine.core.goals;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.dltk.ast.ASTNode;
@@ -25,17 +26,17 @@ import com.dubture.doctrine.core.model.DoctrineModelAccess;
 import com.dubture.doctrine.core.model.Entity;
 
 /**
- * 
+ *
  * Evaluates repository classes from calls like
- * 
+ *
  * <pre>
- * 
+ *
  * $repo = $em->getRepository('Acme\DemoBundle\Entity\SomeEntity');
- * 
+ *
  * $repo->| <-- evaluates to the repoClass of SomeEntity
- * 
+ *
  * </pre>
- *  
+ *
  * @author Robert Gruendler <r.gruendler@gmail.com>
  *
  */
@@ -44,110 +45,101 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 
 	public GoalEvaluator createEvaluator(IGoal goal) {
 
-		Class<?>goalClass = goal.getClass();
+		Class<?> goalClass = goal.getClass();
 
 		if (!(goal.getContext() instanceof MethodContext)) {
 			return null;
 		}
-		
+
 		MethodContext context = (MethodContext) goal.getContext();
-		
+
 		if (goalClass == ExpressionTypeGoal.class) {
 
-			ExpressionTypeGoal expGoal = (ExpressionTypeGoal) goal;			
+			ExpressionTypeGoal expGoal = (ExpressionTypeGoal) goal;
 			ASTNode expression = expGoal.getExpression();
 
-			if (expression instanceof PHPCallExpression) {
-				
-				PHPCallExpression expr = (PHPCallExpression) expression;
-				
-				// are we calling a method named "get" ?
-				if (expr.getName().equals("getRepository")) {
-				
-					try {
-						
-						CallArgumentsList args = expr.getArgs();
-						List<?> children = args.getChilds();
-						
-						if (children.size() > 0) {
-							
-							if (args.getChilds().get(0) instanceof Scalar) {
-						
-								Scalar entity = (Scalar) children.get(0);
-								String et = entity.getValue().replace("'", "").replace("\"", "");
-								
-								if (et == null) {
-									return null;
-								}
-								
-								DoctrineModelAccess model = DoctrineModelAccess.getDefault();
-								IScriptProject project = context.getSourceModule().getScriptProject();
-								List<Entity> entities = model.getEntities(project);
-								PhpModelAccess phpmodel = PhpModelAccess.getDefault();
-								
-								for (Entity e : entities) {
-									if (et.equals(e.getFullyQualifiedName())) {
-										String qualifier = null;										
-										INamespace ns = e.getNamespace();
-										if (ns != null) {											
-											qualifier = ns.getQualifiedName("\\");
-										}
-										
-										String repo = model.getRepositoryClass(e.getElementName(), qualifier, project);
-										IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
-										IType[] types = phpmodel.findTypes(repo, MatchRule.EXACT, 0, 0, scope, null);
-										
-										if (types.length == 1) {											
-											IType type = types[0];
-											return new RepositoryGoalEvaluator(goal, type);
-										}
-									}
-								}
-								
-								IType type = model.getExtensionType(et, project);
-								
-								if (type == null) {
-									return null;
-								}
-								
-								String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
-								IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
-								IType[] types = phpmodel.findTypes(repo, MatchRule.EXACT, 0, 0, scope, null);
-								
-								if (types.length == 1) {											
-									IType ttype = types[0];
-									return new RepositoryGoalEvaluator(goal, ttype);
-								}
-								
-								IType repoType = model.getExtensionType(repo, project);
-								
-								if (repoType == null) {
-									return null;
-								}
-
-								types = phpmodel.findTypes(repoType.getTypeQualifiedName("\\"), MatchRule.EXACT, 0, 0, scope, null);
-								
-								if (types.length == 1) {											
-									IType ttype = types[0];
-									return new RepositoryGoalEvaluator(goal, ttype);
-								}
-							}							
-						}
-					} catch (Exception e) {
-						Logger.logException(e);
-					}					
-				}				
-			}
-		}/* else if (goalClass == PHPDocMethodReturnTypeGoal.class) {
-			PHPDocMethodReturnTypeGoal returnTypeGoal = (PHPDocMethodReturnTypeGoal) goal;
-			if (!"getRepository".equals(returnTypeGoal.getMethodName())) {
+			if (!(expression instanceof PHPCallExpression)) {
 				return null;
 			}
-			
-			return new RepositoryGoalEvaluator(goal);
-		}*/
-		
-		
+			PHPCallExpression expr = (PHPCallExpression) expression;
+
+			// are we calling a method named "get" ?
+			if (expr.getName().equals("getRepository") && expr.getArgs().getChilds().size() > 0) {
+
+				try {
+
+					final List<?> children = expr.getArgs().getChilds();
+					if (children.get(0) instanceof Scalar) {
+						String et = ((Scalar) children.get(0)).getValue().replace("'", "").replace("\"", "");
+						if (et == null) {
+							return null;
+						}
+
+						DoctrineModelAccess model = DoctrineModelAccess.getDefault();
+						IScriptProject project = context.getSourceModule().getScriptProject();
+						List<Entity> entities = model.getEntities(project);
+
+						for (Entity e : entities) {
+							if (et.equals(e.getFullyQualifiedName())) {
+								String qualifier = null;
+								INamespace ns = e.getNamespace();
+								if (ns != null) {
+									qualifier = ns.getQualifiedName("\\");
+								}
+
+								String repo = model.getRepositoryClass(e.getElementName(), qualifier, project);
+								IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
+								Collection<IType> types = context.getCache().getTypes(context.getSourceModule(), repo, null, null);
+
+								if (types.size() == 1) {
+									IType type = types.iterator().next();
+									return new RepositoryGoalEvaluator(goal, type);
+								}
+							}
+						}
+
+						IType type = model.getExtensionType(et, project);
+
+						if (type == null) {
+							return null;
+						}
+						// This can provide bootleneck on huge projects
+
+						String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
+						IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
+						Collection<IType> types = context.getCache().getTypes(context.getSourceModule(), repo, null, null);
+
+						if (types.size() == 1) {
+							IType ttype = types.iterator().next();
+							return new RepositoryGoalEvaluator(goal, ttype);
+						}
+
+						IType repoType = model.getExtensionType(repo, project);
+
+						if (repoType == null) {
+							return null;
+						}
+						types = context.getCache().getTypes(context.getSourceModule(), repoType.getTypeQualifiedName("\\"), null, null);
+
+						if (types.size() == 1) {
+							IType ttype = types.iterator().next();
+							return new RepositoryGoalEvaluator(goal, ttype);
+						}
+					}
+				} catch (Exception e) {
+					Logger.logException(e);
+				}
+			}
+		}/*
+		 * else if (goalClass == PHPDocMethodReturnTypeGoal.class) {
+		 * PHPDocMethodReturnTypeGoal returnTypeGoal =
+		 * (PHPDocMethodReturnTypeGoal) goal; if
+		 * (!"getRepository".equals(returnTypeGoal.getMethodName())) { return
+		 * null; }
+		 *
+		 * return new RepositoryGoalEvaluator(goal); }
+		 */
+
 		return null;
 	}
 }
