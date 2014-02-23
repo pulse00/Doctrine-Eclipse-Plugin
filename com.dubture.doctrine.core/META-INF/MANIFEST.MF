@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Doctrine Core Plugin
 Bundle-SymbolicName: com.dubture.doctrine.core;singleton:=true
-Bundle-Version: 1.0.6.qualifier
+Bundle-Version: 1.0.7.qualifier
 Bundle-Activator: com.dubture.doctrine.core.DoctrineCorePlugin
 Bundle-Vendor: https://github.com/pulse00
 Require-Bundle: org.eclipse.core.runtime,
@@ -13,6 +13,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.dubture.doctrine.core,
- com.dubture.doctrine.core.goals,
- com.dubture.doctrine.core.model
+Export-Package: com.dubture.doctrine.core,com.dubture.doctrine.core.go
+ als,com.dubture.doctrine.core.model
