@@ -18,6 +18,8 @@ import org.eclipse.dltk.ti.goals.IGoal;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPCallExpression;
 import org.eclipse.php.internal.core.compiler.ast.nodes.Scalar;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.typeinference.IModelAccessCache;
+import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.php.internal.core.typeinference.context.MethodContext;
 
 import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
@@ -74,6 +76,7 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 						if (et == null) {
 							return null;
 						}
+						IModelAccessCache cache = context.getCache();
 
 						DoctrineModelAccess model = DoctrineModelAccess.getDefault();
 						IScriptProject project = context.getSourceModule().getScriptProject();
@@ -88,12 +91,12 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 								}
 
 								String repo = model.getRepositoryClass(e.getElementName(), qualifier, project);
-								IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
-								Collection<IType> types = context.getCache().getTypes(context.getSourceModule(), repo, null, null);
+								;
 
-								if (types.size() == 1) {
-									IType type = types.iterator().next();
-									return new RepositoryGoalEvaluator(goal, type);
+								IType[] types = PHPModelUtils.getTypes(repo, context.getSourceModule(), 0, cache, null);
+
+								if (types.length == 1) {
+									return new RepositoryGoalEvaluator(goal, types[0]);
 								}
 							}
 						}
@@ -106,12 +109,10 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 						// This can provide bootleneck on huge projects
 
 						String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
-						IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
-						Collection<IType> types = context.getCache().getTypes(context.getSourceModule(), repo, null, null);
+						IType[] types = PHPModelUtils.getTypes(repo, context.getSourceModule(), 0, cache, null);
 
-						if (types.size() == 1) {
-							IType ttype = types.iterator().next();
-							return new RepositoryGoalEvaluator(goal, ttype);
+						if (types.length == 1) {
+							return new RepositoryGoalEvaluator(goal, types[0]);
 						}
 
 						IType repoType = model.getExtensionType(repo, project);
@@ -119,11 +120,10 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 						if (repoType == null) {
 							return null;
 						}
-						types = context.getCache().getTypes(context.getSourceModule(), repoType.getTypeQualifiedName("\\"), null, null);
+						types = PHPModelUtils.getTypes(repoType.getTypeQualifiedName("\\"), context.getSourceModule(), 0, cache, null);
 
-						if (types.size() == 1) {
-							IType ttype = types.iterator().next();
-							return new RepositoryGoalEvaluator(goal, ttype);
+						if (types.length == 1) {
+							return new RepositoryGoalEvaluator(goal, types[0]);
 						}
 					}
 				} catch (Exception e) {
