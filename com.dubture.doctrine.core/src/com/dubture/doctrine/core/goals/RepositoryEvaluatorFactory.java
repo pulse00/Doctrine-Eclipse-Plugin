@@ -15,6 +15,7 @@ import org.eclipse.dltk.ti.IGoalEvaluatorFactory;
 import org.eclipse.dltk.ti.goals.ExpressionTypeGoal;
 import org.eclipse.dltk.ti.goals.GoalEvaluator;
 import org.eclipse.dltk.ti.goals.IGoal;
+import org.eclipse.dltk.ti.goals.MethodReturnTypeGoal;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPCallExpression;
 import org.eclipse.php.internal.core.compiler.ast.nodes.Scalar;
 import org.eclipse.php.internal.core.compiler.ast.parser.ASTUtils;
@@ -22,6 +23,7 @@ import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.IModelAccessCache;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.php.internal.core.typeinference.context.MethodContext;
+import org.eclipse.php.internal.core.typeinference.goals.MethodElementReturnTypeGoal;
 
 import com.dubture.doctrine.core.goals.evaluator.RepositoryExpressionGoalEvaluator;
 import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
@@ -55,49 +57,16 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 			return null;
 		}
 
-		MethodContext context = (MethodContext) goal.getContext();
+		if (goalClass == MethodElementReturnTypeGoal.class) {
+			MethodElementReturnTypeGoal g = (MethodElementReturnTypeGoal) goal;
+			if (g.getMethodName().equals("getRepository") && g.getArgNames() != null && g.getArgNames().length > 0 && g.getArgNames()[0] != null) {
 
-		if (goalClass == ExpressionTypeGoal.class) {
+				return new RepositoryExpressionGoalEvaluator(goal, ASTUtils.stripQuotes(g.getArgNames()[0]));
 
-			ExpressionTypeGoal expGoal = (ExpressionTypeGoal) goal;
-			ASTNode expression = expGoal.getExpression();
-
-			if (!(expression instanceof PHPCallExpression)) {
-				return null;
-			}
-			PHPCallExpression expr = (PHPCallExpression) expression;
-
-			// are we calling a method named "get" ?
-			if (expr.getName().equals("getRepository") && expr.getArgs().getChilds().size() > 0) {
-
-				try {
-
-					final List<?> children = expr.getArgs().getChilds();
-					if (children.get(0) instanceof Scalar) {
-						String et = ASTUtils.stripQuotes(((Scalar) children.get(0)).getValue());
-						if (et == null) {
-							return null;
-						}
-
-						return new RepositoryExpressionGoalEvaluator(goal, et);
-
-					}
-				} catch (Exception e) {
-					Logger.logException(e);
-				}
 			}
 		} else if (goalClass == RepositoryTypeGoal.class) {
 			return new RepositoryGoalEvaluator((RepositoryTypeGoal) goal);
-		}			
-			/*
-		 * else if (goalClass == PHPDocMethodReturnTypeGoal.class) {
-		 * PHPDocMethodReturnTypeGoal returnTypeGoal =
-		 * (PHPDocMethodReturnTypeGoal) goal; if
-		 * (!"getRepository".equals(returnTypeGoal.getMethodName())) { return
-		 * null; }
-		 *
-		 * return new RepositoryExpressionGoalEvaluator(goal); }
-		 */
+		}
 
 		return null;
 	}

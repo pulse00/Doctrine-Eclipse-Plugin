@@ -41,6 +41,7 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 
 	private LRUCache entityCache = new LRUCache();
 	private LRUCache repoCache = new LRUCache();
+	private final String NULL_RESULT = "__NOT_FOUND__";
 
 	public static DoctrineModelAccess getDefault() {
 
@@ -59,11 +60,16 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	 * @return
 	 */
 	public String getRepositoryClass(String className, String qualifier, IScriptProject project) {
+		if (className != null ) {
+			return null;
+		}
 
 		String key = className + project.getElementName();
 
-		if (repoCache.get(key) != null)
-			return (String) repoCache.get(key);
+		Object object = repoCache.get(key);
+		if (object != null)  {
+			return object.equals(NULL_RESULT) ? null : (String) object;
+		}
 
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
@@ -96,6 +102,8 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 			String repo = repos.get(0);
 			repoCache.put(key, repo);
 			return repo;
+		} else {
+			repoCache.put(key,NULL_RESULT);
 		}
 
 		return null;
@@ -147,24 +155,26 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	public IType getExtensionType(String classname, IScriptProject project) {
 
 		String key = classname + project.getElementName();
-
-		if (entityCache.get(key) != null) {
-			return (IType) entityCache.get(key);
+		Object object = entityCache.get(key);
+		if (object != null && object.equals(NULL_RESULT)) {
+			return null;
+		} else if (object instanceof IType) {
+			return (IType) object;
 		}
 
-		IType type = null;
 
 		for (IEntityResolver resolver : getResolvers()) {
 
-			type = resolver.resolve(classname, project);
+			IType type = resolver.resolve(classname, project);
 			// first extension wins
 			if (type != null) {
 				entityCache.put(key, type);
 				return type;
 			}
 		}
+		entityCache.put(classname, NULL_RESULT);
 
-		return type;
+		return null;
 
 	}
 

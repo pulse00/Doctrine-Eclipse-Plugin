@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.dltk.core.INamespace;
 import org.eclipse.dltk.core.IScriptProject;
+import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.ti.GoalState;
@@ -39,49 +40,46 @@ public class RepositoryGoalEvaluator extends GoalEvaluator {
 			return IGoal.NO_GOALS;
 		}
 		ISourceModuleContext context = (ISourceModuleContext) goal.getContext();
+		ISourceModule sourceModule = context.getSourceModule();
 		IModelAccessCache cache = null;
 		if (context instanceof IModelCacheContext) {
 			cache = ((IModelCacheContext) context).getCache();
 		}
 
+
 		DoctrineModelAccess model = DoctrineModelAccess.getDefault();
-		IScriptProject project = context.getSourceModule().getScriptProject();
-		List<Entity> entities = model.getEntities(project);
+		IScriptProject project = sourceModule.getScriptProject();
 
-		for (Entity e : entities) {
-			if (goal.getEtityName().equals(e.getFullyQualifiedName())) {
-				try {
-				String qualifier = null;
-				INamespace ns = e.getNamespace();
-				if (ns != null) {
-					qualifier = ns.getQualifiedName("\\");
+		String repo = null;
+		if (!goal.getEtityName().contains(":")) {
+			try {
+				IType[] types = PHPModelUtils.getTypes(goal.getEtityName(), sourceModule,0, cache, null);
+				if (types != null && types.length > 0) {
+					model.getRepositoryClass(goal.getEtityName(), null, project);
+					if (repo != null) {
+						result = new PHPClassType(repo);
+						return IGoal.NO_GOALS;
+					}
 				}
-
-				String repo = model.getRepositoryClass(e.getElementName(), qualifier, project);
-
-				if (repo != null) {
-					result = new PHPClassType(repo);
-					return IGoal.NO_GOALS;
-				}
-
-				} catch (ModelException e1) {
-					Logger.logException(e1);
-				}
+			} catch (ModelException e) {
 			}
 		}
 
 		IType type = model.getExtensionType(goal.getEtityName(), project);
-
 		if (type == null) {
 			return IGoal.NO_GOALS;
 		}
-		// This can provide bootleneck on huge projects
 
-		String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
+
+		// This can provide bootleneck on huge projects
+		repo = model.getRepositoryClass(type.getElementName(), type.getFullyQualifiedName("\\"), project);
+
 		if (repo == null) {
-			result = new PHPClassType("\\Doctrine\\ORM\\EntityRepository");
+			// FIXME If force EntityRepostory, PDT hang for 15s
+			result = new PHPClassType("Doctrine\\Common\\Persistence", "ObjectRepository");
 			return IGoal.NO_GOALS;
 		}
+
 		try {
 			IType[] types = PHPModelUtils.getTypes(repo, context.getSourceModule(), 0, cache, null);
 			if (types.length > 0) {
@@ -91,7 +89,6 @@ public class RepositoryGoalEvaluator extends GoalEvaluator {
 		} catch (ModelException e1) {
 			Logger.logException(e1);
 		}
-
 		IType extensionType = model.getExtensionType(repo, project);
 		if (extensionType != null) {
 			this.result = new PHPClassType(extensionType.getFullyQualifiedName("\\"));
