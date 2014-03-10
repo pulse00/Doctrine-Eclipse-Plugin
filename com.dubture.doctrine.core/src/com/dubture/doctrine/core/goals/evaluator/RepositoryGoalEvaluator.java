@@ -1,51 +1,117 @@
 package com.dubture.doctrine.core.goals.evaluator;
 
+import java.util.List;
+
+import org.eclipse.dltk.core.INamespace;
+import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.IType;
+import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.ti.GoalState;
+import org.eclipse.dltk.ti.ISourceModuleContext;
 import org.eclipse.dltk.ti.goals.GoalEvaluator;
 import org.eclipse.dltk.ti.goals.IGoal;
+import org.eclipse.dltk.ti.types.IEvaluatedType;
+import org.eclipse.php.internal.core.typeinference.IModelAccessCache;
 import org.eclipse.php.internal.core.typeinference.PHPClassType;
+import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
+import org.eclipse.php.internal.core.typeinference.context.IModelCacheContext;
 
-/**
- * @author Robert Gruendler <r.gruendler@gmail.com>
- */
-@SuppressWarnings("restriction")
+import com.dubture.doctrine.core.goals.RepositoryTypeGoal;
+import com.dubture.doctrine.core.log.Logger;
+import com.dubture.doctrine.core.model.DoctrineModelAccess;
+import com.dubture.doctrine.core.model.Entity;
+import com.dubture.doctrine.core.model.IDoctrineModelElement;
+
 public class RepositoryGoalEvaluator extends GoalEvaluator {
 
-	private IType type;
+	private RepositoryTypeGoal goal;
+	private IEvaluatedType result;
 
-	public RepositoryGoalEvaluator(IGoal goal) {
+	public RepositoryGoalEvaluator(RepositoryTypeGoal goal) {
 		super(goal);
-	}
+		this.goal = goal;
 
-	public RepositoryGoalEvaluator(IGoal goal, IType iType) {
-		super(goal);
-		type = iType;
 	}
 
 	@Override
 	public IGoal[] init() {
-		return null;
+		if (!(goal.getContext() instanceof ISourceModuleContext)) {
+			return IGoal.NO_GOALS;
+		}
+		ISourceModuleContext context = (ISourceModuleContext) goal.getContext();
+		IModelAccessCache cache = null;
+		if (context instanceof IModelCacheContext) {
+			cache = ((IModelCacheContext) context).getCache();
+		}
+
+		DoctrineModelAccess model = DoctrineModelAccess.getDefault();
+		IScriptProject project = context.getSourceModule().getScriptProject();
+		List<Entity> entities = model.getEntities(project);
+
+		for (Entity e : entities) {
+			if (goal.getEtityName().equals(e.getFullyQualifiedName())) {
+				try {
+				String qualifier = null;
+				INamespace ns = e.getNamespace();
+				if (ns != null) {
+					qualifier = ns.getQualifiedName("\\");
+				}
+
+				String repo = model.getRepositoryClass(e.getElementName(), qualifier, project);
+
+				if (repo != null) {
+					result = new PHPClassType(repo);
+					return IGoal.NO_GOALS;
+				}
+
+				} catch (ModelException e1) {
+					Logger.logException(e1);
+				}
+			}
+		}
+
+		IType type = model.getExtensionType(goal.getEtityName(), project);
+
+		if (type == null) {
+			return IGoal.NO_GOALS;
+		}
+		// This can provide bootleneck on huge projects
+
+		String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
+		if (repo == null) {
+			result = new PHPClassType("\\Doctrine\\ORM\\EntityRepository");
+			return IGoal.NO_GOALS;
+		}
+		try {
+			IType[] types = PHPModelUtils.getTypes(repo, context.getSourceModule(), 0, cache, null);
+			if (types.length > 0) {
+				this.result = new PHPClassType(types[0].getFullyQualifiedName("\\"));
+				return IGoal.NO_GOALS;
+			}
+		} catch (ModelException e1) {
+			Logger.logException(e1);
+		}
+
+		IType extensionType = model.getExtensionType(repo, project);
+		if (extensionType != null) {
+			this.result = new PHPClassType(extensionType.getFullyQualifiedName("\\"));
+		}
+
+		return IGoal.NO_GOALS;
+
+		///= PHPModelUtils.getTypes(repoType.getTypeQualifiedName("\\"), context.getSourceModule(), 0, cache, null);
+		//return IGoal.NO_GOALS;
 	}
 
 	@Override
 	public IGoal[] subGoalDone(IGoal subgoal, Object result, GoalState state) {
+
 		return IGoal.NO_GOALS;
 	}
 
 	@Override
 	public Object produceResult() {
-
-		if (type == null) {
-			return null;
-		}
-
-		String fqn = type.getFullyQualifiedName("\\");
-
-		if (fqn != null) {
-			return new PHPClassType(fqn);
-		}
-
-		return null;
+		return result;
 	}
+
 }

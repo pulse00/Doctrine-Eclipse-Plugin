@@ -24,12 +24,12 @@ import com.dubture.doctrine.core.index.ICleanListener;
 import com.dubture.doctrine.core.log.Logger;
 
 /**
- * 
+ *
  * Access to the doctrine model.
- * 
- * 
+ *
+ *
  * @author Robert Gruendler <r.gruendler@gmail.com>
- * 
+ *
  */
 @SuppressWarnings("restriction")
 public class DoctrineModelAccess extends PhpModelAccess implements ICleanListener {
@@ -51,9 +51,9 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	}
 
 	/**
-	 * 
+	 *
 	 * Find the repositoryClass for a doctrine entity
-	 * 
+	 *
 	 * @param className
 	 * @param project
 	 * @return
@@ -139,7 +139,7 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 
 	/**
 	 * Resolve a classname via registered entityResolver extensions.
-	 * 
+	 *
 	 * @param classname
 	 * @param project
 	 * @return
@@ -149,13 +149,11 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 		String key = classname + project.getElementName();
 
 		if (entityCache.get(key) != null) {
-			System.err.println("return cached");
 			return (IType) entityCache.get(key);
 		}
 
 		IType type = null;
 
-		System.err.println("resolvers " + getResolvers().size());
 		for (IEntityResolver resolver : getResolvers()) {
 
 			type = resolver.resolve(classname, project);

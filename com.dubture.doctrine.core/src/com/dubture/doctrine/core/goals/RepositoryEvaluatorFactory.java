@@ -17,11 +17,13 @@ import org.eclipse.dltk.ti.goals.GoalEvaluator;
 import org.eclipse.dltk.ti.goals.IGoal;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPCallExpression;
 import org.eclipse.php.internal.core.compiler.ast.nodes.Scalar;
+import org.eclipse.php.internal.core.compiler.ast.parser.ASTUtils;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.IModelAccessCache;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.php.internal.core.typeinference.context.MethodContext;
 
+import com.dubture.doctrine.core.goals.evaluator.RepositoryExpressionGoalEvaluator;
 import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.DoctrineModelAccess;
@@ -72,72 +74,29 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 
 					final List<?> children = expr.getArgs().getChilds();
 					if (children.get(0) instanceof Scalar) {
-						String et = ((Scalar) children.get(0)).getValue().replace("'", "").replace("\"", "");
+						String et = ASTUtils.stripQuotes(((Scalar) children.get(0)).getValue());
 						if (et == null) {
 							return null;
 						}
-						IModelAccessCache cache = context.getCache();
 
-						DoctrineModelAccess model = DoctrineModelAccess.getDefault();
-						IScriptProject project = context.getSourceModule().getScriptProject();
-						List<Entity> entities = model.getEntities(project);
+						return new RepositoryExpressionGoalEvaluator(goal, et);
 
-						for (Entity e : entities) {
-							if (et.equals(e.getFullyQualifiedName())) {
-								String qualifier = null;
-								INamespace ns = e.getNamespace();
-								if (ns != null) {
-									qualifier = ns.getQualifiedName("\\");
-								}
-
-								String repo = model.getRepositoryClass(e.getElementName(), qualifier, project);
-								;
-
-								IType[] types = PHPModelUtils.getTypes(repo, context.getSourceModule(), 0, cache, null);
-
-								if (types.length == 1) {
-									return new RepositoryGoalEvaluator(goal, types[0]);
-								}
-							}
-						}
-
-						IType type = model.getExtensionType(et, project);
-
-						if (type == null) {
-							return null;
-						}
-						// This can provide bootleneck on huge projects
-
-						String repo = model.getRepositoryClass(type.getElementName(), type.getTypeQualifiedName("\\"), project);
-						IType[] types = PHPModelUtils.getTypes(repo, context.getSourceModule(), 0, cache, null);
-
-						if (types.length == 1) {
-							return new RepositoryGoalEvaluator(goal, types[0]);
-						}
-
-						IType repoType = model.getExtensionType(repo, project);
-
-						if (repoType == null) {
-							return null;
-						}
-						types = PHPModelUtils.getTypes(repoType.getTypeQualifiedName("\\"), context.getSourceModule(), 0, cache, null);
-
-						if (types.length == 1) {
-							return new RepositoryGoalEvaluator(goal, types[0]);
-						}
 					}
 				} catch (Exception e) {
 					Logger.logException(e);
 				}
 			}
-		}/*
+		} else if (goalClass == RepositoryTypeGoal.class) {
+			return new RepositoryGoalEvaluator((RepositoryTypeGoal) goal);
+		}			
+			/*
 		 * else if (goalClass == PHPDocMethodReturnTypeGoal.class) {
 		 * PHPDocMethodReturnTypeGoal returnTypeGoal =
 		 * (PHPDocMethodReturnTypeGoal) goal; if
 		 * (!"getRepository".equals(returnTypeGoal.getMethodName())) { return
 		 * null; }
 		 *
-		 * return new RepositoryGoalEvaluator(goal); }
+		 * return new RepositoryExpressionGoalEvaluator(goal); }
 		 */
 
 		return null;
