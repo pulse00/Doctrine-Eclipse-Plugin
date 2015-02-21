@@ -1,0 +1,16 @@
+--TEST--
+
+--FILE--
+<?
+namespace NS;
+/**
+ * @|
+ */
+class A {
+}
+?>
+--EXPECT--
+type(Note1)
+type(Note2)
+type(AnotherNote1)
+type(AnotherNote2)

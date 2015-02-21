@@ -3,14 +3,22 @@ package com.dubture.doctrine.core.index;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
+
 import com.dubture.doctrine.core.DoctrineCorePlugin;
+import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.Entity;
+import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 
 /**
  * This builder parses .xml files for doctrine ORM mappings. As
@@ -76,7 +84,28 @@ public class DoctrineBuilder extends IncrementalProjectBuilder
     
     protected void incrementalBuild(IResourceDelta delta,
             IProgressMonitor monitor) throws CoreException {
-
         delta.accept(new ResourceVisitor());
-    }    
+    }   
+    
+    @Override
+    protected void startupOnInitialize() {
+    	super.startupOnInitialize();
+    	IEclipsePreferences node = InstanceScope.INSTANCE.getNode(DoctrineCorePlugin.ID);
+		if (!DoctrineCoreConstants.INDEX_VERSION.equals(node.get(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, null))) {
+			try {
+
+				for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+					if (project.isOpen() && project.hasNature(DoctrineNature.NATURE_ID)) {
+						project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
+					}
+				}
+				node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
+				node.flush();
+			} catch (CoreException e) {
+				Logger.logException(e);
+			} catch (BackingStoreException e) {
+				Logger.logException(e);
+			}
+		}
+    }
 }

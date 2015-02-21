@@ -1,7 +1,13 @@
 Eclipse Plugin for the Doctrine ORM
 ===================================
 
-## Availability 
+### Minimum Requirements
 
-The plugin is currently only available bundled via the [Symfony Plugin](https://github.com/pulse00/Symfony-2-Eclipse-Plugin).
+- Java 6
+- Eclipse 4.3 (Kepler)
+
+### Features
+
+- Full doctrine annotation support in PHP Editor
+
 

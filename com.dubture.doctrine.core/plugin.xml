@@ -39,5 +39,17 @@
          </run>
       </builder>
    </extension>
+   <extension
+         point="org.eclipse.dltk.core.buildParticipant">
+      <buildParticipant
+            class="com.dubture.doctrine.internal.core.build.AnnotationBuildParticipantFactory"
+            id="com.dubture.doctrine.core.annotationBuildParticipant"
+            name="Annotation Build Participant"
+            nature="org.eclipse.php.core.PHPNature">
+         <requires
+               id="org.eclipse.php.core.buildParticipant.parser">
+         </requires>
+      </buildParticipant>
+   </extension>
 
 </plugin>

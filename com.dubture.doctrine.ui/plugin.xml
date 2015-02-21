@@ -28,5 +28,18 @@
          </action>
       </objectContribution>
    </extension>
+   <extension
+       id="com.dubture.doctrine.ui.doctrineCompletionProposalComputer"
+       point="org.eclipse.dltk.ui.scriptCompletionProposalComputer">
+    <scriptCompletionProposalComputer
+          categoryId="org.eclipse.dltk.ui.scriptTypeProposalCategory"
+          class="com.dubture.doctrine.ui.contentassist.DoctrineCompletionProposalComputer"
+          toolkitId="org.eclipse.php.core.PHPNature"
+          activate="true">
+       <partition
+             type="org.eclipse.php.PHP_DEFAULT">
+       </partition>
+    </scriptCompletionProposalComputer>
+ </extension>
 
 </plugin>

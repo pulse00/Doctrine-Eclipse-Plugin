@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-	CodeGenerationTest.class
+	CodeGenerationTest.class,DoctrineAnnotationCodeAssistTest.class
 })
 public class AllTests {
 

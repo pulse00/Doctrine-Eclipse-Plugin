@@ -1,0 +1,15 @@
+--TEST--
+
+--FILE--
+<?
+namespace NS;
+use Foo\Bar as MyAlias;
+/**
+ * @MyAlias\|
+ */
+class A {
+}
+?>
+--EXPECT--
+type(Note1)
+type(Note2)
