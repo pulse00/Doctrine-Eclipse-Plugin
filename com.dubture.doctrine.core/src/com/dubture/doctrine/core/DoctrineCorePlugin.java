@@ -1,8 +1,20 @@
 package com.dubture.doctrine.core;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
+import org.osgi.service.prefs.BackingStoreException;
+
+import com.dubture.doctrine.core.log.Logger;
+import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 
 public class DoctrineCorePlugin extends Plugin {
 
@@ -20,6 +32,35 @@ public class DoctrineCorePlugin extends Plugin {
 		super.start(bundleContext);
 		DoctrineCorePlugin.context = bundleContext;
 		plugin = this;
+		bundleContext.addBundleListener(new BundleListener() {
+			private boolean init = false;
+			@Override
+			public void bundleChanged(BundleEvent event) {
+				if (event.getBundle() == getBundle()) {
+					if (init) {
+						return;
+					}
+					init = true;
+					IEclipsePreferences node = InstanceScope.INSTANCE.getNode(DoctrineCorePlugin.ID);
+					if (!DoctrineCoreConstants.INDEX_VERSION.equals(node.get(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, null))) {
+						try {
+							for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+								if (project.isAccessible() && project.hasNature(DoctrineNature.NATURE_ID)) {
+									project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+								}
+							}
+							node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
+							node.flush();
+						} catch (BackingStoreException e) {
+							Logger.logException(e);
+						} catch (CoreException e) {
+							Logger.logException(e);
+						}
+					}
+				}
+				
+			}
+		});
 
 	}
 

@@ -86,20 +86,5 @@ public class DoctrineBuilder extends IncrementalProjectBuilder
             IProgressMonitor monitor) throws CoreException {
         delta.accept(new ResourceVisitor());
     }   
-    
-    @Override
-    protected void startupOnInitialize() {
-    	super.startupOnInitialize();
-    	IEclipsePreferences node = InstanceScope.INSTANCE.getNode(DoctrineCorePlugin.ID);
-		if (!DoctrineCoreConstants.INDEX_VERSION.equals(node.get(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, null))) {
-			try {
-				node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
-				node.flush();
-				forgetLastBuiltState();
-				needRebuild();
-			} catch (BackingStoreException e) {
-				Logger.logException(e);
-			}
-		}
-    }
+
 }
