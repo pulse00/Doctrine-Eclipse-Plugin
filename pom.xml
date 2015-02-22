@@ -1,50 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.dubture.doctrine</groupId>
-  <artifactId>parent</artifactId>
-  <version>1.0.8-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <modules>
-    <module>com.dubture.doctrine.core</module>
-    <module>com.dubture.doctrine.annotation</module>
-    <module>com.dubture.doctrine.ui</module>
-    <module>com.dubture.doctrine.test</module>
-    <module>com.dubture.doctrine.feature</module> 
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.dubture.doctrine</groupId>
+	<artifactId>parent</artifactId>
+	<version>1.0.8-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>com.dubture.doctrine.core</module>
+		<module>com.dubture.doctrine.annotation</module>
+		<module>com.dubture.doctrine.ui</module>
+		<module>com.dubture.doctrine.test</module>
+		<module>com.dubture.doctrine.feature</module>
+	</modules>
 
-  <properties>
-    <tycho-version>0.22.0</tycho-version>
-  </properties>
+	<properties>
+		<tycho-version>0.22.0</tycho-version>
+	</properties>
 
-  <repositories>
-   <repository>
-     <id>luna</id>
-     <layout>p2</layout>
-     <url>http://download.eclipse.org/releases/luna</url>
-   </repository>	
-  </repositories>
+	<repositories>
+		<repository>
+			<id>luna</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/luna</url>
+		</repository>
+		<repository>
+			<id>dltk-tests</id>
+			<layout>p2</layout>
+			<url>https://hudson.eclipse.org/dltk/job/dltk-nightly/lastSuccessfulBuild/artifact/org.eclipse.dltk.releng/build/update.site/target/repository/</url>
+		</repository>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho-version}</version>
-        <extensions>true</extensions>
-      </plugin>
-      <plugin>
-	    <groupId>org.eclipse.tycho</groupId>
-	    <artifactId>tycho-compiler-plugin</artifactId>
-	    <version>${tycho-version}</version>
-	    <configuration>
-		  <source>1.6</source>
-		  <target>1.6</target>
-	    </configuration>
-      </plugin>	  
+		<repository>
+			<id>pdt-nightly</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/tools/pdt/updates/latest-nightly/</url>
+		</repository>
+	</repositories>
 
-    </plugins>
-  </build>
-  
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
 
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<!-- this profile simplify contributing -->
+			<id>individual</id>
+			<repositories>
+				<repository>
+					<id>pex</id>
+					<layout>p2</layout>
+					<url>http://p2-dev.pdt-extensions.org/</url>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
 </project>
