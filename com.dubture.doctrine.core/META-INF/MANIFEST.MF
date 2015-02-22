@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dltk.core,
  org.eclipse.php.core,
  com.dubture.doctrine.annotation,
- org.eclipse.text
+ org.eclipse.text,
+ org.eclipse.wst.sse.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.dubture.doctrine.core,

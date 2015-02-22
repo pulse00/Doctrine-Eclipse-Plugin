@@ -35,7 +35,7 @@ public class DoctrineCompletionProposal extends PHPCompletionProposal {
 		char lastChar = replacementString.charAt(replacementString
 				.length() - 1);
 		super.apply(document, trigger, offset);
-		if (lastChar == NamespaceReference.NAMESPACE_SEPARATOR) {
+		if (lastChar == NamespaceReference.NAMESPACE_SEPARATOR ) {
 			AutoActivationTrigger.register(document);
 		}
 	}

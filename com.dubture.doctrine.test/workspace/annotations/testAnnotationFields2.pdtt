@@ -1,15 +1,16 @@
 --TEST--
 
 --FILE--
-<?php
+<?
 namespace NS;
-use Foo\Bar as MyAlias;
+
+use Foo\Bar;
+
 /**
- * @MyAlias\|
+ * @Bar\Note2(|)
  */
 class A {
 }
 ?>
 --EXPECT--
-type(Note1)
-type(Note2)
+field($variable)

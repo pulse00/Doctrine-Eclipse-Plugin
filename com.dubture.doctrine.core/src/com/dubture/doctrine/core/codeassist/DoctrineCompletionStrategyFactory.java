@@ -16,7 +16,9 @@ import org.eclipse.php.core.codeassist.ICompletionStrategy;
 import org.eclipse.php.core.codeassist.ICompletionStrategyFactory;
 
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationCompletionContext;
+import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldContext;
 import com.dubture.doctrine.core.codeassist.strategies.AnnotationCompletionStrategy;
+import com.dubture.doctrine.core.codeassist.strategies.AnnotationFieldStrategy;
 
 /**
  * Factory class for CompletionStrategies.
@@ -33,13 +35,11 @@ public class DoctrineCompletionStrategyFactory implements ICompletionStrategyFac
 		List<ICompletionStrategy> result = new LinkedList<ICompletionStrategy>();
 
 		for (ICompletionContext context : contexts) {
-
 			Class contextClass = context.getClass();
-
 			if (contextClass == AnnotationCompletionContext.class) {
-
 				result.add(new AnnotationCompletionStrategy(context));
-
+			} else if (contextClass == AnnotationFieldContext.class) {
+				result.add(new AnnotationFieldStrategy(context));
 			}
 		}
 

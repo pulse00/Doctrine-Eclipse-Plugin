@@ -13,6 +13,7 @@ import org.eclipse.php.core.codeassist.ICompletionContextResolver;
 import org.eclipse.php.internal.core.codeassist.contexts.CompletionContextResolver;
 
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationCompletionContext;
+import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldContext;
 
 
 /**
@@ -32,6 +33,7 @@ public class DoctrineCompletionContextResolver extends CompletionContextResolver
 
 		return new ICompletionContext[] {
 				new AnnotationCompletionContext(),
+				new AnnotationFieldContext()
 		};
 	}
 }

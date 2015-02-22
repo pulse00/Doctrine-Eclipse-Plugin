@@ -8,45 +8,39 @@
  ******************************************************************************/
 package com.dubture.doctrine.core.codeassist.strategies;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
+import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceRange;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.SourceParserUtil;
-import org.eclipse.dltk.core.SourceRange;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
-import org.eclipse.dltk.internal.core.ModelElement;
-import org.eclipse.dltk.internal.core.SourceType;
-import org.eclipse.dltk.internal.core.hierarchy.FakeType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.core.codeassist.ICompletionContext;
+import org.eclipse.php.core.compiler.PHPFlags;
 import org.eclipse.php.internal.core.Logger;
-import org.eclipse.php.internal.core.codeassist.AliasType;
 import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
 import org.eclipse.php.internal.core.codeassist.ICompletionReporter;
-import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
-import com.dubture.doctrine.core.codeassist.contexts.AnnotationCompletionContext;
-import com.dubture.doctrine.core.compiler.DoctrineFlags;
+import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldContext;
 import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 
 /**
  * 
- * The {@link AnnotationCompletionStrategy} parses the UseStatements of the
- * current class and reports the aliases to the completion engine:
+ * The {@link AnnotationFieldStrategy} parses the UseStatements of the current
+ * class and reports the aliases to the completion engine:
  * 
  * <pre>
  * 
@@ -62,12 +56,12 @@ import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
  * @author Robert Gruendler <r.gruendler@gmail.com>
  */
 @SuppressWarnings({ "restriction" })
-public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
+public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 
 	private int trueFlag = IDoctrineModifiers.AccAnnotation;
 	private int falseFlag = 0;
 
-	public AnnotationCompletionStrategy(ICompletionContext context) {
+	public AnnotationFieldStrategy(ICompletionContext context) {
 		super(context);
 	}
 
@@ -76,28 +70,23 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 
 		ICompletionContext ctx = getContext();
 
-		if (!(ctx instanceof AnnotationCompletionContext)) {
+		if (!(ctx instanceof AnnotationFieldContext)) {
 			return;
 		}
 
-		AnnotationCompletionContext context = (AnnotationCompletionContext) ctx;
-		int target = context.getTarget();
-		if (target == -1) {
-			return;
-		}
-		trueFlag = target;
+		AnnotationFieldContext context = (AnnotationFieldContext) ctx;
 		ISourceRange replaceRange = getReplacementRange(context);
 		IDLTKSearchScope scope = createSearchScope();
-		String prefix = context.getPrefix();
-		String name = prefix;
-		String qualifier = null;
 		ISourceModule sourceModule = context.getSourceModule();
 		if (sourceModule == null) {
 			return;
 		}
-		
 		ModuleDeclaration moduleDeclaration = SourceParserUtil.getModuleDeclaration(sourceModule);
 		IType namespace = PHPModelUtils.getCurrentNamespace(sourceModule, context.getOffset());
+		String prefix = context.getAnnotationName();
+		String name = prefix;
+		String qualifier = null;
+
 		if (prefix.contains(String.valueOf(NamespaceReference.NAMESPACE_SEPARATOR))) {
 			int i = name.lastIndexOf(NamespaceReference.NAMESPACE_SEPARATOR);
 			qualifier = name.substring(0, i);
@@ -116,7 +105,6 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 			if (start + length < prefixEnd) {
 				length = prefixEnd - start;
 			}
-			replaceRange = new SourceRange(start, length); //set valid replace range
 			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, context.getOffset(), namespace, false);
 			for (Entry<String, UsePart> entry : aliases.entrySet()) {
 				if (alias.equalsIgnoreCase(entry.getKey())) {
@@ -127,49 +115,32 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 		} else {
 			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), namespace, false); //$NON-NLS-1$
 			for (Entry<String, UsePart> entry : map.entrySet()) {
+				if (entry.getValue().getAlias() == null) {
+					continue; // ignore
+				}
 				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
 				}
-				IType[] findTypes = PhpModelAccess.getDefault().findTypes(entry.getValue().getNamespace().getFullyQualifiedName(), MatchRule.EXACT, 0, 0, scope, null);
-				if (findTypes.length != 0) {
-					try {
-						if (DoctrineFlags.isAnnotation(findTypes[0].getFlags()) && (findTypes[0].getFlags() & target) == 0) {
-							continue;
-						}
-						reporter.reportType(new AliasType((SourceType)findTypes[0], entry.getValue().getNamespace().getName(), entry.getKey()), DoctrineFlags.isNamespace(findTypes[0].getFlags()) ? "\\" : "()", replaceRange, Integer.valueOf(0), 10);
-					} catch (ModelException e) {
-						Logger.logException(e);
-					}
-				} else {
-					reporter.reportType(new FakeType((ModelElement)sourceModule, entry.getKey(), IDoctrineModifiers.AccNameSpace), "\\", replaceRange, Integer.valueOf(ProposalExtraInfo.TYPE_ONLY) | ProposalExtraInfo.NO_INSERT_USE, 10);
-				}
+				name = entry.getValue().getNamespace().getName();
+				qualifier = entry.getValue().getNamespace().getNamespace().getName();
 			}
 		}
-		
-
-		IType[] types = getTypes(context, scope, qualifier, name.trim());
-		String suffix = "()";
-		for (IType type : types) {
-			reporter.reportType(type, suffix, replaceRange);
-		}
-	}
-
-	private IType[] getTypes(AnnotationCompletionContext context, IDLTKSearchScope scope, String qualifier, String prefix) {
-		if (context.getCompletionRequestor().isContextInformationMode()) {
-			return PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.EXACT, trueFlag, falseFlag, scope, null);
-		}
-
-		List<IType> result = new LinkedList<IType>();
-		if (prefix.length() > 1 && prefix.toUpperCase().equals(prefix)) {
-			// Search by camel-case
-			IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.CAMEL_CASE, trueFlag, falseFlag, scope, null);
-			result.addAll(Arrays.asList(types));
+		IType[] findTypes = PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag, scope, null);
+		for (IType type : findTypes) {
+			try {
+				for (IField f : PHPModelUtils.getTypeHierarchyField(type, getCompanion().getSuperTypeHierarchy(type, null), "$" + context.getKeyPrefix(), false,new NullProgressMonitor())) {
+					if (PHPFlags.isPublic(f.getFlags()) && !PHPFlags.isStatic(f.getFlags()) && !"$value".equals(f.getElementName())) {
+						reporter.reportField(f, "=", replaceRange, true);
+						// TODO FOrmatter settings:
+					}
+				}
+			} catch (ModelException e) {
+				Logger.logException(e);
+			} catch (CoreException e) {
+				Logger.logException(e);
+			}
 		}
 
-		IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.PREFIX, trueFlag, falseFlag, scope, null);
-		result.addAll(Arrays.asList(types));
-
-		return (IType[]) result.toArray(new IType[result.size()]);
 	}
 
 }

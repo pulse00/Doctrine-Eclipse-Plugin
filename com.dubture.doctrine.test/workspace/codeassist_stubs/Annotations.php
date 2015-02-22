@@ -1,15 +1,25 @@
 <?php
 namespace Foo\Bar {
     /**
-     * @Annotation
+     * @Annotation()
+     * @Target({"CLASS"})
      */
     class Note1 {
+        public $value;
     }
 
     /**
      * @Annotation
      */
     class Note2 {
+        public $variable;
+    }
+
+    /**
+     * @Annotation()
+     * @Target("METHOD")
+     */
+    class NoteForMethod {
     }
     class Note3 {
     }

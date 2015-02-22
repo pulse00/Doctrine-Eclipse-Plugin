@@ -1,0 +1,21 @@
+--TEST--
+
+--FILE--
+<?
+namespace NS;
+
+use Foo\Bar;
+
+
+class A {
+    /**
+     * @Bar\Note|
+     */
+    public function test() {
+        
+    }
+}
+?>
+--EXPECT--
+type(Note2)
+type(NoteForMethod)

@@ -15,6 +15,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.wst.sse.ui,
  org.eclipse.php.core;bundle-version="3.4.0",
- com.dubture.doctrine.annotation
+ com.dubture.doctrine.annotation,
+ org.eclipse.wst.sse.core,
+ org.eclipse.wst.sse.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

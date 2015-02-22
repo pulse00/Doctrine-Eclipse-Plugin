@@ -8,12 +8,20 @@
  ******************************************************************************/
 package com.dubture.doctrine.core.codeassist.contexts;
 
+
 import org.eclipse.dltk.core.CompletionRequestor;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.internal.core.codeassist.contexts.PHPDocTagContext;
+import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
+import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
+import org.eclipse.php.internal.core.documentModel.partitioner.PHPPartitionTypes;
 import org.eclipse.php.internal.core.util.text.TextSequence;
+import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
+import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
 
 import com.dubture.doctrine.core.DoctrineNature;
+import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 import com.dubture.doctrine.core.log.Logger;
 
 /**
@@ -51,7 +59,7 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 			
 			// we're inside an annotation's parameters
 			// can't complete this so far.
-			if (line.contains("(")) {
+			if (line.contains("(") || line.contains("[") || line.contains("{")) {
 				return false;
 			}
 			if (line.trim().endsWith("*")) { //$NON-NLS-1$
@@ -64,5 +72,51 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 		}
 		
 		return true;
+	}
+	
+	public int getTarget() {
+		IStructuredDocumentRegion sdRegion = getDocument().getRegionAtCharacterOffset(getOffset());
+		ITextRegion textRegion = sdRegion
+				.getRegionAtCharacterOffset(getOffset());
+		if (!(textRegion instanceof IPhpScriptRegion)) {
+			return -1;
+		}
+		IPhpScriptRegion phpScriptRegion = (IPhpScriptRegion) textRegion;
+		int position = getOffset();
+		try {
+			textRegion = phpScriptRegion.getPhpToken(position
+					- phpScriptRegion.getStart()
+					- sdRegion.getStartOffset());
+			while (textRegion != null) {
+				
+				if (PHPPartitionTypes.isPHPCommentState(textRegion.getType()) || PHPRegionTypes.WHITESPACE.equals(textRegion.getType())) {
+					textRegion = phpScriptRegion.getPhpToken(textRegion.getEnd() + 1);
+					continue;
+				}
+				if (PHPRegionTypes.PHP_CURLY_OPEN.equals(textRegion.getType()) || PHPRegionTypes.PHP_SEMICOLON.equals(textRegion.getType())) {
+					return -1;
+				}
+				if (PHPRegionTypes.PHP_FUNCTION.equals(textRegion.getType())) {
+					return IDoctrineModifiers.AccTargetMethod;
+				}
+				if (PHPRegionTypes.PHP_VAR.equals(textRegion.getType())) {
+					return IDoctrineModifiers.AccTargetField;
+				}
+				if (PHPRegionTypes.PHP_VARIABLE.equals(textRegion.getType()) ) {
+					return IDoctrineModifiers.AccTargetField;
+				}
+				if (PHPRegionTypes.PHP_CLASS.equals(textRegion.getType())) {
+					if (getStatementText().toString().contains("@Annotation")) { //$NON-NLS-1$
+						return IDoctrineModifiers.AccTargetAnnotation;
+					}
+					return IDoctrineModifiers.AccTargetClass;
+				}
+				textRegion = phpScriptRegion.getPhpToken(textRegion.getEnd() + 1);
+			}
+		} catch (BadLocationException e) {
+			Logger.logException(e);
+		}
+		
+		return -1;
 	}
 }

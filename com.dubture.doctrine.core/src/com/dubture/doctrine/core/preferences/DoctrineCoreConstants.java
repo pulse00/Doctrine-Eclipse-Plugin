@@ -14,6 +14,6 @@ import com.dubture.doctrine.core.DoctrineCorePlugin;
 public class DoctrineCoreConstants {
 	public static final String PLUGIN_ID = DoctrineCorePlugin.ID;
 	
-	public static final String INDEX_VERSION = "0.0.2";
+	public static final String INDEX_VERSION = "0.0.3";
 	public static final String INDEX_VERSION_PREFERENCE = "indexVersion";
 }

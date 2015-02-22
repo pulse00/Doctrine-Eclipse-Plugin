@@ -90,7 +90,6 @@ public class DoctrineCompletionProposalCollector extends PHPCompletionProposalCo
 		Image image = getImage(descriptor);
 
 		String displayString = ((DoctrineCompletionProposalLabelProvider) getLabelProvider()).createTypeProposalLabel(typeProposal);
-		System.out.println(displayString);
 		ScriptCompletionProposal scriptProposal = new DoctrineCompletionProposal(completion, replaceStart, length, image, displayString, 0) {
 			@Override
 			public Object getExtraInfo() {

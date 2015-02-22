@@ -6,9 +6,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.compiler.IElementRequestor.TypeInfo;
 import org.eclipse.dltk.compiler.env.IModuleSource;
-import org.eclipse.dltk.core.DLTKCore;
-import org.eclipse.dltk.core.IModelElement;
-import org.eclipse.dltk.core.IRegion;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.php.core.compiler.PHPSourceElementRequestorExtension;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
@@ -20,9 +17,7 @@ import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.ArgumentValueType;
 import com.dubture.doctrine.annotation.model.ArrayValue;
 import com.dubture.doctrine.annotation.model.IArgumentValue;
-import com.dubture.doctrine.annotation.model.StringValue;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
-import com.dubture.doctrine.core.DoctrineCorePlugin;
 import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.utils.AnnotationUtils;
@@ -96,10 +91,13 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 				target = el;
 			}
 		}
-		if (!isAnnotation || target == null) {
+		if (!isAnnotation) {
 			return flags;
 		}
-		if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.ARRAY) {
+		if (target == null) {
+			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
+			
+		} else if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.ARRAY) {
 			ArrayValue val = (ArrayValue) target.getArgumentValue(0);
 			for (IArgumentValue pos : (List<IArgumentValue>) val.getValue()) {
 				if (TARGET_ALL.equals(pos.getValue())) {
@@ -113,6 +111,19 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 				} else if (TARGET_CLASS.equals(pos.getValue())) {
 					flags |= IDoctrineModifiers.AccTargetClass;
 				}
+			}
+		} else if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.STRING) {
+			Object value = target.getArgumentValue(0).getValue();
+			if (TARGET_ALL.equals(value)) {
+				flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
+			} else if (TARGET_ANNOTATION.equals(value)) {
+				flags |= IDoctrineModifiers.AccTargetAnnotation;
+			} else if (TARGET_FIELD.equals(value)) {
+				flags |= IDoctrineModifiers.AccTargetField;
+			} else if (TARGET_METHOD.equals(value)) {
+				flags |= IDoctrineModifiers.AccTargetMethod;
+			} else if (TARGET_CLASS.equals(value)) {
+				flags |= IDoctrineModifiers.AccTargetClass;
 			}
 		} else {
 			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
