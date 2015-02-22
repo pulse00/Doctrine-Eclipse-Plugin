@@ -93,16 +93,10 @@ public class DoctrineBuilder extends IncrementalProjectBuilder
     	IEclipsePreferences node = InstanceScope.INSTANCE.getNode(DoctrineCorePlugin.ID);
 		if (!DoctrineCoreConstants.INDEX_VERSION.equals(node.get(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, null))) {
 			try {
-
-				for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-					if (project.isOpen() && project.hasNature(DoctrineNature.NATURE_ID)) {
-						project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
-					}
-				}
 				node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
 				node.flush();
-			} catch (CoreException e) {
-				Logger.logException(e);
+				forgetLastBuiltState();
+				needRebuild();
 			} catch (BackingStoreException e) {
 				Logger.logException(e);
 			}
