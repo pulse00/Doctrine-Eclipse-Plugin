@@ -8,6 +8,8 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.documentModel.parser.PHPRegionContext;
 import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
 import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
+import org.eclipse.php.internal.core.util.text.PHPTextSequenceUtilities;
+import org.eclipse.php.internal.core.util.text.TextSequence;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
@@ -49,30 +51,30 @@ public class PHPDocTextSequenceUtilities {
 			tRegion = phpScriptRegion.getPhpToken(offset - container.getStartOffset() - phpScriptRegion.getStart());
 		} catch (BadLocationException e) {
 		}
-		
+
 		if (tRegion == null) {
 			return null;
 		}
-		
+
 		return tRegion.getType();
 	}
-	
+
 	public static boolean isPHPDoc(IStructuredDocument document, int offset) {
 		return PHPRegionTypes.PHPDOC_COMMENT.equals(getPHPRegionType(document, offset));
 	}
-	
+
 	public static String getAnnotationName(IDocument document, int offset) throws BadLocationException {
 		return getAnnotationName(document, offset, document.getLength() - 1);
 	}
-	
+
 	public static String getAnnotationName(IDocument document, int offset, int max) throws BadLocationException {
 		if (document.getLength() < offset) {
 			return null;
 		}
 		StringBuilder name = new StringBuilder();
-		for (int i = offset - 1; i >=0; i--) {
+		for (int i = offset - 1; i >= 0; i--) {
 			char ch = document.getChar(i);
-			
+
 			if (ch == '@') {
 				break;
 			} else if (!isIdentPart(ch)) {
@@ -80,7 +82,7 @@ public class PHPDocTextSequenceUtilities {
 			}
 			name.insert(0, ch);
 		}
-		for (int i = offset; i <= max ; i++) {
+		for (int i = offset; i <= max; i++) {
 			char ch = document.getChar(i);
 			if (Character.isWhitespace(ch) || ch == '(') {
 				break;
@@ -89,11 +91,65 @@ public class PHPDocTextSequenceUtilities {
 			}
 			name.append(ch);
 		}
-		
+
 		return name.toString();
 	}
-	
+
 	public static boolean isIdentPart(char ch) {
 		return Character.isLetterOrDigit(ch) || ch == NamespaceReference.NAMESPACE_SEPARATOR || ch == '_';
+	}
+
+	public static boolean isInsideAnnotation(String text, int offset) {
+		int end = offset;
+		if (offset >= text.length()) {
+			offset = text.length() - 1;
+		}
+		for (; end > 0 && text.charAt(end) != '@'; end--) {
+		}
+		end--;
+		boolean inString = false;
+		boolean go = false;
+		int calls = 0;
+		for (; !go && end > 1; end--) {
+			char ch = text.charAt(end);
+			if (inString && ch == '"' && text.charAt(end - 1) != '\\') {
+				inString = false;
+				continue;
+			}
+			switch (ch) {
+			case '"':
+				inString = true;
+				continue;
+			case ')':
+				calls ++;
+				continue;
+			case '(':
+				if (calls == 0) {
+					go = true;
+					break;
+				}
+				calls--;
+			}
+		}
+		end--;
+		if (end == 1) {
+			return false;
+		}
+		boolean noMoreWhiteSpace = false;
+		for (; end > 1; end--) {
+			char ch = text.charAt(end);
+			if (isIdentPart(ch)) {
+				noMoreWhiteSpace = true;
+				continue;
+			}
+			if (!noMoreWhiteSpace && (Character.isWhitespace(ch) || ch == '*')) {
+				continue;
+			} else if (ch == '@') {
+				return true;
+			}
+			return false;
+		}
+		
+		return false;
 	}
 }

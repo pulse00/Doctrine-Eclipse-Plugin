@@ -1,11 +1,16 @@
 package com.dubture.doctrine.core;
 
+import org.eclipse.core.internal.jobs.JobManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
@@ -32,35 +37,31 @@ public class DoctrineCorePlugin extends Plugin {
 		super.start(bundleContext);
 		DoctrineCorePlugin.context = bundleContext;
 		plugin = this;
-		bundleContext.addBundleListener(new BundleListener() {
-			private boolean init = false;
+		new Job("Doctrine index change detector") { //$NON-NLS-1$
+			
 			@Override
-			public void bundleChanged(BundleEvent event) {
-				if (event.getBundle() == getBundle()) {
-					if (init) {
-						return;
-					}
-					init = true;
-					IEclipsePreferences node = InstanceScope.INSTANCE.getNode(DoctrineCorePlugin.ID);
-					if (!DoctrineCoreConstants.INDEX_VERSION.equals(node.get(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, null))) {
-						try {
-							for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-								if (project.isAccessible() && project.hasNature(DoctrineNature.NATURE_ID)) {
-									project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-								}
+			protected IStatus run(IProgressMonitor monitor) {
+				IEclipsePreferences node = InstanceScope.INSTANCE.getNode(DoctrineCorePlugin.ID);
+				if (!DoctrineCoreConstants.INDEX_VERSION.equals(node.get(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, null))) {
+					try {
+						for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+							if (project.isAccessible() && project.hasNature(DoctrineNature.NATURE_ID)) {
+								monitor.subTask("Rebuild doctrine index: " + project.getName()); //$NON-NLS-1$
+								project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 							}
-							node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
-							node.flush();
-						} catch (BackingStoreException e) {
-							Logger.logException(e);
-						} catch (CoreException e) {
-							Logger.logException(e);
 						}
+						node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
+						node.flush();
+					} catch (BackingStoreException e) {
+						Logger.logException(e);
+					} catch (CoreException e) {
+						Logger.logException(e);
 					}
 				}
 				
+				return Status.OK_STATUS;
 			}
-		});
+		}.schedule(100);
 
 	}
 

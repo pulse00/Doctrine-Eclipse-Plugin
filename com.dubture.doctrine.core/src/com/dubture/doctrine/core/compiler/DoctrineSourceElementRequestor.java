@@ -95,13 +95,13 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 			return flags;
 		}
 		if (target == null) {
-			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
+			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 			
 		} else if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.ARRAY) {
 			ArrayValue val = (ArrayValue) target.getArgumentValue(0);
 			for (IArgumentValue pos : (List<IArgumentValue>) val.getValue()) {
 				if (TARGET_ALL.equals(pos.getValue())) {
-					flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
+					flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 				} else if (TARGET_ANNOTATION.equals(pos.getValue())) {
 					flags |= IDoctrineModifiers.AccTargetAnnotation;
 				} else if (TARGET_FIELD.equals(pos.getValue())) {
@@ -115,7 +115,7 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 		} else if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.STRING) {
 			Object value = target.getArgumentValue(0).getValue();
 			if (TARGET_ALL.equals(value)) {
-				flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
+				flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 			} else if (TARGET_ANNOTATION.equals(value)) {
 				flags |= IDoctrineModifiers.AccTargetAnnotation;
 			} else if (TARGET_FIELD.equals(value)) {
@@ -126,7 +126,7 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 				flags |= IDoctrineModifiers.AccTargetClass;
 			}
 		} else {
-			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod;
+			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 		}
 
 		return flags;

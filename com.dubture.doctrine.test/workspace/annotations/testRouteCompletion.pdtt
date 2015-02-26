@@ -1,0 +1,17 @@
+--TEST--
+Should complete methods a @Route annotation
+--FILE--
+<?
+namespace NS;
+class SomeController {
+
+    /**
+     * @R|
+     */
+	public function someAction() {
+	
+	}
+}
+?>
+--EXPECT--
+type(Route)

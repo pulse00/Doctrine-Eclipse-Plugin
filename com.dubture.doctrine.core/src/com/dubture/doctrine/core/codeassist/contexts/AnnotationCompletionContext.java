@@ -23,6 +23,7 @@ import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
 import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 import com.dubture.doctrine.core.log.Logger;
+import com.dubture.doctrine.internal.core.text.PHPDocTextSequenceUtilities;
 
 /**
  * 
@@ -75,18 +76,26 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 	}
 	
 	public int getTarget() {
+		
+		
+		
 		IStructuredDocumentRegion sdRegion = getDocument().getRegionAtCharacterOffset(getOffset());
 		ITextRegion textRegion = sdRegion
 				.getRegionAtCharacterOffset(getOffset());
 		if (!(textRegion instanceof IPhpScriptRegion)) {
 			return -1;
 		}
+		
+		
 		IPhpScriptRegion phpScriptRegion = (IPhpScriptRegion) textRegion;
 		int position = getOffset();
 		try {
 			textRegion = phpScriptRegion.getPhpToken(position
 					- phpScriptRegion.getStart()
 					- sdRegion.getStartOffset());
+			if (textRegion != null && PHPDocTextSequenceUtilities.isInsideAnnotation(sdRegion.getParentDocument().get(textRegion.getStart(), textRegion.getEnd() + sdRegion.getStartOffset() > getOffset() ? textRegion.getEnd() + sdRegion.getStartOffset() : getOffset()), getOffset() - textRegion.getStart())) {
+				return IDoctrineModifiers.AccTargetAnnotation;
+			}
 			while (textRegion != null) {
 				
 				if (PHPPartitionTypes.isPHPCommentState(textRegion.getType()) || PHPRegionTypes.WHITESPACE.equals(textRegion.getType())) {
@@ -106,9 +115,6 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 					return IDoctrineModifiers.AccTargetField;
 				}
 				if (PHPRegionTypes.PHP_CLASS.equals(textRegion.getType())) {
-					if (getStatementText().toString().contains("@Annotation")) { //$NON-NLS-1$
-						return IDoctrineModifiers.AccTargetAnnotation;
-					}
 					return IDoctrineModifiers.AccTargetClass;
 				}
 				textRegion = phpScriptRegion.getPhpToken(textRegion.getEnd() + 1);

@@ -1,0 +1,16 @@
+--TEST--
+Should complete methods a @Inject annotation
+--FILE--
+<?
+namespace NS;
+class SomeController {
+
+    /**
+     * @I|
+     */
+	public $property;
+}
+?>
+--EXPECT--
+type(Inject)
+
