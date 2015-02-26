@@ -94,6 +94,6 @@ public class PHPDocTextSequenceUtilities {
 	}
 	
 	public static boolean isIdentPart(char ch) {
-		return Character.isAlphabetic(ch) || Character.isDigit(ch) || ch == NamespaceReference.NAMESPACE_SEPARATOR;
+		return Character.isLetterOrDigit(ch) || ch == NamespaceReference.NAMESPACE_SEPARATOR || ch == '_';
 	}
 }
