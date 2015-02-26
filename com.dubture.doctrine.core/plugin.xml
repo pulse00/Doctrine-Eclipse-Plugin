@@ -51,5 +51,12 @@
          </requires>
       </buildParticipant>
    </extension>
-
+   <extension
+         point="org.eclipse.dltk.core.selectionEngine">
+      <selectionEngine
+            class="com.dubture.doctrine.core.codeassist.DoctrineSelectionEngine"
+            nature="org.eclipse.php.core.PHPNature"
+            priority="80">
+      </selectionEngine>
+   </extension>
 </plugin>
