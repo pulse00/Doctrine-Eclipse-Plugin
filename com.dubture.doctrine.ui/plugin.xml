@@ -46,5 +46,19 @@
 			type="autoeditstrategy"	
             class="com.dubture.doctrine.ui.autoedit.AnnotationAutoEditStrategy"
             target="org.eclipse.php.PHP_DEFAULT" />
-    </extension>
+ </extension>
+ <extension
+   point="org.eclipse.wst.sse.ui.semanticHighlighting">
+    <highlighting
+      class="com.dubture.doctrine.ui.editor.highlighting.AnnotationHighlighting"
+      target="org.eclipse.php.core.phpsource">
+    </highlighting> 
+ </extension>
+  <!-- dark theme defaults -->
+  <extension
+	   point="org.eclipse.e4.ui.css.swt.theme">
+	  <stylesheet uri="resources/css/dark/preferencestyle.css"> 
+	      <themeid refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
+	  </stylesheet>
+  </extension>
 </plugin>

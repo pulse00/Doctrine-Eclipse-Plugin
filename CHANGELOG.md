@@ -5,3 +5,4 @@
   * Annotation fields with description
   * Filter by @Target
 * Annotation selection engine
+* Annotation highlighting

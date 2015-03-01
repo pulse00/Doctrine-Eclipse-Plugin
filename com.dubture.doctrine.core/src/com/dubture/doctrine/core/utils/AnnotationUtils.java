@@ -16,6 +16,7 @@ import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.log.Logger;
 
+@SuppressWarnings("restriction")
 public class AnnotationUtils {
 	// FIXME: Those two have been copied from AnnotationUtils that can be found in com.dubture.symfony.core
     protected static final String[] PHPDOC_TAGS_EXTRA = {"api", "inheritdoc"};
@@ -65,6 +66,35 @@ public class AnnotationUtils {
     }
     
     /**
+     * Parse a comment from a comment PHP AST node. This is the preferred method to
+     * use if you need exact source position in the annotations returned.
+     *
+     * @param parser The parser used to parse a comment
+     * @param comment The comment node to parse the comment from
+     * @param sourceModule The source module where the comment is located
+     *
+     * @return A list of valid annotations
+     */
+    public static List<Annotation> extractAnnotations(AnnotationCommentParser parser,
+                                                      Comment comment,
+                                                      ISourceModule sourceModule) {
+        if (comment == null || comment.getCommentType() != Comment.TYPE_PHPDOC) {
+            return EMPTY_ANNOTATIONS;
+        }
+
+        try {
+            int commentStartOffset = comment.getStart();
+            int commentEndOffset = comment.getEnd();
+            String commentSource = getCommentSource(sourceModule, commentStartOffset, commentEndOffset);
+
+            return parser.parse(commentSource, commentStartOffset);
+        } catch (Exception exception) {
+            Logger.logException("Unable to extract annotations from comment", exception);
+            return EMPTY_ANNOTATIONS;
+        }
+    }
+    
+    /**
      * This will create a default {@link AnnotationCommentParser}. This default
      * parser will exclude base PHP doc tags and also some extra PHP doc tags (
      * {@literal @inheritdoc} and {@literal @api}).
@@ -82,7 +112,7 @@ public class AnnotationUtils {
      * @return A default {@link AnnotationCommentParser} set to include only the classes specified
      */
     // FIXME: This has been copied from AnnotationUtils that can be found in com.dubture.symfony.core
-    public static AnnotationCommentParser createParser(String[] includedClassNames) {
+	public static AnnotationCommentParser createParser(String[] includedClassNames) {
         AnnotationCommentParser parser = new AnnotationCommentParser();
         parser.addExcludedClassNames(PHPDocTagStrategy.PHPDOC_TAGS);
         parser.addExcludedClassNames(PHPDOC_TAGS_EXTRA);
@@ -119,4 +149,22 @@ public class AnnotationUtils {
 	public static AnnotationCommentParser createParser() {
 		return createParser(PHPDOC_TAGS_EXTRA);
 	}
+	
+	/**
+     * Get the comment source from a source module. This will simply get the source
+     * and extract the substring representing the comment.
+     *
+     * @param sourceModule The source module to extract the comment from
+     * @param start The start offset of the comment
+     * @param end The end offset of the comment
+     *
+     * @return The comment source extracted from the source module
+     *
+     * @throws ModelException If an exception occurs while accessing the underlying resource
+     */
+    private static String getCommentSource(ISourceModule sourceModule, int start, int end) throws ModelException {
+        String source = sourceModule.getSource();
+
+        return source.substring(start, end);
+    }
 }

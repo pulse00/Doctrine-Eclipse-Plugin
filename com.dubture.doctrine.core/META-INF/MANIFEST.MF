@@ -18,4 +18,5 @@ Export-Package: com.dubture.doctrine.core,
  com.dubture.doctrine.core.codeassist,
  com.dubture.doctrine.core.compiler,
  com.dubture.doctrine.core.goals,
- com.dubture.doctrine.core.model
+ com.dubture.doctrine.core.model,
+ com.dubture.doctrine.core.utils
