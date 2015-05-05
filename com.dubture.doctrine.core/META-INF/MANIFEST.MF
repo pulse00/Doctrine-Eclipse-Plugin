@@ -5,13 +5,15 @@ Bundle-SymbolicName: com.dubture.doctrine.core;singleton:=true
 Bundle-Version: 1.0.8.qualifier
 Bundle-Activator: com.dubture.doctrine.core.DoctrineCorePlugin
 Bundle-Vendor: https://github.com/pulse00
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.dltk.core,
  org.eclipse.php.core,
  com.dubture.doctrine.annotation,
  org.eclipse.text,
- org.eclipse.wst.sse.core
+ org.eclipse.wst.sse.core,
+ org.eclipse.ltk.core.refactoring
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.dubture.doctrine.core,
