@@ -11,9 +11,9 @@
 
 	<artifactId>com.dubture.doctrine.test</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
-  <properties>
-    <test.vmargs>-Xmx256m -XX:MaxPermSize=256m</test.vmargs>
-  </properties>
+	<properties>
+		<test.vmargs>-Xmx256m -XX:MaxPermSize=256m</test.vmargs>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -21,9 +21,9 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-	      			<testSuite>com.dubture.doctrine.test</testSuite>
-    	  			<testClass>com.dubture.doctrine.test.AllTests</testClass>
-	      			<dependencies>
+					<testSuite>com.dubture.doctrine.test</testSuite>
+					<testClass>com.dubture.doctrine.test.AllTests</testClass>
+					<dependencies>
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.eclipse.dltk.core.index.sql.h2</artifactId>
@@ -31,8 +31,8 @@
 					</dependencies>
 				</configuration>
 			</plugin>
-    </plugins>
-    <pluginManagement>
+		</plugins>
+		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>

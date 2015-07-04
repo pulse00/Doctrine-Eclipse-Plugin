@@ -12,28 +12,38 @@
 		<module>com.dubture.doctrine.ui</module>
 		<module>com.dubture.doctrine.test</module>
 		<module>com.dubture.doctrine.feature</module>
+		<module>repository</module>
 	</modules>
 
 	<properties>
 		<tycho-version>0.22.0</tycho-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<eclipse.name>luna</eclipse.name>
+		<release>false</release>
+		<bintray.user></bintray.user>
+		<bintray.apikey></bintray.apikey>
+		<bintray.owner></bintray.owner>
+		<bintray.repo>doctrine-plugin</bintray.repo>
+		<bintray.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</bintray.version>
+		<pdt.version>latest-nightly</pdt.version>
+		<dltk.version>latest-nightly</dltk.version>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>luna</id>
+			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/luna</url>
+			<url>http://download.eclipse.org/releases/${eclipse.name}</url>
 		</repository>
 		<repository>
-			<id>dltk-tests</id>
+			<id>dltk</id>
 			<layout>p2</layout>
-			<url>https://hudson.eclipse.org/dltk/job/dltk-nightly/lastSuccessfulBuild/artifact/org.eclipse.dltk.releng/build/update.site/target/repository/</url>
+			<url>http://download.eclipse.org/technology/dltk/updates-dev/${dltk.version}/</url>
 		</repository>
-
 		<repository>
-			<id>pdt-nightly</id>
+			<id>pdt</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/pdt/updates/latest-nightly/</url>
+			<url>http://download.eclipse.org/tools/pdt/updates/${pdt.version}/</url>
 		</repository>
 	</repositories>
 
@@ -54,20 +64,97 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<pomDependencies>consider</pomDependencies>
+					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>parse-version</id>
+						<goals>
+							<goal>parse-version</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
-			<!-- this profile simplify contributing -->
-			<id>individual</id>
-			<repositories>
-				<repository>
-					<id>pex</id>
-					<layout>p2</layout>
-					<url>http://p2-dev.pdt-extensions.org/</url>
-				</repository>
-			</repositories>
+			<id>release</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<properties>
+				<bintray.package>release</bintray.package>
+			</properties>
+		</profile>
+		<profile>
+			<id>nightly</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>false</value>
+				</property>
+			</activation>
+			<properties>
+				<bintray.package>nightly</bintray.package>
+			</properties>
 		</profile>
 	</profiles>
 </project>
