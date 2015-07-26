@@ -11,5 +11,7 @@ Eclipse Plugin for the Doctrine ORM
 ### Features
 
 - Full doctrine annotation support in PHP Editor
+- Annotation rename refactoring
+- Annotation usage validator
 
 
