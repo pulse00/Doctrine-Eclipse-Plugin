@@ -30,7 +30,9 @@ public class Argument extends AnnotationSourceElement {
 	@Override
 	public void traverse(AnnotationVisitor visitor) {
 		if (visitor.visit(this)) {
-			value.traverse(visitor);;
+			if (value != null) {
+				value.traverse(visitor);
+			}
 		}
 		visitor.endVisit(this);
 	}

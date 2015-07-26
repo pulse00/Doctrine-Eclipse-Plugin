@@ -36,7 +36,9 @@ public class NamedArgument extends Argument {
 	@Override
 	public void traverse(AnnotationVisitor visitor) {
 		if (visitor.visit(this)) {
-			value.traverse(visitor);
+			if (value != null) {
+				value.traverse(visitor);
+			}
 		}
 		visitor.endVisit(this);
 	}
