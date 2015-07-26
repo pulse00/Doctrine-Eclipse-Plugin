@@ -3,6 +3,7 @@
 * Annotation cache
 * Annotation import validator
 * Index improvements
+* Resurrect RepositoryClass goal evaluators
 1.0.8
 * Doctrine feature become standalone feature
 * Improved code assist for annotations

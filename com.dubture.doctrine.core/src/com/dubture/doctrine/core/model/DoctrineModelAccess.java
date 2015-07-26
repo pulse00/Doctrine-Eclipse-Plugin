@@ -39,8 +39,7 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	private static DoctrineModelAccess modelInstance = null;
 	private List<IEntityResolver> resolvers = null;
 
-	private LRUCache entityCache = new LRUCache();
-	private LRUCache repoCache = new LRUCache();
+	private LRUCache entityCache = new LRUCache(10);
 	private final String NULL_RESULT = "__NOT_FOUND__";
 
 	public static DoctrineModelAccess getDefault() {
@@ -60,16 +59,11 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 	 * @return
 	 */
 	public String getRepositoryClass(String className, String qualifier, IScriptProject project) {
-		if (className != null ) {
+		if (className == null ) {
 			return null;
 		}
 
-		String key = className + project.getElementName();
-
-		Object object = repoCache.get(key);
-		if (object != null)  {
-			return object.equals(NULL_RESULT) ? null : (String) object;
-		}
+		String key = project.getElementName() + "/" + className;
 
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project);
 
@@ -80,30 +74,22 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
 		final List<String> repos = new ArrayList<String>();
 
-		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, null, className, 0, 0, 100, SearchFor.REFERENCES,
+		engine.search(IDoctrineModelElement.REPOSITORY_CLASS, qualifier, className, 0, 0, 100, SearchFor.REFERENCES,
 				MatchRule.EXACT, scope, new ISearchRequestor() {
 
-					/**
-					 * FIXME: Override annotation removed due to failing tycho
-					 * build
-					 */
 					public void match(int elementType, int flags, int offset, int length, int nameOffset,
 							int nameLength, String elementName, String metadata, String doc, String qualifier,
 							String parent, ISourceModule sourceModule, boolean isReference) {
-
-						if (metadata != null)
+						if (metadata != null) {
 							repos.add(metadata);
+						}
 
 					}
 				}, null);
 
 		if (repos.size() == 1) {
-
 			String repo = repos.get(0);
-			repoCache.put(key, repo);
 			return repo;
-		} else {
-			repoCache.put(key,NULL_RESULT);
 		}
 
 		return null;
@@ -205,6 +191,5 @@ public class DoctrineModelAccess extends PhpModelAccess implements ICleanListene
 
 	public void clean() {
 		entityCache.flush();
-		repoCache.flush();
 	}
 }

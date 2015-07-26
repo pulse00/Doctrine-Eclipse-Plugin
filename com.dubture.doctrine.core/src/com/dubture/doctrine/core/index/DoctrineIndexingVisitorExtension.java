@@ -8,14 +8,12 @@ import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
-import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.DeclarationInfo;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.ReferenceInfo;
 import org.eclipse.php.core.index.PhpIndexingVisitorExtension;
 import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UseStatement;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
@@ -47,14 +45,12 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
 
 	private NamespaceDeclaration namespace;
 	private IAnnotationModuleDeclaration decl;
-	private PHPModuleDeclaration mod;
 	private HashMap<String, String> parts;
 
 	@Override
 	public void setSourceModule(ISourceModule module) {
 		super.setSourceModule(module);
 		parts = new HashMap<String, String>();
-		mod = (PHPModuleDeclaration) SourceParserUtil.getModuleDeclaration(module);
 		try {
 			decl = AnnotationParserUtil.getModule(module);
 		} catch (CoreException e) {
@@ -147,8 +143,8 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
 		String repositoryClass = (String) repoArgumentValue.getValue();
 		ReferenceInfo repositoryInfo = new ReferenceInfo(IDoctrineModelElement.REPOSITORY_CLASS, classDeclaration.sourceStart(), classDeclaration.sourceEnd(),
 				classDeclaration.getName(), repositoryClass, qualifier);
-
 		Logger.debugMSG("indexing repository class: " + classDeclaration.getName() + " => " + repositoryClass);
+
 		requestor.addReference(repositoryInfo);
 	}
 

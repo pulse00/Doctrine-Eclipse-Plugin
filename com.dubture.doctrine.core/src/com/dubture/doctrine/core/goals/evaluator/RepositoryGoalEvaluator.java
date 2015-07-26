@@ -55,7 +55,7 @@ public class RepositoryGoalEvaluator extends GoalEvaluator {
 			try {
 				IType[] types = PHPModelUtils.getTypes(goal.getEtityName(), sourceModule,0, cache, null);
 				if (types != null && types.length > 0) {
-					model.getRepositoryClass(goal.getEtityName(), null, project);
+					model.getRepositoryClass(PHPModelUtils.extractElementName(goal.getEtityName()), PHPModelUtils.extractNameSpaceName(goal.getEtityName()), project);
 					if (repo != null) {
 						result = new PHPClassType(repo);
 						return IGoal.NO_GOALS;
@@ -72,11 +72,11 @@ public class RepositoryGoalEvaluator extends GoalEvaluator {
 
 
 		// This can provide bootleneck on huge projects
-		repo = model.getRepositoryClass(type.getElementName(), type.getFullyQualifiedName("\\"), project);
+		String fullName = PHPModelUtils.getFullName(type);
+		repo = model.getRepositoryClass(PHPModelUtils.extractElementName(fullName), PHPModelUtils.extractNameSpaceName(fullName), project);
 
 		if (repo == null) {
-			// FIXME If force EntityRepostory, PDT hang for 15s
-			result = new PHPClassType("Doctrine\\Common\\Persistence", "ObjectRepository");
+			result = new PHPClassType("Doctrine\\ORM", "EntityRepository");
 			return IGoal.NO_GOALS;
 		}
 

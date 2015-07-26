@@ -24,6 +24,7 @@ import org.eclipse.php.internal.core.typeinference.IModelAccessCache;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.php.internal.core.typeinference.context.MethodContext;
 import org.eclipse.php.internal.core.typeinference.goals.MethodElementReturnTypeGoal;
+import org.eclipse.php.internal.core.typeinference.goals.phpdoc.PHPDocMethodReturnTypeGoal;
 
 import com.dubture.doctrine.core.goals.evaluator.RepositoryExpressionGoalEvaluator;
 import com.dubture.doctrine.core.goals.evaluator.RepositoryGoalEvaluator;
@@ -57,8 +58,8 @@ public class RepositoryEvaluatorFactory implements IGoalEvaluatorFactory {
 			return null;
 		}
 
-		if (goalClass == MethodElementReturnTypeGoal.class) {
-			MethodElementReturnTypeGoal g = (MethodElementReturnTypeGoal) goal;
+		if (goalClass == PHPDocMethodReturnTypeGoal.class) {
+			PHPDocMethodReturnTypeGoal g = (PHPDocMethodReturnTypeGoal) goal;
 			if (g.getMethodName().equals("getRepository") && g.getArgNames() != null && g.getArgNames().length > 0 && g.getArgNames()[0] != null) {
 
 				return new RepositoryExpressionGoalEvaluator(goal, ASTUtils.stripQuotes(g.getArgNames()[0]));

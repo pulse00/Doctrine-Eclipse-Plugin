@@ -14,7 +14,7 @@ public class RepositoryTypeGoal extends AbstractGoal {
 	public RepositoryTypeGoal(IContext context, String entityName) {
 		super(context);
 		assert entityName != null;
-		this.entityName = entityName.length() > 2 ? entityName.replaceAll("\\\\\\\\", "\\\\") : entityName;
+		this.entityName = entityName.length() > 2 ? entityName.replace("\\\\", "\\") : entityName;
 	}
 
 	@Override
