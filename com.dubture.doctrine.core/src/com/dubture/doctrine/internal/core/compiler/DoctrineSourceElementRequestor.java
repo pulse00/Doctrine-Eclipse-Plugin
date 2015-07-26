@@ -1,4 +1,4 @@
-package com.dubture.doctrine.core.compiler;
+package com.dubture.doctrine.internal.core.compiler;
 
 import java.util.List;
 
@@ -21,6 +21,9 @@ import com.dubture.doctrine.annotation.model.IArgumentValue;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.DoctrineNature;
+import com.dubture.doctrine.core.compiler.DoctrineFlags;
+import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
+import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.utils.AnnotationUtils;
 

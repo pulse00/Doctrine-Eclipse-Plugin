@@ -51,4 +51,9 @@ public class AnnotationModuleDeclaration implements IAnnotationModuleDeclaration
 		}
 		return EMPTY;
 	}
+
+	@Override
+	public AnnotationBlock[] getBlocks() {
+		return annotations.values().toArray(new AnnotationBlock[annotations.size()]);
+	}
 }

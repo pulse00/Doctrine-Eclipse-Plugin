@@ -27,4 +27,18 @@ public class AnnotationBlock extends AnnotationSourceElement {
 	public List<Annotation> getAnnotations() {
 		return annotations;
 	}
+	
+	public boolean isEmpty() {
+		return annotations.isEmpty();
+	}
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		if (visitor.visit(this)) {
+			for (Annotation a : annotations) {
+				a.traverse(visitor);
+			}
+		}
+		visitor.endVisit(this);
+	}
 }

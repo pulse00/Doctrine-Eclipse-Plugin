@@ -23,4 +23,13 @@ public class AnnotationValue extends Annotation implements IArgumentValue {
     public String toString() {
         return super.toString();
     }
+    
+    @Override
+    public void traverse(AnnotationVisitor visitor) {
+    	if (visitor.visit(this)) {
+			this.annotationClass.traverse(visitor);
+			this.annotationDeclaration.traverse(visitor);
+		}
+		visitor.endVisit(this);
+    }
 }

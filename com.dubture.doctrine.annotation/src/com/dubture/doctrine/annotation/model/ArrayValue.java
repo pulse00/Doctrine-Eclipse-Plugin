@@ -49,4 +49,14 @@ public class ArrayValue extends ArgumentValue {
     public String toString() {
         return values.toString();
     }
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		if (visitor.visit(this)) {
+			for (IArgumentValue val : values) {
+				val.traverse(visitor);
+			}
+		}
+		visitor.endVisit(this);
+	}
 }

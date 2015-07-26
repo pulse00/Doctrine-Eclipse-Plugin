@@ -15,7 +15,7 @@ import com.dubture.doctrine.annotation.parser.antlr.SourcePosition;
  *
  * @author Matthieu Vachon <matthieu.o.vachon@gmail.com>
  */
-public class AnnotationSourceElement implements ISourceElement {
+abstract public class AnnotationSourceElement implements ISourceElement {
 
     protected SourcePosition sourcePosition = new SourcePosition();
 

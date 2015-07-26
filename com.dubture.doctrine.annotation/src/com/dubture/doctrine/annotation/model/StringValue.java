@@ -32,4 +32,10 @@ public class StringValue extends ArgumentValue {
     public String toString() {
         return value;
     }
+    
+    @Override
+	public void traverse(AnnotationVisitor visitor) {
+		visitor.visit(this);
+		visitor.endVisit(this);
+	}
 }

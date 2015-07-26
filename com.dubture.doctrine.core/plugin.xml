@@ -59,4 +59,28 @@
             priority="80">
       </selectionEngine>
    </extension>
+   <extension
+          point="org.eclipse.ltk.core.refactoring.renameParticipants">
+       <renameParticipant
+             class="com.dubture.doctrine.internal.core.refactoring.RenameAnnotationParticipant"
+             id="com.dubture.doctrine.core.refactoring.renameAnnotation"
+             name="Rename Annotation Reference">
+          <enablement>
+          	<with variable="affectedNatures">
+		        <iterate operator="or">
+		          <equals value="com.dubture.doctrine.core.doctrineNature"/>
+		        </iterate>
+		      </with>
+		      <with variable="element">
+		        <instanceof value="org.eclipse.dltk.core.IType"/>
+		      </with>
+          </enablement>
+       </renameParticipant>
+    </extension>
+   <extension
+         point="org.eclipse.php.core.phpSourceElementRequestors">
+      <requestor
+            class="com.dubture.doctrine.internal.core.compiler.DoctrineSourceElementRequestor">
+      </requestor>
+   </extension>
 </plugin>

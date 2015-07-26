@@ -3,59 +3,37 @@ package com.dubture.doctrine.core.codeassist;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.crypto.dsig.keyinfo.PGPData;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
+import org.eclipse.dltk.codeassist.ScriptSelectionEngine;
 import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IProjectFragment;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
-import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.SourceParserUtil;
-import org.eclipse.dltk.core.SourceRange;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
-import org.eclipse.dltk.internal.core.ModelElement;
-import org.eclipse.dltk.internal.core.SourceType;
-import org.eclipse.dltk.internal.core.hierarchy.FakeType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.internal.core.PHPCorePlugin;
-import org.eclipse.php.internal.core.PHPVersion;
-import org.eclipse.php.internal.core.codeassist.AliasType;
-import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
-import org.eclipse.php.internal.core.codeassist.PHPSelectionEngine;
-import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
-import org.eclipse.php.internal.core.documentModel.parser.PHPRegionContext;
-import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
-import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
-import org.eclipse.php.internal.core.util.text.PHPTextSequenceUtilities;
-import org.eclipse.php.internal.core.util.text.TextSequence;
-import org.eclipse.php.internal.core.util.text.TextSequenceUtilities;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
-import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
-import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
-import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionCollection;
-import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionContainer;
 
 import com.dubture.doctrine.core.DoctrineNature;
-import com.dubture.doctrine.core.compiler.DoctrineFlags;
 import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.internal.core.text.PHPDocTextSequenceUtilities;
 
 @SuppressWarnings("restriction")
-public class DoctrineSelectionEngine extends PHPSelectionEngine {
+public class DoctrineSelectionEngine extends ScriptSelectionEngine {
 	private final static IModelElement[] NONE = {};
 	private final static String DEFAULT_ANNOTATION_QUALIFIER = "Doctrine\\Common\\Annotations\\Annotation"; //$NON-NLS-1$
 

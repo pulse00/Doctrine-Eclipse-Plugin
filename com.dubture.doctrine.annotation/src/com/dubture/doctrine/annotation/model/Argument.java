@@ -26,4 +26,12 @@ public class Argument extends AnnotationSourceElement {
     public String toString() {
         return value.toString();
     }
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		if (visitor.visit(this)) {
+			value.traverse(visitor);;
+		}
+		visitor.endVisit(this);
+	}
 }

@@ -97,4 +97,14 @@ public class AnnotationDeclaration extends AnnotationSourceElement {
         return "(" + arguments.toString() + ")";
     }
 
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		if (visitor.visit(this)) {
+			for (Argument a : arguments) {
+				a.traverse(visitor);
+			}
+		}
+		visitor.endVisit(this);
+	}
+
 }

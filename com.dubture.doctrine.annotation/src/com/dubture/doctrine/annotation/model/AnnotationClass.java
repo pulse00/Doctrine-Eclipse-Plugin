@@ -50,6 +50,10 @@ public class AnnotationClass extends AnnotationSourceElement {
 
         return namespaceBuilder.toString();
     }
+    
+    public boolean hasNamespace() {
+    	return !namespace.isEmpty();
+    }
 
     public String getFirstNamespacePart() {
         if (namespace.size() > 0) {
@@ -62,4 +66,10 @@ public class AnnotationClass extends AnnotationSourceElement {
     public void pushNamespaceSegment(String namespaceSegment) {
         namespace.push(namespaceSegment);
     }
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		visitor.visit(this);
+		visitor.endVisit(this);
+	}
 }

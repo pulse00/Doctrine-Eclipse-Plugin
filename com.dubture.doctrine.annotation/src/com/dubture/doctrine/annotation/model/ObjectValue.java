@@ -4,57 +4,65 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This object represents a object value. This object can
- * be assigned to annotation argument. It holds
- * information about the attributes of an object. This object
- * has the following string form:
- *   {"name1" = "value", "name2" = false, "name3" = null}
+ * This object represents a object value. This object can be assigned to
+ * annotation argument. It holds information about the attributes of an object.
+ * This object has the following string form: {"name1" = "value", "name2" =
+ * false, "name3" = null}
  *
  * The valid values for the arguments are:
  *
- *    - {@link StringValue}
- *    - {@link BooleanValue}
- *    - {@link NullValue}
+ * - {@link StringValue} - {@link BooleanValue} - {@link NullValue}
  *
  * @author Matthieu Vachon <matthieu.o.vachon@gmail.com>
  */
 public class ObjectValue extends ArgumentValue {
 
-    private Map<String, IArgumentValue> pairs = new HashMap<String, IArgumentValue>();
+	private Map<String, IArgumentValue> pairs = new HashMap<String, IArgumentValue>();
 
-    public void put(String name, IArgumentValue value) {
-        pairs.put(name, value);
-    }
+	public void put(String name, IArgumentValue value) {
+		pairs.put(name, value);
+	}
 
-    public Object get(String name) {
-        if (pairs.containsKey(name)) {
-            return pairs.get(name).getValue();
-        }
+	public Object get(String name) {
+		if (pairs.containsKey(name)) {
+			return pairs.get(name).getValue();
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    public IArgumentValue getArgumentValue(String name) {
-        IArgumentValue argumentValue = null;
-        if (pairs.containsKey(name)) {
-            argumentValue = pairs.get(name);
-        }
+	public IArgumentValue getArgumentValue(String name) {
+		IArgumentValue argumentValue = null;
+		if (pairs.containsKey(name)) {
+			argumentValue = pairs.get(name);
+		}
 
-        return argumentValue;
-    }
+		return argumentValue;
+	}
 
-    @Override
-    public Object getValue() {
-        return pairs;
-    }
+	@Override
+	public Object getValue() {
+		return pairs;
+	}
 
-    @Override
-    public ArgumentValueType getType() {
-        return ArgumentValueType.OBJECT;
-    }
+	@Override
+	public ArgumentValueType getType() {
+		return ArgumentValueType.OBJECT;
+	}
 
-    @Override
-    public String toString() {
-        return pairs.toString();
-    }
+	@Override
+	public String toString() {
+		return pairs.toString();
+	}
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		if (visitor.visit(this)) {
+			// FIXME value name is lost during traversing
+			for (IArgumentValue val : pairs.values()) {
+				val.traverse(visitor);
+			}
+		}
+		visitor.endVisit(this);
+	}
 }

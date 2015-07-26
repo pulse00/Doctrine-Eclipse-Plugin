@@ -104,4 +104,13 @@ public class Annotation extends AnnotationSourceElement {
 
         return builder.toString();
     }
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		if (visitor.visit(this)) {
+			this.annotationClass.traverse(visitor);
+			this.annotationDeclaration.traverse(visitor);
+		}
+		visitor.endVisit(this);
+	}
 }

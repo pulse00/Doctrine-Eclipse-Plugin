@@ -26,5 +26,7 @@ public interface ISourceElement {
      * @param position The new source position
      */
     void setSourcePosition(SourcePosition position);
+    
+    void traverse(AnnotationVisitor visitor);
 
 }

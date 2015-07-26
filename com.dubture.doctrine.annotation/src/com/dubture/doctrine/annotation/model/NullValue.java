@@ -7,22 +7,28 @@ package com.dubture.doctrine.annotation.model;
  */
 public final class NullValue extends ArgumentValue {
 
-    public NullValue() {
+	public NullValue() {
 
-    }
+	}
 
-    @Override
-    public Object getValue() {
-        return null;
-    }
+	@Override
+	public Object getValue() {
+		return null;
+	}
 
-    @Override
-    public ArgumentValueType getType() {
-        return ArgumentValueType.NULL;
-    }
+	@Override
+	public ArgumentValueType getType() {
+		return ArgumentValueType.NULL;
+	}
 
-    @Override
-    public String toString() {
-        return "null";
-    }
+	@Override
+	public String toString() {
+		return "null";
+	}
+
+	@Override
+	public void traverse(AnnotationVisitor visitor) {
+		visitor.visit(this);
+		visitor.endVisit(this);
+	}
 }

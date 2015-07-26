@@ -16,4 +16,6 @@ public interface IAnnotationModuleDeclaration {
 	public AnnotationBlock readAnnotations(ASTNode node);
 	
 	public AnnotationBlock readAnnotations(ISourceReference ref);
+	
+	public AnnotationBlock[] getBlocks();
 }
