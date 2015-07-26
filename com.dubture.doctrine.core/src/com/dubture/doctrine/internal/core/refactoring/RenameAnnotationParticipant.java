@@ -26,6 +26,7 @@ import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
+import org.eclipse.dltk.core.manipulation.SourceModuleChange;
 import org.eclipse.dltk.core.search.IDLTKSearchConstants;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
@@ -36,10 +37,12 @@ import org.eclipse.dltk.core.search.SearchRequestor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.ISharableParticipant;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringArguments;
+import org.eclipse.ltk.core.refactoring.participants.RefactoringProcessor;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.ltk.internal.core.refactoring.Changes;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
@@ -54,8 +57,14 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.UseStatement;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
+import org.eclipse.php.refactoring.core.changes.ProgramFileChange;
+import org.eclipse.php.refactoring.core.rename.AbstractRenameProcessor;
+import org.eclipse.php.refactoring.core.utils.RefactoringUtility;
+import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
@@ -69,18 +78,17 @@ import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 
-public class RenameAnnotationParticipant extends RenameParticipant{
+public class RenameAnnotationParticipant extends RenameParticipant {
 
-	
 	private IType fType;
 	private String fFullName;
-	
+
 	@Override
 	protected boolean initialize(Object element) {
 		fType = (IType) element;
 		fFullName = PHPModelUtils.getFullName(fType);
 		try {
-			if (DoctrineFlags.isAnnotation(((IType)element).getFlags())) {
+			if (DoctrineFlags.isAnnotation(((IType) element).getFlags())) {
 				return true;
 			}
 		} catch (ModelException e) {
@@ -104,35 +112,26 @@ public class RenameAnnotationParticipant extends RenameParticipant{
 		final HashSet<ISourceModule> list = new HashSet<ISourceModule>();
 		IScriptProject project = fType.getScriptProject();
 
-		IDLTKSearchScope scope = SearchEngine.createSearchScope(project,
-				IDLTKSearchScope.SOURCES
-				| IDLTKSearchScope.APPLICATION_LIBRARIES);
+		IDLTKSearchScope scope = SearchEngine.createSearchScope(project, IDLTKSearchScope.SOURCES | IDLTKSearchScope.APPLICATION_LIBRARIES);
 
 		SearchPattern pattern = null;
-		int matchMode = SearchPattern.R_EXACT_MATCH
-				| SearchPattern.R_ERASURE_MATCH;
+		int matchMode = SearchPattern.R_EXACT_MATCH | SearchPattern.R_ERASURE_MATCH;
 
 		SearchEngine engine = new SearchEngine();
 
-		pattern = SearchPattern.createPattern(fType,IDLTKSearchConstants.ALL_OCCURRENCES,
-				matchMode, PHPLanguageToolkit.getDefault());
+		pattern = SearchPattern.createPattern(fType, IDLTKSearchConstants.ALL_OCCURRENCES, matchMode, PHPLanguageToolkit.getDefault());
 		try {
-			engine.search(pattern,
-					new SearchParticipant[] {
-							SearchEngine.getDefaultSearchParticipant() },
-					scope, new SearchRequestor() {
-						@Override
-						public void acceptSearchMatch(SearchMatch match)
-								throws CoreException {
-							IModelElement element = (IModelElement) match
-									.getElement();
-							if (element instanceof IMember) {
-								list.add(((IMember) element).getSourceModule());
-							} else if (element instanceof ISourceModule) {
-								list.add((ISourceModule) element);
-							}
-						}
-					}, new NullProgressMonitor());
+			engine.search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() }, scope, new SearchRequestor() {
+				@Override
+				public void acceptSearchMatch(SearchMatch match) throws CoreException {
+					IModelElement element = (IModelElement) match.getElement();
+					if (element instanceof IMember) {
+						list.add(((IMember) element).getSourceModule());
+					} else if (element instanceof ISourceModule) {
+						list.add((ISourceModule) element);
+					}
+				}
+			}, new NullProgressMonitor());
 		} catch (CoreException e) {
 		}
 		CompositeChange changes = new CompositeChange("Rename annotation class");
@@ -155,42 +154,50 @@ public class RenameAnnotationParticipant extends RenameParticipant{
 			if (checker.replaces.isEmpty()) {
 				continue;
 			}
-			TextFileChange change = new TextFileChange(module.getResource().getName(), (IFile) module.getResource());
-			change.setEdit(new MultiTextEdit());
-			for (ReplaceEdit edit: checker.replaces) {
-				change.addEdit(edit);
-				change.addTextEditGroup(new TextEditGroup("Update annotation reference", edit));
+			TextChange change;
+			try {
+				change = getTextChange(module.getResource());
+				if (change == null) {
+					change = new SourceModuleChange(module.getResource().getName(), module);
+					change.setEdit(new MultiTextEdit());
+					changes.add(change);
+					found = true;
+				}
+				TextEditGroup textEditGroup = new TextEditGroup("Update annotation references");
+				change.addTextEditGroup(textEditGroup);
+				for (TextEdit edit : checker.replaces) {
+					textEditGroup.addTextEdit(edit);
+					change.addEdit(edit);
+				}
+
+			} catch (Exception e) {
+				Logger.logException(e);
 			}
-			
-			changes.add(change);
-			found = true;
 		}
-		
+
 		return found ? changes : null;
 	}
-	
+
 	@SuppressWarnings("restriction")
 	private class AnnotationChecker extends PHPASTVisitor {
 		private Map<String, String> parts;
 		private Map<String, String> aliasedParts;
-		private String namespace = null;
-		private List<ReplaceEdit> replaces = new LinkedList<ReplaceEdit>();
+		private List<TextEdit> replaces = new LinkedList<TextEdit>();
 		private IAnnotationModuleDeclaration annotationModule;
-		
+
 		public AnnotationChecker(IAnnotationModuleDeclaration annotationModule) {
 			parts = new HashMap<String, String>();
 			aliasedParts = new HashMap<String, String>();
 			this.annotationModule = annotationModule;
 		}
-		
+
 		@Override
 		public boolean visit(NamespaceDeclaration s) throws Exception {
 			parts = new HashMap<String, String>();
 			aliasedParts = new HashMap<String, String>();
-			namespace = s.isGlobal() ? null : s.getName();
 			return super.visit(s);
 		}
-		
+
 		@Override
 		public boolean visit(UseStatement s) {
 			if (s.getStatementType() != UseStatement.T_NONE) {
@@ -206,12 +213,12 @@ public class RenameAnnotationParticipant extends RenameParticipant{
 				} else {
 					aliasedParts.put(part.getAlias().getName().toLowerCase(), fullName);
 				}
-				
+
 			}
 
 			return false;
 		}
-		
+
 		@Override
 		public boolean visit(PHPMethodDeclaration s) throws Exception {
 			check(s);
@@ -235,13 +242,13 @@ public class RenameAnnotationParticipant extends RenameParticipant{
 			check(s);
 			return super.visit(s);
 		}
-		
+
 		private void check(ASTNode node) throws Exception {
 			AnnotationBlock readAnnotations = annotationModule.readAnnotations(node);
 			if (readAnnotations == null || readAnnotations.isEmpty()) {
 				return;
 			}
-			
+
 			readAnnotations.traverse(new AnnotationVisitor() {
 				@Override
 				public boolean visit(AnnotationClass node) {
@@ -253,7 +260,8 @@ public class RenameAnnotationParticipant extends RenameParticipant{
 					String useName = (node.hasNamespace() ? node.getFirstNamespacePart() : node.getClassName()).toLowerCase();
 					String realName;
 					if (aliasedParts.containsKey(useName)) {
-						realName = node.hasNamespace() ? aliasedParts.get(useName) + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName() : aliasedParts.get(useName);
+						realName = node.hasNamespace() ? aliasedParts.get(useName) + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName()
+								: aliasedParts.get(useName);
 					} else if (parts.containsKey(useName)) {
 						realName = node.hasNamespace() ? parts.get(useName) + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName() : parts.get(useName);
 					} else {
@@ -262,10 +270,11 @@ public class RenameAnnotationParticipant extends RenameParticipant{
 					if (!fFullName.equalsIgnoreCase(realName)) {
 						return true;
 					}
-					
+
 					int offset = node.getSourcePosition().startOffset + 1 + node.getNamespace().length();
-					replaces.add(new ReplaceEdit(offset, fType.getElementName().length(), getArguments().getNewName()));
 					
+					replaces.add(new ReplaceEdit(offset, node.getClassName().length(), getArguments().getNewName()));
+
 					return super.visit(node);
 				}
 			});

@@ -97,7 +97,7 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
 			}
 		}
 
-		if (annotation != null) {
+		if (annotation == null) {
 			info.flags = DoctrineSourceElementRequestor.prepareAnnotationFlags(info.flags, annotations);
 			return;
 		}

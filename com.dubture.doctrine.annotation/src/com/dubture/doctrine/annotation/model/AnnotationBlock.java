@@ -28,6 +28,17 @@ public class AnnotationBlock extends AnnotationSourceElement {
 		return annotations;
 	}
 	
+	public List<Annotation> findAnnotations(String className) {
+		List<Annotation> result = new LinkedList<Annotation>();
+		for (Annotation a :annotations) {
+			if (a.getClassName().equalsIgnoreCase(className)) {
+				result.add(a);
+			}
+		}
+		
+		return result;
+	}
+	
 	public boolean isEmpty() {
 		return annotations.isEmpty();
 	}
