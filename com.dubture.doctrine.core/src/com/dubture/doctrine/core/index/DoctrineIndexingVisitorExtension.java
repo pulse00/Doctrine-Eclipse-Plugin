@@ -2,6 +2,7 @@ package com.dubture.doctrine.core.index;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.core.ISourceModule;
@@ -15,7 +16,9 @@ import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.ArgumentValueType;
 import com.dubture.doctrine.annotation.model.IArgumentValue;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
+import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.compiler.DoctrineSourceElementRequestor;
+import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.Entity;
 import com.dubture.doctrine.core.model.IDoctrineModelElement;
@@ -35,16 +38,18 @@ import com.dubture.doctrine.core.utils.AnnotationUtils;
 public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtension {
 
     private NamespaceDeclaration namespace;
-
-    private ISourceModule sourceModule;
-    private AnnotationCommentParser parser;
+    private IAnnotationModuleDeclaration decl;
 
     @Override
     public void setSourceModule(ISourceModule module) {
         super.setSourceModule(module);
+        try {
+			decl = AnnotationParserUtil.getModule(module);
+		} catch (CoreException e) {
+			Logger.logException(e);
+		}
 
         this.sourceModule = module;
-        this.parser = AnnotationUtils.createParser();
         indexPendingEntities();
         
     }
@@ -77,7 +82,10 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
     }
 
     protected void processClassDeclaration(ClassDeclaration classDeclaration, DeclarationInfo info) {
-        List<Annotation> annotations = AnnotationUtils.extractAnnotations(parser, classDeclaration, sourceModule);
+    	if (decl == null) {
+    		return;
+    	}
+        List<Annotation> annotations = decl.readAnnotations((ASTNode)classDeclaration).getAnnotations();
 
         if (annotations.size() < 1) {
             return;
@@ -132,7 +140,14 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
     	if (node instanceof ClassDeclaration) {
     		processClassDeclaration((ClassDeclaration) node, info);
     	}
+    	indexReferences(node);
     	super.modifyDeclaration(node, info);
     }
+
+	private void indexReferences(ASTNode node) {
+		if (decl == null) {
+			return;
+		}
+	}
 
 }

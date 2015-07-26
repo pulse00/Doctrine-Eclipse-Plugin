@@ -7,6 +7,7 @@ import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.compiler.IElementRequestor.TypeInfo;
 import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.IScriptProject;
+import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.php.core.compiler.PHPSourceElementRequestorExtension;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
@@ -18,6 +19,7 @@ import com.dubture.doctrine.annotation.model.ArgumentValueType;
 import com.dubture.doctrine.annotation.model.ArrayValue;
 import com.dubture.doctrine.annotation.model.IArgumentValue;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
+import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.utils.AnnotationUtils;
@@ -31,9 +33,8 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 	private final static String TARGET_ANNOTATION = "ANNOTATION"; //$NON-NLS-1$
 	private final static String TARGET_ALL = "ALL"; //$NON-NLS-1$
 
-	private AnnotationCommentParser parser;
-
 	private boolean enabled = false;
+	private IAnnotationModuleDeclaration decl;
 
 	public DoctrineSourceElementRequestor() {
 	}
@@ -45,7 +46,7 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 		try {
 			if (scriptProject.exists() && scriptProject.getProject().hasNature(DoctrineNature.NATURE_ID)) {
 				enabled = true;
-				parser = AnnotationUtils.createParser();
+				decl = AnnotationParserUtil.getModule((ISourceModule) sourceModule.getModelElement());
 			} else {
 				enabled = false;
 			}
@@ -72,8 +73,7 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 
 	private void checkAnnotation(TypeDeclaration typeDeclaration, TypeInfo ti) {
 		if (typeDeclaration instanceof IPHPDocAwareDeclaration) {
-			List<Annotation> annotations = AnnotationUtils.extractAnnotations(parser, (IPHPDocAwareDeclaration) typeDeclaration, getSourceModule()
-					.getSourceContents());
+			List<Annotation> annotations = decl.readAnnotations(typeDeclaration).getAnnotations(); 
 			ti.modifiers = prepareAnnotationFlags(ti.modifiers, annotations);
 			typeDeclaration.setModifiers(ti.modifiers);
 		}

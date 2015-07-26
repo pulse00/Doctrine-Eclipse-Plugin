@@ -10,16 +10,22 @@ package com.dubture.doctrine.ui.editor.highlighting;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dltk.core.IMember;
+import org.eclipse.dltk.core.IModelElement;
+import org.eclipse.dltk.core.IModelElementVisitor;
 import org.eclipse.dltk.core.ISourceModule;
-import org.eclipse.php.internal.core.ast.nodes.Comment;
+import org.eclipse.dltk.core.ModelException;
+import org.eclipse.php.internal.core.ast.nodes.Program;
+import org.eclipse.php.internal.ui.Logger;
 import org.eclipse.php.internal.ui.editor.highlighter.AbstractSemanticApply;
 import org.eclipse.php.internal.ui.editor.highlighter.AbstractSemanticHighlighting;
 import org.eclipse.swt.graphics.RGB;
 
 import com.dubture.doctrine.annotation.model.Annotation;
-import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.annotation.parser.antlr.SourcePosition;
-import com.dubture.doctrine.core.utils.AnnotationUtils;
+import com.dubture.doctrine.core.AnnotationParserUtil;
+import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 
 /** 
  *
@@ -32,28 +38,45 @@ public class AnnotationHighlighting extends AbstractSemanticHighlighting {
     protected class AnnotationApply extends AbstractSemanticApply {
 
         protected ISourceModule sourceModule;
-        protected AnnotationCommentParser parser;
+        protected IAnnotationModuleDeclaration decl;
 
         public AnnotationApply() {
             this.sourceModule = getSourceModule();
-            this.parser = AnnotationUtils.createParser();
+            try {
+				this.decl = AnnotationParserUtil.getModule(sourceModule);
+			} catch (CoreException e) {
+				com.dubture.doctrine.ui.log.Logger.logException(e);
+			}
         }
-
+        
         @Override
-        public boolean visit(Comment comment) {
-        	if (comment.getCommentType() != Comment.TYPE_PHPDOC) {
-        		return true;
+		public boolean visit(Program program) {
+        	if (decl == null) {
+        		return false;
         	}
-            List<Annotation> annotations = AnnotationUtils.extractAnnotations(parser, comment, sourceModule);
-            for (Annotation annotation : annotations) {
-                SourcePosition sourcePosition = annotation.getSourcePosition();
-                highlight(sourcePosition.startOffset, sourcePosition.length);
-            }
+			try {
+				getSourceModule().accept(new IModelElementVisitor() {
 
-            return true;
-        }
+					@Override
+					public boolean visit(IModelElement element) {
+						if (element instanceof IMember) {
+							List<Annotation> annotations = decl.readAnnotations((IMember)element).getAnnotations();
+				            for (Annotation annotation : annotations) {
+				                SourcePosition sourcePosition = annotation.getSourcePosition();
+				                highlight(sourcePosition.startOffset, sourcePosition.length);
+				            }
+						}
+						return true;
+					}
+				});
 
+			} catch (ModelException e) {
+				Logger.logException(e);
+			}
+			return false;
+		}
     }
+    
 
     public AnnotationHighlighting() {
         super();
@@ -74,4 +97,5 @@ public class AnnotationHighlighting extends AbstractSemanticHighlighting {
         getStyle().setUnderlineByDefault(false).setDefaultTextColor(
                 new RGB(64, 64, 64));
     }
+    
 }

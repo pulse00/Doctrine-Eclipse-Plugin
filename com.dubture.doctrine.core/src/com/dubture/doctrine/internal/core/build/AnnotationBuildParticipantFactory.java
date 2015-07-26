@@ -1,28 +1,24 @@
 package com.dubture.doctrine.internal.core.build;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dltk.compiler.problem.ProblemCollector;
 import org.eclipse.dltk.core.IScriptProject;
+import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.dltk.core.ISourceModuleInfoCache.ISourceModuleInfo;
 import org.eclipse.dltk.core.builder.AbstractBuildParticipantType;
 import org.eclipse.dltk.core.builder.IBuildContext;
 import org.eclipse.dltk.core.builder.IBuildParticipant;
 import org.eclipse.dltk.core.builder.IBuildParticipantFactory;
-import org.eclipse.dltk.internal.core.ModelManager;
-import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPFieldDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
+import org.eclipse.dltk.core.builder.IScriptBuilder;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.TraitDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 
-import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
+import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.DoctrineNature;
-import com.dubture.doctrine.core.log.Logger;
-import com.dubture.doctrine.core.utils.AnnotationUtils;
+import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
+import com.dubture.doctrine.internal.core.compiler.AnnotationParser;
 
 @SuppressWarnings("restriction")
 public class AnnotationBuildParticipantFactory extends AbstractBuildParticipantType implements IBuildParticipantFactory {
-
 	public AnnotationBuildParticipantFactory() {
 	}
 
@@ -41,34 +37,27 @@ public class AnnotationBuildParticipantFactory extends AbstractBuildParticipantT
 			if (context.get(IBuildContext.ATTR_MODULE_DECLARATION) == null) {
 				return; // Library dir
 			}
-			ISourceModuleInfo cacheEntry = ModelManager.getModelManager().getSourceModuleInfoCache().get(context.getSourceModule());
-			
-			PHPModuleDeclaration module = (PHPModuleDeclaration) context.get(IBuildContext.ATTR_MODULE_DECLARATION);
-			
-			try {
-				module.traverse(new PHPASTVisitor() {
-					@Override
-					public boolean visit(PHPMethodDeclaration s) throws Exception {
-						return super.visit(s);
-					}
-					
-					public boolean visit(PHPFieldDeclaration s) throws Exception {
-						return super.visit(s);
-					};
-					
-					@Override
-					public boolean visit(TraitDeclaration s) throws Exception {
-						return super.visit(s);
-					}
-					
-					@Override
-					public boolean visit(ClassDeclaration s) throws Exception {
-						return super.visit(s);
-					}
-				});
-			} catch (Exception e) {
-				Logger.logException(e);
+			ISourceModuleInfo cacheEntry = SourceParserUtil.getCache().get(context.getSourceModule());
+			IAnnotationModuleDeclaration annotationModule;
+			if (context.getBuildType() != IScriptBuilder.FULL_BUILD) {
+				annotationModule = AnnotationParserUtil.getModuleFromCache(cacheEntry, context.getProblemReporter());
+				if (annotationModule != null) {
+					context.set(IAnnotationModuleDeclaration.class.getName(), annotationModule);
+					return;
+				}
 			}
+
+			PHPModuleDeclaration module = (PHPModuleDeclaration) context.get(IBuildContext.ATTR_MODULE_DECLARATION);
+			final ProblemCollector problemCollector = new ProblemCollector();
+			AnnotationParser parser = new AnnotationParser();
+			annotationModule = parser.parse(context.getSourceModule(), module, problemCollector);
+
+			// put result to the cache
+			AnnotationParserUtil.putModuleToCache(cacheEntry, annotationModule, problemCollector);
+			// report errors to the build context
+			problemCollector.copyTo(context.getProblemReporter());
+
+			context.set(IAnnotationModuleDeclaration.class.getName(), annotationModule);
 		}
 
 	}

@@ -1,5 +1,7 @@
 package com.dubture.doctrine.core.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
 
 import com.dubture.doctrine.annotation.model.Annotation;
+import com.dubture.doctrine.annotation.model.AnnotationBlock;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.log.Logger;
 
@@ -20,7 +23,7 @@ import com.dubture.doctrine.core.log.Logger;
 public class AnnotationUtils {
 	// FIXME: Those two have been copied from AnnotationUtils that can be found in com.dubture.symfony.core
     protected static final String[] PHPDOC_TAGS_EXTRA = {"api", "inheritdoc"};
-    protected static final List<Annotation> EMPTY_ANNOTATIONS = new LinkedList<Annotation>();
+    protected static final AnnotationBlock EMPTY_ANNOTATIONS = new AnnotationBlock(Collections.unmodifiableList(new ArrayList<Annotation>(0)));
 	
 	/**
      * Parse a comment from a PHP doc aware declaration. By using the source module,
@@ -34,7 +37,7 @@ public class AnnotationUtils {
      * @return A list of valid annotations according to the parser
      */
     // FIXME: This has been copied from AnnotationUtils that can be found in com.dubture.symfony.core
-    public static List<Annotation> extractAnnotations(AnnotationCommentParser parser,
+    public static AnnotationBlock extractAnnotations(AnnotationCommentParser parser,
                                                       IPHPDocAwareDeclaration declaration,
                                                       ISourceModule sourceModule) {
         try {
@@ -46,7 +49,7 @@ public class AnnotationUtils {
     }
     
     
-    public static List<Annotation> extractAnnotations(AnnotationCommentParser parser,
+    public static AnnotationBlock extractAnnotations(AnnotationCommentParser parser,
                                                       IPHPDocAwareDeclaration declaration,
                                                       String source) {
     	try {
@@ -75,7 +78,7 @@ public class AnnotationUtils {
      *
      * @return A list of valid annotations
      */
-    public static List<Annotation> extractAnnotations(AnnotationCommentParser parser,
+    public static AnnotationBlock extractAnnotations(AnnotationCommentParser parser,
                                                       Comment comment,
                                                       ISourceModule sourceModule) {
         if (comment == null || comment.getCommentType() != Comment.TYPE_PHPDOC) {

@@ -14,8 +14,10 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
 import com.dubture.doctrine.annotation.model.Annotation;
+import com.dubture.doctrine.annotation.model.AnnotationBlock;
 import com.dubture.doctrine.annotation.parser.antlr.AnnotationLexer;
 import com.dubture.doctrine.annotation.parser.antlr.AnnotationParser;
+import com.dubture.doctrine.annotation.parser.antlr.SourcePosition;
 import com.dubture.doctrine.annotation.parser.antlr.error.IAnnotationErrorReporter;
 import com.dubture.doctrine.annotation.parser.tree.AnnotationCommonTree;
 import com.dubture.doctrine.annotation.parser.tree.AnnotationCommonTreeAdaptor;
@@ -76,21 +78,21 @@ import com.dubture.doctrine.annotation.parser.tree.visitor.AnnotationNodeVisitor
  */
 public class AnnotationCommentParser {
 
-    static public List<Annotation> parseFromString(String comment) {
+    static public AnnotationBlock parseFromString(String comment) {
         return parseFromString(comment, 0);
     }
 
-    static public List<Annotation> parseFromString(String comment, int commentCharOffset) {
+    static public AnnotationBlock parseFromString(String comment, int commentCharOffset) {
         return parseFromString(comment, 0, new ArrayList<String>());
     }
 
-    static public List<Annotation> parseFromString(String comment,
+    static public AnnotationBlock parseFromString(String comment,
                                                    int commentCharOffset,
                                                    List<String> excludedClassNames) {
         return parseFromString(comment, commentCharOffset, excludedClassNames);
     }
 
-    static public List<Annotation> parseFromString(String comment,
+    static public AnnotationBlock parseFromString(String comment,
                                                    int commentCharOffset,
                                                    List<String> excludedClassNames,
                                                    List<String> includedClassNames) {
@@ -211,7 +213,7 @@ public class AnnotationCommentParser {
      *
      * @return A filtered list of annotations.
      */
-    public List<Annotation> parse(String comment) {
+    public AnnotationBlock parse(String comment) {
         return parse(comment, 0);
     }
 
@@ -230,7 +232,7 @@ public class AnnotationCommentParser {
      *
      * @return A filtered list of annotations.
      */
-    public List<Annotation> parse(String comment, int commentCharOffset) {
+    public AnnotationBlock parse(String comment, int commentCharOffset) {
         reset(comment, commentCharOffset);
 
         List<Annotation> annotations = new LinkedList<Annotation>();
@@ -249,8 +251,9 @@ public class AnnotationCommentParser {
             currentCharOffset = annotation.getSourcePosition().endOffset + 1 - commentCharOffset;
         }
 
-        return postProcess(annotations);
+        return prepareBlock(postProcess(annotations));
     }
+    
 
     /**
      * This method determines if the annotation received is a valid annotation.
@@ -318,6 +321,17 @@ public class AnnotationCommentParser {
         }
 
         return annotations;
+    }
+    
+    protected AnnotationBlock prepareBlock(List<Annotation> annotations) {
+    	AnnotationBlock block = new AnnotationBlock(annotations);
+    	if (!annotations.isEmpty()) {
+    		Annotation first = annotations.get(0);
+    		Annotation last = annotations.get(annotations.size()-1);
+    		block.setSourcePosition(new SourcePosition(first.getSourcePosition().line, first.getSourcePosition().column, first.getSourcePosition().startOffset, last.getSourcePosition().endOffset));
+    	}
+    	
+    	return block;
     }
 
     protected Annotation parseChunk(String chunk) {
