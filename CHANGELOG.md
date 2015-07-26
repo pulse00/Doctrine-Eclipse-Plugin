@@ -1,6 +1,8 @@
 1.1.0
 * Annotation class refactoring support
 * Annotation cache
+* Annotation import validator
+* Index improvements
 1.0.8
 * Doctrine feature become standalone feature
 * Improved code assist for annotations
