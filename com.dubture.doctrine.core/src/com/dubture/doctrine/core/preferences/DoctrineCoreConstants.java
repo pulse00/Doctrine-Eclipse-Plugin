@@ -14,7 +14,7 @@ import com.dubture.doctrine.core.DoctrineCorePlugin;
 public class DoctrineCoreConstants {
 	public static final String PLUGIN_ID = DoctrineCorePlugin.ID;
 	
-	public static final String INDEX_VERSION = "0.0.5";
+	public static final String INDEX_VERSION = "0.0.6";
 	public static final String INDEX_VERSION_PREFERENCE = "indexVersion";
 	
 	public static final String DEFAULT_ANNOTATION_NAMESPACE = "Doctrine\\Common\\Annotations";

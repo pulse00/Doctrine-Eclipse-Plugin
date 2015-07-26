@@ -9,26 +9,25 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
-import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.SourceParserUtil;
+import org.eclipse.dltk.core.index2.search.ISearchEngine;
+import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
+import org.eclipse.dltk.core.index2.search.ISearchEngine.SearchFor;
+import org.eclipse.dltk.core.index2.search.ISearchRequestor;
+import org.eclipse.dltk.core.index2.search.ModelAccess;
 import org.eclipse.dltk.core.manipulation.SourceModuleChange;
-import org.eclipse.dltk.core.search.IDLTKSearchConstants;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
-import org.eclipse.dltk.core.search.SearchMatch;
-import org.eclipse.dltk.core.search.SearchParticipant;
-import org.eclipse.dltk.core.search.SearchPattern;
-import org.eclipse.dltk.core.search.SearchRequestor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -61,6 +60,7 @@ import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 
+@SuppressWarnings("restriction")
 public class RenameAnnotationParticipant extends RenameParticipant {
 
 	private IType fType;
@@ -97,26 +97,25 @@ public class RenameAnnotationParticipant extends RenameParticipant {
 
 		IDLTKSearchScope scope = SearchEngine.createSearchScope(project, IDLTKSearchScope.SOURCES | IDLTKSearchScope.APPLICATION_LIBRARIES);
 
-		SearchPattern pattern = null;
-		int matchMode = SearchPattern.R_EXACT_MATCH | SearchPattern.R_ERASURE_MATCH;
-
-		SearchEngine engine = new SearchEngine();
-
-		pattern = SearchPattern.createPattern(fType, IDLTKSearchConstants.ALL_OCCURRENCES, matchMode, PHPLanguageToolkit.getDefault());
-		try {
-			engine.search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() }, scope, new SearchRequestor() {
-				@Override
-				public void acceptSearchMatch(SearchMatch match) throws CoreException {
-					IModelElement element = (IModelElement) match.getElement();
-					if (element instanceof IMember) {
-						list.add(((IMember) element).getSourceModule());
-					} else if (element instanceof ISourceModule) {
-						list.add((ISourceModule) element);
-					}
-				}
-			}, new NullProgressMonitor());
-		} catch (CoreException e) {
-		}
+		
+		ISearchEngine engine = ModelAccess.getSearchEngine(PHPLanguageToolkit.getDefault());
+		int i = fFullName.lastIndexOf(NamespaceReference.NAMESPACE_SEPARATOR);
+		String qualifier = null;
+		String name = fFullName;
+		if (i != -1) {
+			qualifier = name.substring(0, i);
+			name = name.substring(i + 1);
+		} 
+		pm.subTask("Search references"); //$NON-NLS-1$
+		engine.search(IModelElement.TYPE, qualifier, name, 0, 0, 0, SearchFor.REFERENCES, MatchRule.EXACT, scope, new ISearchRequestor() {
+			
+			@Override
+			public void match(int elementType, int flags, int offset, int length, int nameOffset, int nameLength, String elementName, String metadata, String doc,
+					String qualifier, String parent, ISourceModule sourceModule, boolean isReference) {
+				list.add(sourceModule);
+			}
+		}, null);
+		pm.subTask("Prepare changes"); //$NON-NLS-1$
 		CompositeChange changes = new CompositeChange("Rename annotation class");
 		boolean found = false;
 		for (ISourceModule module : list) {

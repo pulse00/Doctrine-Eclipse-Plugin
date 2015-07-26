@@ -9,27 +9,16 @@
 package com.dubture.doctrine.internal.core.validation.validator;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.ASTNode;
-import org.eclipse.dltk.ast.references.SimpleReference;
-import org.eclipse.dltk.compiler.problem.DefaultProblem;
-import org.eclipse.dltk.compiler.problem.IProblem;
-import org.eclipse.dltk.compiler.problem.IProblemReporter;
-import org.eclipse.dltk.compiler.problem.ProblemSeverity;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
-import org.eclipse.dltk.core.builder.IBuildContext;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
-import org.eclipse.php.internal.core.compiler.ast.nodes.ArrayCreation;
 import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.FullyQualifiedReference;
-import org.eclipse.php.internal.core.compiler.ast.nodes.GotoLabel;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPFieldDeclaration;
@@ -39,15 +28,11 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UseStatement;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
-import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.pdtextensions.semanticanalysis.validation.IValidatorContext;
 
-import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
 import com.dubture.doctrine.annotation.model.AnnotationClass;
 import com.dubture.doctrine.annotation.model.AnnotationVisitor;
-import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
-import com.dubture.doctrine.annotation.parser.antlr.SourcePosition;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 import com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier;
@@ -70,8 +55,6 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 
 	final private static String MESSAGE_CANNOT_RESOLVE_TYPE = "The annotation %s cannot be resolved";
 
-	private ClassDeclaration currentClass = null;
-	private PHPMethodDeclaration currentMethod = null;
 
 	private IValidatorContext context;
 	private ISourceModule sourceModule;
