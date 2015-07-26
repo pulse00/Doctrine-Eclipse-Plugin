@@ -47,7 +47,7 @@ public class DoctrineCorePlugin extends Plugin {
 						for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 							if (project.isAccessible() && project.hasNature(DoctrineNature.NATURE_ID)) {
 								monitor.subTask("Rebuild doctrine index: " + project.getName()); //$NON-NLS-1$
-								project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+								project.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
 							}
 						}
 						node.put(DoctrineCoreConstants.INDEX_VERSION_PREFERENCE, DoctrineCoreConstants.INDEX_VERSION);
