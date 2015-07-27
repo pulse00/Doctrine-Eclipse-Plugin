@@ -10,6 +10,7 @@ package com.dubture.doctrine.internal.core.validation.validator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.ASTNode;
@@ -28,6 +29,7 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UseStatement;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.preferences.TaskPatternsProvider;
 import org.pdtextensions.semanticanalysis.validation.IValidatorContext;
 
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
@@ -54,6 +56,7 @@ import com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier;
 public class AnnotationValidatorVisitor extends PHPASTVisitor {
 
 	final private static String MESSAGE_CANNOT_RESOLVE_TYPE = "The annotation %s cannot be resolved";
+	final private static String TASK_ATTRIBUTE_KEY = AnnotationValidatorVisitor.class.getName() + "_task_tags:"; //$NON-NLS-1$
 
 
 	private IValidatorContext context;
@@ -62,11 +65,20 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 
 	private Map<String, String> parts;
 	private Map<String, Boolean> resolved;
+	private Pattern[] taskPatterns;
 
 	public AnnotationValidatorVisitor(IValidatorContext context, IAnnotationModuleDeclaration moduleDeclaration) {
 		this.context = context;
 		this.sourceModule = context.getSourceModule();
 		this.annotationModuleDeclaration = moduleDeclaration;
+		String taskTagsKey = TASK_ATTRIBUTE_KEY + context.getSourceModule().getScriptProject().getElementName();
+		Object taskAttr = context.getRawContext().get(taskTagsKey);
+		if (taskAttr == null) {
+			taskPatterns = TaskPatternsProvider.getInstance().getPatternsForProject(sourceModule.getScriptProject().getProject());
+			context.getRawContext().set(taskTagsKey, taskPatterns);
+		} else {
+			taskPatterns = (Pattern[]) taskAttr;
+		}
 		parts = new HashMap<String, String>();
 		resolved = new HashMap<String, Boolean>();
 	}
@@ -159,6 +171,12 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 					return true;
 				}
 				if (!node.hasNamespace()) {
+					String toMatch = '@' + node.getClassName();
+					for (Pattern taskPattern : taskPatterns) {
+						if (taskPattern.matcher(toMatch).matches()) {
+							return true;
+						}
+					}
 					if (parts.containsKey(node.getClassName().toLowerCase())) {
 						fullName = parts.get(node.getClassName().toLowerCase());
 					} else {
