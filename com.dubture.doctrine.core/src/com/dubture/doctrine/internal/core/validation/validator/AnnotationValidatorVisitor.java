@@ -146,6 +146,12 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 		annotations.traverse(new AnnotationVisitor() {
 			@Override
 			public boolean visit(AnnotationClass node) {
+				if (node.getClassName().length() == 0) {
+					return true;
+				}
+				if (Character.isLowerCase(node.getClassName().charAt(0))) {
+					return true; // ignore lowercase "annotations", phpdoc and phpunit tags
+				}
 				String fullName;
 				if (node.hasNamespace() && !parts.containsKey(node.getFirstNamespacePart().toLowerCase())) {
 					context.registerProblem(DoctrineProblemIdentifier.UNRESOVABLE, String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
