@@ -15,6 +15,7 @@ import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IModelElementVisitor;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.core.ISourceReference;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.php.internal.core.ast.nodes.Program;
 import org.eclipse.php.internal.ui.Logger;
@@ -59,8 +60,8 @@ public class AnnotationHighlighting extends AbstractSemanticHighlighting {
 
 					@Override
 					public boolean visit(IModelElement element) {
-						if (element instanceof IMember) {
-							List<Annotation> annotations = decl.readAnnotations((IMember)element).getAnnotations();
+						if (element instanceof ISourceReference) {
+							List<Annotation> annotations = decl.readAnnotations((ISourceReference)element).getAnnotations();
 				            for (Annotation annotation : annotations) {
 				                SourcePosition sourcePosition = annotation.getSourcePosition();
 				                highlight(sourcePosition.startOffset, sourcePosition.length);

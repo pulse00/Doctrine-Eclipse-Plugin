@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.dltk.ast.ASTNode;
+import org.eclipse.dltk.core.IField;
+import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.ISourceReference;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
@@ -45,6 +47,9 @@ public class AnnotationModuleDeclaration implements IAnnotationModuleDeclaration
 	@Override
 	public AnnotationBlock readAnnotations(ISourceReference ref) {
 		try {
+			if (ref instanceof IField) {
+				return read(ref.getNameRange().getOffset());
+			}
 			return read(ref.getSourceRange().getOffset());
 		} catch (ModelException e) {
 			Logger.logException(e);
