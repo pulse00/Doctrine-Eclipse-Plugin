@@ -1,5 +1,6 @@
 1.1.0
 
+* CA with protected annotation field if corresponding setter method exists
 * Annotation class refactoring support
 * Annotation cache
 * Annotation import validator

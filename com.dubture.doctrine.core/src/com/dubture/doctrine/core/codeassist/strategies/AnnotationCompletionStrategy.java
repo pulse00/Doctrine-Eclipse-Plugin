@@ -9,10 +9,12 @@
 package com.dubture.doctrine.core.codeassist.strategies;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.core.ISourceModule;
@@ -98,6 +100,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 		
 		ModuleDeclaration moduleDeclaration = SourceParserUtil.getModuleDeclaration(sourceModule);
 		IType namespace = PHPModelUtils.getCurrentNamespace(sourceModule, context.getOffset());
+		Set<IType> collected = new HashSet<IType>();
 		if (prefix.contains(String.valueOf(NamespaceReference.NAMESPACE_SEPARATOR))) {
 			int i = name.lastIndexOf(NamespaceReference.NAMESPACE_SEPARATOR);
 			qualifier = name.substring(0, i);
@@ -136,6 +139,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 						if (DoctrineFlags.isAnnotation(findTypes[0].getFlags()) && (findTypes[0].getFlags() & target) == 0) {
 							continue;
 						}
+						collected.add(findTypes[0]);
 						reporter.reportType(new AliasType((SourceType)findTypes[0], entry.getValue().getNamespace().getName(), entry.getKey()), DoctrineFlags.isNamespace(findTypes[0].getFlags()) ? "\\" : "()", replaceRange, Integer.valueOf(0), 10);
 					} catch (ModelException e) {
 						Logger.logException(e);
@@ -150,7 +154,9 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 		IType[] types = getTypes(context, scope, qualifier, name.trim());
 		String suffix = "()";
 		for (IType type : types) {
-			reporter.reportType(type, suffix, replaceRange);
+			if (!collected.contains(type)) {
+				reporter.reportType(type, suffix, replaceRange);
+			}
 		}
 	}
 

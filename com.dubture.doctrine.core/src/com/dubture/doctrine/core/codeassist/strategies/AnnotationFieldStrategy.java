@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.core.IField;
+import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceRange;
 import org.eclipse.dltk.core.IType;
@@ -115,9 +116,6 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 		} else {
 			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), namespace, false); //$NON-NLS-1$
 			for (Entry<String, UsePart> entry : map.entrySet()) {
-				if (entry.getValue().getAlias() == null) {
-					continue; // ignore
-				}
 				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
 				}
@@ -131,7 +129,13 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 				for (IField f : PHPModelUtils.getTypeHierarchyField(type, getCompanion().getSuperTypeHierarchy(type, null), "$" + context.getKeyPrefix(), false,new NullProgressMonitor())) {
 					if (PHPFlags.isPublic(f.getFlags()) && !PHPFlags.isStatic(f.getFlags()) && !"$value".equals(f.getElementName())) {
 						reporter.reportField(f, "=", replaceRange, true);
+						continue;
 						// TODO FOrmatter settings:
+					}
+					IMethod[] setter = PHPModelUtils.getTypeHierarchyMethod(type, getCompanion().getSuperTypeHierarchy(type, null), "set" + f.getElementName().substring(1), true,new NullProgressMonitor());
+					if (setter != null && setter.length > 0 && PHPFlags.isPublic(setter[0].getFlags()) && !PHPFlags.isStatic(setter[0].getFlags())) {
+						reporter.reportField(f, "=", replaceRange, true);
+						continue;
 					}
 				}
 			} catch (ModelException e) {
