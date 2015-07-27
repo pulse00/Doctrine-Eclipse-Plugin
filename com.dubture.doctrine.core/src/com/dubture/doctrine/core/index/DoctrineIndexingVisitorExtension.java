@@ -176,6 +176,9 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
 				if (parts.containsKey(node.getClassName().toLowerCase())) {
 					fullName = parts.get(node.getClassName().toLowerCase());
 				} else {
+					if (DoctrineCoreConstants.ANNOTATION_TAG_NAME.equals(node.getClassName())) {
+						return super.visit(node);
+					}
 					fullName = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE  + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 				}
 			} else {

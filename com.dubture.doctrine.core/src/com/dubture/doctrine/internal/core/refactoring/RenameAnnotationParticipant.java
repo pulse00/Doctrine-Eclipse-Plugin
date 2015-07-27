@@ -247,6 +247,9 @@ public class RenameAnnotationParticipant extends RenameParticipant {
 					} else if (parts.containsKey(useName)) {
 						realName = node.hasNamespace() ? parts.get(useName) + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName() : parts.get(useName);
 					} else {
+						if (DoctrineCoreConstants.ANNOTATION_TAG_NAME.equals(node.getClassName())) {
+							return true;
+						}
 						realName = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 					}
 					if (!fFullName.equalsIgnoreCase(realName)) {

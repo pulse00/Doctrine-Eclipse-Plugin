@@ -156,6 +156,9 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 					if (parts.containsKey(node.getClassName().toLowerCase())) {
 						fullName = parts.get(node.getClassName().toLowerCase());
 					} else {
+						if (DoctrineCoreConstants.ANNOTATION_TAG_NAME.equals(node.getClassName())) {
+							return true;
+						}
 						fullName = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE  + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 					}
 				} else {

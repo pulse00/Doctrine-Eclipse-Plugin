@@ -17,5 +17,6 @@ public class DoctrineCoreConstants {
 	public static final String INDEX_VERSION = "0.0.7";
 	public static final String INDEX_VERSION_PREFERENCE = "indexVersion";
 	
-	public static final String DEFAULT_ANNOTATION_NAMESPACE = "Doctrine\\Common\\Annotations";
+	public static final String DEFAULT_ANNOTATION_NAMESPACE = "Doctrine\\Common\\Annotations\\Annotation";
+	public static final String ANNOTATION_TAG_NAME = "Annotation";
 }
