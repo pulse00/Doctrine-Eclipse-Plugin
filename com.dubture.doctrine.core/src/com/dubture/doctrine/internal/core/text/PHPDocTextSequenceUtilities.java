@@ -1,24 +1,16 @@
 package com.dubture.doctrine.internal.core.text;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.documentModel.parser.PHPRegionContext;
 import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
 import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
-import org.eclipse.php.internal.core.util.text.PHPTextSequenceUtilities;
-import org.eclipse.php.internal.core.util.text.TextSequence;
-import org.eclipse.wst.sse.core.StructuredModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionCollection;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionContainer;
-
-import com.dubture.doctrine.core.log.Logger;
 
 /**
  * @author zulus
@@ -60,7 +52,8 @@ public class PHPDocTextSequenceUtilities {
 	}
 
 	public static boolean isPHPDoc(IStructuredDocument document, int offset) {
-		return PHPRegionTypes.PHPDOC_COMMENT.equals(getPHPRegionType(document, offset));
+		String region = getPHPRegionType(document, offset);
+		return PHPRegionTypes.PHPDOC_COMMENT.equals(region) || PHPRegionTypes.PHPDOC_PARAM.equals(region) || PHPRegionTypes.PHPDOC_DESC.equals(region);
 	}
 
 	public static String getAnnotationName(IDocument document, int offset) throws BadLocationException {

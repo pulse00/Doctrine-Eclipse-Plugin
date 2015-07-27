@@ -81,9 +81,7 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 				continue;
 			}
 			String fullName = part.getNamespace().getFullyQualifiedName();
-			if (part.getAlias() == null) {
-				parts.put(part.getAlias() == null ? part.getNamespace().getName().toLowerCase() : part.getAlias().getName().toLowerCase(), fullName);
-			}
+			parts.put(part.getAlias() == null ? part.getNamespace().getName().toLowerCase() : part.getAlias().getName().toLowerCase(), fullName);
 
 		}
 
@@ -151,7 +149,7 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 				String fullName;
 				if (node.hasNamespace() && !parts.containsKey(node.getFirstNamespacePart().toLowerCase())) {
 					context.registerProblem(DoctrineProblemIdentifier.UNRESOVABLE, String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
-							node.getSourcePosition().startOffset + 1, node.getSourcePosition().endOffset);
+							node.getSourcePosition().startOffset + 1, node.getSourcePosition().endOffset + 1);
 					return true;
 				}
 				if (!node.hasNamespace()) {
@@ -161,7 +159,7 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 						fullName = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE  + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 					}
 				} else {
-					fullName = parts.get(node.getFirstNamespacePart().toLowerCase());
+					fullName = parts.get(node.getFirstNamespacePart().toLowerCase()) + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 				}
 				String lower = fullName.toLowerCase();
 				if (!resolved.containsKey(lower)) {
@@ -174,7 +172,7 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 				}
 				if (!resolved.get(lower)) {
 					context.registerProblem(DoctrineProblemIdentifier.UNRESOVABLE, String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
-							node.getSourcePosition().startOffset + 1, node.getSourcePosition().endOffset);
+							node.getSourcePosition().startOffset + 1, node.getSourcePosition().endOffset + 1);
 				}
 				return super.visit(node);
 			}
