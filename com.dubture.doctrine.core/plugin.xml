@@ -91,38 +91,8 @@
       </category>
       <validator
             categoryId="com.dubture.doctrine.core.validationCategory"
-            class="com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator"
-            id="com.dubture.doctrine.core.annotationValidator">
-         <type
-               defaultSeverity="info"
-               id="use"
-               label="Use annotation">
-         </type>
-      </validator>
-      <validator
-            categoryId="com.dubture.doctrine.core.validationCategory"
-            class="com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator"
-            id="com.dubture.doctrine.core.annotationValidator">
-         <type
-               defaultSeverity="info"
-               id="Doctrine: com.dubture.doctrine.core.type1"
-               label="label">
-         </type>
-      </validator>
-      <validator
-            categoryId="com.dubture.doctrine.core.validationCategory"
-            class="com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator"
-            id="com.dubture.doctrine.core.annotationValidator">
-         <type
-               defaultSeverity="info"
-               id="Doctrine: com.dubture.doctrine.core.type1"
-               label="label">
-         </type>
-      </validator>
-      <validator
-            categoryId="org.pdtextensions.semanticanalysis.defaultCategory"
             class="com.dubture.doctrine.internal.core.validation.factory.AnnotationValidatorFactory"
-            id="com.dubture.doctrine.core.annotationValidator">
+            id="com.dubture.doctrine.core.validator.annotationValidator">
             <type
                  id="use"
                  label="Annotation not found"
