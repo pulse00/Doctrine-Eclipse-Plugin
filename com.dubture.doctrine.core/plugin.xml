@@ -92,7 +92,7 @@
       <validator
             categoryId="com.dubture.doctrine.core.validationCategory"
             class="com.dubture.doctrine.internal.core.validation.factory.AnnotationValidatorFactory"
-            id="com.dubture.doctrine.core.validator.annotationValidator">
+            id="com.dubture.doctrine.core.annotationValidator">
             <type
                  id="use"
                  label="Annotation not found"
