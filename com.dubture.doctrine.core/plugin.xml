@@ -83,4 +83,57 @@
             class="com.dubture.doctrine.internal.core.compiler.DoctrineSourceElementRequestor">
       </requestor>
    </extension>
+   <extension
+         point="org.pdtextensions.semanticanalysis.validator">
+      <category
+            id="com.dubture.doctrine.core.validationCategory"
+            label="Doctrine validators">
+      </category>
+      <validator
+            categoryId="com.dubture.doctrine.core.validationCategory"
+            class="com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator"
+            id="com.dubture.doctrine.core.annotationValidator">
+         <type
+               defaultSeverity="info"
+               id="use"
+               label="Use annotation">
+         </type>
+      </validator>
+      <validator
+            categoryId="com.dubture.doctrine.core.validationCategory"
+            class="com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator"
+            id="com.dubture.doctrine.core.annotationValidator">
+         <type
+               defaultSeverity="info"
+               id="Doctrine: com.dubture.doctrine.core.type1"
+               label="label">
+         </type>
+      </validator>
+      <validator
+            categoryId="com.dubture.doctrine.core.validationCategory"
+            class="com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator"
+            id="com.dubture.doctrine.core.annotationValidator">
+         <type
+               defaultSeverity="info"
+               id="Doctrine: com.dubture.doctrine.core.type1"
+               label="label">
+         </type>
+      </validator>
+      <validator
+            categoryId="org.pdtextensions.semanticanalysis.defaultCategory"
+            class="com.dubture.doctrine.internal.core.validation.factory.AnnotationValidatorFactory"
+            id="com.dubture.doctrine.core.annotationValidator">
+            <type
+                 id="use"
+                 label="Annotation not found"
+                 defaultSeverity="warning" />
+      </validator>
+   </extension>
+   <extension
+          point="org.eclipse.dltk.core.problemFactory">
+       <problemIdentifierFactory
+             class="com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifierFactory"
+             namespace="com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier">
+       </problemIdentifierFactory>
+    </extension>
 </plugin>

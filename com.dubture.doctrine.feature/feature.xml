@@ -20,9 +20,10 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    </license>
-   
+
    <requires>
       <import feature="org.eclipse.php" version="3.5.0" match="greaterOrEqual"/>
+      <import feature="org.pdtextensions.feature" version="0.22.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -30,7 +31,7 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
          download-size="0"
          install-size="0"
          version="1.1.0.qualifier"
-         unpack="false"/> 
+         unpack="false"/>
 
    <plugin
          id="com.dubture.doctrine.ui"

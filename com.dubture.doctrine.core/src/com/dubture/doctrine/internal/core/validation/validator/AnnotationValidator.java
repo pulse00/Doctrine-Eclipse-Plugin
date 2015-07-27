@@ -1,6 +1,5 @@
 package com.dubture.doctrine.internal.core.validation.validator;
 
-import org.pdtextensions.semanticanalysis.validation.AbstractValidator;
 import org.pdtextensions.semanticanalysis.validation.IValidatorContext;
 import org.pdtextensions.semanticanalysis.validation.IValidatorParticipant;
 

@@ -11,10 +11,6 @@ import com.dubture.doctrine.internal.core.validation.validator.AnnotationValidat
 
 public class AnnotationValidatorFactory implements IValidatorFactory {
 
-	public AnnotationValidatorFactory() {
-		// TODO Auto-generated constructor stub
-	}
-
 	@Override
 	public IValidatorParticipant getValidatorParticipant(IScriptProject scriptProject) {
 		try {
