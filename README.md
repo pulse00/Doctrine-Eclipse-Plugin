@@ -16,4 +16,3 @@ Eclipse Plugin for the Doctrine ORM
 - Annotation rename refactoring
 - Annotation usage validator
 
-
