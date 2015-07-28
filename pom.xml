@@ -25,6 +25,7 @@
 		<bintray.owner></bintray.owner>
 		<bintray.repo>doctrine-plugin</bintray.repo>
 		<bintray.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</bintray.version>
+		<core-plugin.url>http://pdt-eg.github.io/Core-Plugin/nightly</core-plugin.url>
 		<pdt.version>latest-nightly</pdt.version>
 		<dltk.version>latest-nightly</dltk.version>
 	</properties>
@@ -34,6 +35,11 @@
 			<id>eclipse</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/${eclipse.name}</url>
+		</repository>
+		<repository>
+			<id>core-plugin</id>
+			<layout>p2</layout>
+			<url>${core-plugin.url}</url>
 		</repository>
 		<repository>
 			<id>dltk</id>
