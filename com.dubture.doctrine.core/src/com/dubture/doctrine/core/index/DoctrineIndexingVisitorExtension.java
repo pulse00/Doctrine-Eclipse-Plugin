@@ -150,6 +150,9 @@ public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtensio
 
 	@Override
 	public void modifyDeclaration(ASTNode node, DeclarationInfo info) {
+	    	if (node == null) {
+	    	    return;
+	    	}
 		if (node instanceof ClassDeclaration) {
 			processClassDeclaration((ClassDeclaration) node, info);
 		}
