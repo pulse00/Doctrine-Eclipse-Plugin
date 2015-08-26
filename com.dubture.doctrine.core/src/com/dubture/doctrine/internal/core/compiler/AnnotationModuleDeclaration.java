@@ -41,6 +41,9 @@ public class AnnotationModuleDeclaration implements IAnnotationModuleDeclaration
 
 	@Override
 	public AnnotationBlock readAnnotations(ASTNode node) {
+	    if (node == null) {
+		System.out.println("dupa");
+	    }
 		return read(node.start());
 	}
 

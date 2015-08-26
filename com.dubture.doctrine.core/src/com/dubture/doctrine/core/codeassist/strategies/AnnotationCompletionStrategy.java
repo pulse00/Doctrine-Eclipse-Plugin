@@ -57,7 +57,7 @@ import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
  *   ...
  *   
  *   /**
- *   @ | <-- add ORM\ to the code completion suggestions
+ *   &#64; | <-- add ORM\ to the code completion suggestions
  * 
  * </pre>
  * 
@@ -97,7 +97,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 		if (sourceModule == null) {
 			return;
 		}
-		
+
 		ModuleDeclaration moduleDeclaration = SourceParserUtil.getModuleDeclaration(sourceModule);
 		IType namespace = PHPModelUtils.getCurrentNamespace(sourceModule, context.getOffset());
 		Set<IType> collected = new HashSet<IType>();
@@ -119,8 +119,10 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 			if (start + length < prefixEnd) {
 				length = prefixEnd - start;
 			}
-			replaceRange = new SourceRange(start, length); //set valid replace range
-			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, context.getOffset(), namespace, false);
+			replaceRange = new SourceRange(start, length); // set valid replace
+			// range
+			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, context.getOffset(),
+					namespace, false);
 			for (Entry<String, UsePart> entry : aliases.entrySet()) {
 				if (alias.equalsIgnoreCase(entry.getKey())) {
 					qualifier = entry.getValue().getNamespace().getFullyQualifiedName();
@@ -128,51 +130,71 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 				}
 			}
 		} else {
-			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), namespace, false); //$NON-NLS-1$
+			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), //$NON-NLS-1$
+					namespace, false);
 			for (Entry<String, UsePart> entry : map.entrySet()) {
 				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
 				}
-				IType[] findTypes = PhpModelAccess.getDefault().findTypes(entry.getValue().getNamespace().getFullyQualifiedName(), MatchRule.EXACT, 0, 0, scope, null);
+				IType[] findTypes = PhpModelAccess.getDefault().findTypes(
+						entry.getValue().getNamespace().getFullyQualifiedName(), MatchRule.EXACT, 0, 0, scope, null);
 				if (findTypes.length != 0) {
 					try {
-						if (DoctrineFlags.isAnnotation(findTypes[0].getFlags()) && (findTypes[0].getFlags() & target) == 0) {
-							continue;
-						}
 						collected.add(findTypes[0]);
-						reporter.reportType(new AliasType((SourceType)findTypes[0], entry.getValue().getNamespace().getName(), entry.getKey()), DoctrineFlags.isNamespace(findTypes[0].getFlags()) ? "\\" : "()", replaceRange, Integer.valueOf(0), 10);
+						if (entry.getKey().equals(entry.getValue().getNamespace().getName())) {
+							if (!DoctrineFlags.isAnnotation(findTypes[0].getFlags())) {
+								continue;
+							}
+							reporter.reportType(findTypes[0], "()", replaceRange,
+									Integer.valueOf(ProposalExtraInfo.TYPE_ONLY),
+									ICompletionReporter.RELEVANCE_KEYWORD + 2);
+						} else {
+							reporter.reportType(
+									new AliasType((SourceType) findTypes[0], entry.getValue().getNamespace().getName(),
+											entry.getKey()),
+									DoctrineFlags.isNamespace(findTypes[0].getFlags()) ? "\\" : "()", replaceRange,
+									Integer.valueOf(ProposalExtraInfo.TYPE_ONLY),
+									ICompletionReporter.RELEVANCE_KEYWORD + 2);
+						}
 					} catch (ModelException e) {
 						Logger.logException(e);
 					}
 				} else {
-					reporter.reportType(new FakeType((ModelElement)sourceModule, entry.getKey(), IDoctrineModifiers.AccNameSpace), "\\", replaceRange, Integer.valueOf(ProposalExtraInfo.TYPE_ONLY) | ProposalExtraInfo.NO_INSERT_USE, 10);
+					reporter.reportType(
+							new FakeType((ModelElement) sourceModule, entry.getKey(), IDoctrineModifiers.AccNameSpace),
+							"\\", replaceRange,
+							Integer.valueOf(ProposalExtraInfo.TYPE_ONLY) | ProposalExtraInfo.NO_INSERT_USE,
+							ICompletionReporter.RELEVANCE_KEYWORD + 2);
 				}
 			}
 		}
-		
 
 		IType[] types = getTypes(context, scope, qualifier, name.trim());
 		String suffix = "()";
 		for (IType type : types) {
 			if (!collected.contains(type)) {
-				reporter.reportType(type, suffix, replaceRange);
+				reporter.reportType(type, suffix, replaceRange, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
 			}
 		}
 	}
 
-	private IType[] getTypes(AnnotationCompletionContext context, IDLTKSearchScope scope, String qualifier, String prefix) {
+	private IType[] getTypes(AnnotationCompletionContext context, IDLTKSearchScope scope, String qualifier,
+			String prefix) {
 		if (context.getCompletionRequestor().isContextInformationMode()) {
-			return PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.EXACT, trueFlag, falseFlag, scope, null);
+			return PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.EXACT, trueFlag, falseFlag, scope,
+					null);
 		}
 
 		List<IType> result = new LinkedList<IType>();
 		if (prefix.length() > 1 && prefix.toUpperCase().equals(prefix)) {
 			// Search by camel-case
-			IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.CAMEL_CASE, trueFlag, falseFlag, scope, null);
+			IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.CAMEL_CASE, trueFlag,
+					falseFlag, scope, null);
 			result.addAll(Arrays.asList(types));
 		}
 
-		IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.PREFIX, trueFlag, falseFlag, scope, null);
+		IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.PREFIX, trueFlag, falseFlag,
+				scope, null);
 		result.addAll(Arrays.asList(types));
 
 		return (IType[]) result.toArray(new IType[result.size()]);

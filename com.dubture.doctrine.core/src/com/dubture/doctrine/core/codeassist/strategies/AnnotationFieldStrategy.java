@@ -50,7 +50,7 @@ import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
  *   ...
  *   
  *   /**
- *   @ | <-- add ORM\ to the code completion suggestions
+ *   &#64; | <-- add ORM\ to the code completion suggestions
  * 
  * </pre>
  * 
@@ -106,7 +106,8 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 			if (start + length < prefixEnd) {
 				length = prefixEnd - start;
 			}
-			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, context.getOffset(), namespace, false);
+			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, context.getOffset(),
+					namespace, false);
 			for (Entry<String, UsePart> entry : aliases.entrySet()) {
 				if (alias.equalsIgnoreCase(entry.getKey())) {
 					qualifier = entry.getValue().getNamespace().getFullyQualifiedName();
@@ -114,7 +115,8 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 				}
 			}
 		} else {
-			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), namespace, false); //$NON-NLS-1$
+			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), //$NON-NLS-1$
+					namespace, false);
 			for (Entry<String, UsePart> entry : map.entrySet()) {
 				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
@@ -123,18 +125,25 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 				qualifier = entry.getValue().getNamespace().getNamespace().getName();
 			}
 		}
-		IType[] findTypes = PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag, scope, null);
+		IType[] findTypes = PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag,
+				scope, null);
 		for (IType type : findTypes) {
 			try {
-				for (IField f : PHPModelUtils.getTypeHierarchyField(type, getCompanion().getSuperTypeHierarchy(type, null), "$" + context.getKeyPrefix(), false,new NullProgressMonitor())) {
-					if (PHPFlags.isPublic(f.getFlags()) && !PHPFlags.isStatic(f.getFlags()) && !"$value".equals(f.getElementName())) {
-						reporter.reportField(f, "=", replaceRange, true);
+				for (IField f : PHPModelUtils.getTypeHierarchyField(type,
+						getCompanion().getSuperTypeHierarchy(type, null), "$" + context.getKeyPrefix(), false,
+						new NullProgressMonitor())) {
+					if (PHPFlags.isPublic(f.getFlags()) && !PHPFlags.isStatic(f.getFlags())
+							&& !"$value".equals(f.getElementName())) {
+						reporter.reportField(f, "=", replaceRange, true, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
 						continue;
 						// TODO FOrmatter settings:
 					}
-					IMethod[] setter = PHPModelUtils.getTypeHierarchyMethod(type, getCompanion().getSuperTypeHierarchy(type, null), "set" + f.getElementName().substring(1), true,new NullProgressMonitor());
-					if (setter != null && setter.length > 0 && PHPFlags.isPublic(setter[0].getFlags()) && !PHPFlags.isStatic(setter[0].getFlags())) {
-						reporter.reportField(f, "=", replaceRange, true);
+					IMethod[] setter = PHPModelUtils.getTypeHierarchyMethod(type,
+							getCompanion().getSuperTypeHierarchy(type, null), "set" + f.getElementName().substring(1),
+							true, new NullProgressMonitor());
+					if (setter != null && setter.length > 0 && PHPFlags.isPublic(setter[0].getFlags())
+							&& !PHPFlags.isStatic(setter[0].getFlags())) {
+						reporter.reportField(f, "=", replaceRange, true, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
 						continue;
 					}
 				}

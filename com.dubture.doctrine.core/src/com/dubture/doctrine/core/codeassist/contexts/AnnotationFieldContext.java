@@ -21,8 +21,8 @@ import com.dubture.doctrine.core.log.Logger;
 
 /**
  * 
- * {@link AnnotationFieldContext} checks if we're
- * in a valid PHPDocTag completion context for annotations.
+ * {@link AnnotationFieldContext} checks if we're in a valid PHPDocTag
+ * completion context for annotations.
  * 
  * 
  * @author Robert Gruendler <r.gruendler@gmail.com>
@@ -30,12 +30,12 @@ import com.dubture.doctrine.core.log.Logger;
  */
 @SuppressWarnings("restriction")
 public class AnnotationFieldContext extends PHPDocTagContext {
-	
+
 	private String prefix;
 	private String annotationName;
+
 	@Override
-	public boolean isValid(ISourceModule sourceModule, int offset,
-			CompletionRequestor requestor) {
+	public boolean isValid(ISourceModule sourceModule, int offset, CompletionRequestor requestor) {
 
 		if (!super.isValid(sourceModule, offset, requestor) == true) {
 			return false;
@@ -43,28 +43,30 @@ public class AnnotationFieldContext extends PHPDocTagContext {
 
 		try {
 			// wrong nature
-			if(!sourceModule.getScriptProject().getProject().hasNature(DoctrineNature.NATURE_ID)) {
-				return false;	
+			if (!sourceModule.getScriptProject().getProject().hasNature(DoctrineNature.NATURE_ID)) {
+				return false;
 			}
-			
+
 			TextSequence sequence = getStatementText();
 			int start = sequence.toString().lastIndexOf("@");
 			int end = sequence.toString().length();
-			
+
 			String line = sequence.toString().substring(start, end);
-			
+
 			// we're inside an annotation's parameters
 			// can't complete this so far.
-			
+
 			if (!line.contains("(")) {
 				return false;
 			}
 			TextSequence statementText = getStatementText();
-			int readBackwardSpaces = PHPTextSequenceUtilities.readBackwardSpaces(statementText, statementText.length() );
-			
-			int readIdentifierStartIndex = PHPTextSequenceUtilities.readIdentifierStartIndex(statementText, readBackwardSpaces, false);
+			int readBackwardSpaces = PHPTextSequenceUtilities.readBackwardSpaces(statementText, statementText.length());
+
+			int readIdentifierStartIndex = PHPTextSequenceUtilities.readIdentifierStartIndex(statementText,
+					readBackwardSpaces, false);
 			readBackwardSpaces = readIdentifierStartIndex - 1;
-			while (Character.isWhitespace(statementText.charAt(readBackwardSpaces)) || statementText.charAt(readBackwardSpaces) == '*') {
+			while (Character.isWhitespace(statementText.charAt(readBackwardSpaces))
+					|| statementText.charAt(readBackwardSpaces) == '*') {
 				readBackwardSpaces -= 1;
 			}
 			if (statementText.charAt(readBackwardSpaces) != ',' && statementText.charAt(readBackwardSpaces) != '(') {
@@ -79,14 +81,14 @@ public class AnnotationFieldContext extends PHPDocTagContext {
 		} catch (Exception e) {
 			Logger.logException(e);
 		}
-		
+
 		return false;
 	}
-	
+
 	public String getKeyPrefix() throws BadLocationException {
 		return prefix;
 	}
-	
+
 	public String getAnnotationName() {
 		return annotationName;
 	}
