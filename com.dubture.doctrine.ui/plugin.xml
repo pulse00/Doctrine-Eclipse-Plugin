@@ -61,4 +61,14 @@
 	      <themeid refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
 	  </stylesheet>
   </extension>
+  <extension
+       point="org.eclipse.dltk.ui.queryParticipants"> 
+    <queryParticipant
+          class="com.dubture.doctrine.ui.search.AnnotationSearchParticipant"
+          id="com.dubture.doctrine.ui.annotationQueryParticipant"
+          language="org.eclipse.php.core.PHPNature"
+          name="Annotation Reference "
+          nature="com.dubture.doctrine.core.doctrineNature">
+    </queryParticipant>
+ </extension>
 </plugin>

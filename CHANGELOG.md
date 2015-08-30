@@ -6,6 +6,7 @@
 * Annotation import validator
 * Index improvements
 * Resurrect RepositoryClass goal evaluators
+* Annotation search participant
 
 1.0.8
 
