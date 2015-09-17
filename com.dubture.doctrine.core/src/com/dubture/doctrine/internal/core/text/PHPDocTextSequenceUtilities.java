@@ -6,6 +6,7 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.documentModel.parser.PHPRegionContext;
 import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
 import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
+import org.eclipse.php.internal.core.util.text.TextSequence;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
@@ -144,5 +145,47 @@ public class PHPDocTextSequenceUtilities {
 		}
 		
 		return false;
+	}
+	
+	public static boolean isWhiteSpace(char ch) {
+		return Character.isWhitespace(ch) || ch == '*';
+	}
+	
+	public static int readBackwardSpaces(TextSequence sequence, int offset) {
+		while (offset > 0 && isWhiteSpace(sequence.charAt(offset - 1))) {
+			offset -= 1;
+		}
+		
+		return offset;
+	}
+	
+	
+	public static int findAnnotationBodyStart(TextSequence sequence, int offset) {
+		while (offset >= sequence.length()) {
+			offset--;
+		}
+		int depth = 0;
+		boolean inString = false;
+		if (sequence.charAt(offset) == '(') {
+			return offset -1;
+		}
+		for (; offset > 1; offset--) {
+			char ch = sequence.charAt(offset - 1);
+			if (inString && ch == '"' && sequence.charAt(offset -2) != '\\') {
+				inString = false;
+			} else if (!inString && ch == '"') {
+				inString = true;
+			} else if (!inString && ch == '(') {
+				if (depth > 0) {
+					depth--;
+				} else {
+					return offset - 1;
+				}
+			} else if (!inString && ch == ')') {
+				depth++;
+			}
+		}
+		
+		return -1;
 	}
 }

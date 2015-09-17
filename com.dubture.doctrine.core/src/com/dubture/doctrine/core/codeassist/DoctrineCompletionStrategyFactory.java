@@ -14,10 +14,14 @@ import java.util.List;
 import org.eclipse.php.core.codeassist.ICompletionContext;
 import org.eclipse.php.core.codeassist.ICompletionStrategy;
 import org.eclipse.php.core.codeassist.ICompletionStrategyFactory;
+import org.eclipse.php.internal.core.codeassist.strategies.TypeInStringStrategy;
 
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationCompletionContext;
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldContext;
+import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldValueContext;
+import com.dubture.doctrine.core.codeassist.contexts.AnnotationStringValueContext;
 import com.dubture.doctrine.core.codeassist.strategies.AnnotationCompletionStrategy;
+import com.dubture.doctrine.core.codeassist.strategies.AnnotationEnumStrategy;
 import com.dubture.doctrine.core.codeassist.strategies.AnnotationFieldStrategy;
 
 /**
@@ -40,6 +44,11 @@ public class DoctrineCompletionStrategyFactory implements ICompletionStrategyFac
 				result.add(new AnnotationCompletionStrategy(context));
 			} else if (contextClass == AnnotationFieldContext.class) {
 				result.add(new AnnotationFieldStrategy(context));
+			} else if (contextClass == AnnotationFieldValueContext.class) {
+				
+			} else if (contextClass == AnnotationStringValueContext.class) {
+				result.add(new AnnotationEnumStrategy(context));
+				result.add(new TypeInStringStrategy(context));
 			}
 		}
 

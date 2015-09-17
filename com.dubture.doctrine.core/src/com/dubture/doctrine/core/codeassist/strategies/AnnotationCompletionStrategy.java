@@ -44,6 +44,7 @@ import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationCompletionContext;
 import com.dubture.doctrine.core.compiler.DoctrineFlags;
 import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
+import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 
 /**
  * 
@@ -140,21 +141,25 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 						entry.getValue().getNamespace().getFullyQualifiedName(), MatchRule.EXACT, 0, 0, scope, null);
 				if (findTypes.length != 0) {
 					try {
+						int addon = 0;
+						String fullName = PHPModelUtils.getFullName(findTypes[0]);
+						if (DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE.equals(fullName)
+								|| DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE.equals(qualifier)) {
+							addon = ProposalExtraInfo.NO_INSERT_USE;
+						}
 						collected.add(findTypes[0]);
 						if (entry.getKey().equals(entry.getValue().getNamespace().getName())) {
 							if (!DoctrineFlags.isAnnotation(findTypes[0].getFlags())) {
 								continue;
 							}
-							reporter.reportType(findTypes[0], "()", replaceRange,
-									Integer.valueOf(ProposalExtraInfo.TYPE_ONLY),
+							reporter.reportType(findTypes[0], "()", replaceRange, ProposalExtraInfo.TYPE_ONLY | addon,
 									ICompletionReporter.RELEVANCE_KEYWORD + 2);
 						} else {
 							reporter.reportType(
 									new AliasType((SourceType) findTypes[0], entry.getValue().getNamespace().getName(),
 											entry.getKey()),
 									DoctrineFlags.isNamespace(findTypes[0].getFlags()) ? "\\" : "()", replaceRange,
-									Integer.valueOf(ProposalExtraInfo.TYPE_ONLY),
-									ICompletionReporter.RELEVANCE_KEYWORD + 2);
+									ProposalExtraInfo.TYPE_ONLY | addon, ICompletionReporter.RELEVANCE_KEYWORD + 2);
 						}
 					} catch (ModelException e) {
 						Logger.logException(e);

@@ -1,28 +1,21 @@
 package com.dubture.doctrine.internal.core.compiler;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.parser.IModuleDeclaration;
-import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPFieldDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.TraitDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 
-import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.DoctrineCorePlugin;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;

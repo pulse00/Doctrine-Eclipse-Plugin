@@ -61,16 +61,21 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 					|| line.contains("\t")) {
 				return false;
 			}
+			line = line.trim();
 			if (line.trim().endsWith("*")) { //$NON-NLS-1$
 				return false;
 			}
-
+			for (int i = line.length() - 1; i > 0; i--) {
+				char ch = line.charAt(i);
+				if (!PHPDocTextSequenceUtilities.isIdentPart(ch)) {
+					return false;
+				}
+			}			
+			return true;
 		} catch (Exception e) {
 			Logger.logException(e);
 			return false;
 		}
-
-		return true;
 	}
 
 	public int getTarget() {

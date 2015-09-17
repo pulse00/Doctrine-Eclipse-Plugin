@@ -8,6 +8,8 @@
  ******************************************************************************/
 package com.dubture.doctrine.core.codeassist.strategies;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,7 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.core.IField;
-import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceRange;
 import org.eclipse.dltk.core.IType;
@@ -25,44 +26,49 @@ import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.core.codeassist.ICompletionContext;
-import org.eclipse.php.core.compiler.PHPFlags;
 import org.eclipse.php.internal.core.Logger;
 import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
+import org.eclipse.php.internal.core.codeassist.CompletionFlag;
 import org.eclipse.php.internal.core.codeassist.ICompletionReporter;
+import org.eclipse.php.internal.core.codeassist.IPHPCompletionRequestor;
+import org.eclipse.php.internal.core.codeassist.contexts.AbstractCompletionContext;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
-import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldContext;
+import com.dubture.doctrine.annotation.model.Annotation;
+import com.dubture.doctrine.annotation.model.AnnotationBlock;
+import com.dubture.doctrine.annotation.model.ArrayValue;
+import com.dubture.doctrine.annotation.model.IArgumentValue;
+import com.dubture.doctrine.annotation.model.StringValue;
+import com.dubture.doctrine.core.AnnotationParserUtil;
+import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldValueContext;
+import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
+import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 
 /**
- * 
- * The {@link AnnotationFieldStrategy} parses the UseStatements of the current
- * class and reports the aliases to the completion engine:
- * 
- * <pre>
- * 
- *   use Doctrine\ORM\Mapping as ORM;
- *   
- *   ...
- *   
- *   /**
- *   &#64; | <-- add ORM\ to the code completion suggestions
- * 
- * </pre>
- * 
- * @author Robert Gruendler <r.gruendler@gmail.com>
+ * this class return enum values for field
  */
 @SuppressWarnings({ "restriction" })
-public class AnnotationFieldStrategy extends PHPDocTagStrategy {
+public class AnnotationEnumStrategy extends PHPDocTagStrategy {
 
 	private int trueFlag = IDoctrineModifiers.AccAnnotation;
 	private int falseFlag = 0;
+	private static final Map<String, String[]> builtIn = new HashMap<String, String[]>();
 
-	public AnnotationFieldStrategy(ICompletionContext context) {
+	static {
+		builtIn.put(DoctrineCoreConstants.COLUMN_ANNOTATION + "#$type",
+				new String[] { "smallint", "integer", "bigint", "decimal", "string", "text", "giud", "binary", "blob",
+						"boolean", "date", "datetime", "datetimez", "time", "dateinterval", "array", "simple_array",
+						"json_array", "object" });
+		builtIn.put(DoctrineCoreConstants.TARGET_ANNOTATION + "#$value",
+				new String[] { "ALL", "CLASS", "METHOD", "PROPERTY", "ANNOTATION" });
+	}
+
+	public AnnotationEnumStrategy(ICompletionContext context) {
 		super(context);
 	}
 
@@ -71,11 +77,11 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 
 		ICompletionContext ctx = getContext();
 
-		if (!(ctx instanceof AnnotationFieldContext)) {
+		if (!(ctx instanceof AnnotationFieldValueContext)) {
 			return;
 		}
 
-		AnnotationFieldContext context = (AnnotationFieldContext) ctx;
+		AnnotationFieldValueContext context = (AnnotationFieldValueContext) ctx;
 		ISourceRange replaceRange = getReplacementRange(context);
 		IDLTKSearchScope scope = createSearchScope();
 		ISourceModule sourceModule = context.getSourceModule();
@@ -118,11 +124,14 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), //$NON-NLS-1$
 					namespace, false);
 			for (Entry<String, UsePart> entry : map.entrySet()) {
-				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
+				if (!name.equalsIgnoreCase(entry.getKey())) {
 					continue;
 				}
 				name = entry.getValue().getNamespace().getName();
 				qualifier = entry.getValue().getNamespace().getNamespace().getName();
+			}
+			if (qualifier == null) {
+				qualifier = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE;
 			}
 		}
 		IType[] findTypes = PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag,
@@ -130,26 +139,9 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 		for (IType type : findTypes) {
 			try {
 				for (IField f : PHPModelUtils.getTypeHierarchyField(type,
-						getCompanion().getSuperTypeHierarchy(type, null), "$" + context.getKeyPrefix(), false,
+						getCompanion().getSuperTypeHierarchy(type, null), "$" + context.getFieldName(), false,
 						new NullProgressMonitor())) {
-					if (PHPFlags.isPublic(f.getFlags()) && !PHPFlags.isStatic(f.getFlags())
-							&& !"$value".equals(f.getElementName())) {
-						String suffix = "=";
-						if ("string".equalsIgnoreCase(f.getType())) {
-							suffix = "=\"\"";
-						}
-						reporter.reportField(f, suffix, replaceRange, true, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
-						continue;
-						// TODO FOrmatter settings:
-					}
-					IMethod[] setter = PHPModelUtils.getTypeHierarchyMethod(type,
-							getCompanion().getSuperTypeHierarchy(type, null), "set" + f.getElementName().substring(1),
-							true, new NullProgressMonitor());
-					if (setter != null && setter.length > 0 && PHPFlags.isPublic(setter[0].getFlags())
-							&& !PHPFlags.isStatic(setter[0].getFlags())) {
-						reporter.reportField(f, "=", replaceRange, true, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
-						continue;
-					}
+					collectValues(type, f, reporter, replaceRange, context);
 				}
 			} catch (ModelException e) {
 				Logger.logException(e);
@@ -158,6 +150,48 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 			}
 		}
 
+	}
+
+	private void collectValues(IType type, IField field, ICompletionReporter reporter, ISourceRange replaceRange,
+			AnnotationFieldValueContext context) throws CoreException {
+		String n = PHPModelUtils.getFullName(type) + "#" + field.getElementName();
+		IPHPCompletionRequestor phpCompletionRequestor = (IPHPCompletionRequestor) ((AbstractCompletionContext)getContext()).getCompletionRequestor();
+		if (builtIn.containsKey(n)) {
+			phpCompletionRequestor.addFlag(CompletionFlag.STOP_REPORT_TYPE);
+			for (String key : builtIn.get(n)) {
+				if (CodeAssistUtils.startsWithIgnoreCase(key, context.getValuePrefix())) {
+					reporter.reportKeyword(key, "", replaceRange);
+				}
+			}
+			
+			return;
+		}
+		
+		IAnnotationModuleDeclaration module = AnnotationParserUtil.getModule(type.getAncestor(ISourceModule.class));
+		if (module == null) {
+			return;
+		}
+
+		AnnotationBlock annotations = module.readAnnotations(field);
+		// XXX Resolve real name
+		for (Annotation ann : annotations.findAnnotations("Enum")) {
+			phpCompletionRequestor.addFlag(CompletionFlag.STOP_REPORT_TYPE);
+			IArgumentValue val = ann.getArgumentValue(DoctrineCoreConstants.DEFAULT_FIELD);
+			if (val == null && ann.getArguments().size() > 0) {
+				val = ann.getArgumentValue(0);
+			}
+			if (val instanceof ArrayValue) {
+				List<IArgumentValue> arr = (List<IArgumentValue>) val.getValue();
+				for (IArgumentValue en : arr) {
+					if (en instanceof StringValue) {
+						String string = (String) en.getValue();
+						if (CodeAssistUtils.startsWithIgnoreCase(string, context.getValuePrefix())) {
+							reporter.reportKeyword(string, "", replaceRange);
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

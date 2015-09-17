@@ -6,11 +6,9 @@ import java.util.Map;
 
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.core.IField;
-import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.ISourceReference;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
 
 import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
@@ -41,9 +39,6 @@ public class AnnotationModuleDeclaration implements IAnnotationModuleDeclaration
 
 	@Override
 	public AnnotationBlock readAnnotations(ASTNode node) {
-	    if (node == null) {
-		System.out.println("dupa");
-	    }
 		return read(node.start());
 	}
 

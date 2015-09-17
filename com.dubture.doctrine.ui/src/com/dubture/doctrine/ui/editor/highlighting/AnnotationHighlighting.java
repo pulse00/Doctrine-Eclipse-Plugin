@@ -28,7 +28,7 @@ import com.dubture.doctrine.annotation.parser.antlr.SourcePosition;
 import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 
-/** 
+/**
  *
  * Highlighting for Annotations.
  *
@@ -36,36 +36,36 @@ import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 @SuppressWarnings("restriction")
 public class AnnotationHighlighting extends AbstractSemanticHighlighting {
 
-    protected class AnnotationApply extends AbstractSemanticApply {
+	protected class AnnotationApply extends AbstractSemanticApply {
 
-        protected ISourceModule sourceModule;
-        protected IAnnotationModuleDeclaration decl;
+		protected ISourceModule sourceModule;
+		protected IAnnotationModuleDeclaration decl;
 
-        public AnnotationApply() {
-            this.sourceModule = getSourceModule();
-            try {
+		public AnnotationApply() {
+			this.sourceModule = getSourceModule();
+			try {
 				this.decl = AnnotationParserUtil.getModule(sourceModule);
 			} catch (CoreException e) {
 				com.dubture.doctrine.ui.log.Logger.logException(e);
 			}
-        }
-        
-        @Override
+		}
+
+		@Override
 		public boolean visit(Program program) {
-        	if (decl == null) {
-        		return false;
-        	}
+			if (decl == null) {
+				return false;
+			}
 			try {
 				getSourceModule().accept(new IModelElementVisitor() {
 
 					@Override
 					public boolean visit(IModelElement element) {
 						if (element instanceof ISourceReference) {
-							List<Annotation> annotations = decl.readAnnotations((ISourceReference)element).getAnnotations();
-				            for (Annotation annotation : annotations) {
-				                SourcePosition sourcePosition = annotation.getSourcePosition();
-				                highlight(sourcePosition.startOffset, sourcePosition.length);
-				            }
+							List<Annotation> annotations = decl.readAnnotations((ISourceReference) element).getAnnotations();
+							for (Annotation annotation : annotations) {
+								SourcePosition sourcePosition = annotation.getSourcePosition();
+								highlight(sourcePosition.startOffset, sourcePosition.length);
+							}
 						}
 						return true;
 					}
@@ -76,27 +76,30 @@ public class AnnotationHighlighting extends AbstractSemanticHighlighting {
 			}
 			return false;
 		}
-    }
-    
+	}
 
-    public AnnotationHighlighting() {
-        super();
-    }
+	public AnnotationHighlighting() {
+		super();
+	}
 
-    @Override
-    public String getDisplayName() {
-        return "Annotations";
-    }
+	@Override
+	public String getDisplayName() {
+		return "Annotations";
+	}
 
-    @Override
-    public AbstractSemanticApply getSemanticApply() {
-        return new AnnotationApply();
-    }
+	@Override
+	public AbstractSemanticApply getSemanticApply() {
+		return new AnnotationApply();
+	}
 
-    @Override
-    public void initDefaultPreferences() {
-        getStyle().setUnderlineByDefault(false).setDefaultTextColor(
-                new RGB(64, 64, 64));
-    }
-    
+	@Override
+	public void initDefaultPreferences() {
+		getStyle().setUnderlineByDefault(false).setDefaultTextColor(new RGB(64, 64, 64));
+	}
+
+	@Override
+	public int getPriority() {
+		return 200;
+	}
+
 }

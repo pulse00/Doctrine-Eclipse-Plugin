@@ -19,4 +19,8 @@ public class DoctrineCoreConstants {
 	
 	public static final String DEFAULT_ANNOTATION_NAMESPACE = "Doctrine\\Common\\Annotations\\Annotation";
 	public static final String ANNOTATION_TAG_NAME = "Annotation";
+	public static final String ENUM_ANNOTATION = "Doctrine\\Common\\Annotations\\Annotation\\Enum";
+	public static final String TARGET_ANNOTATION = "Doctrine\\Common\\Annotations\\Annotation\\Target";
+	public static final String COLUMN_ANNOTATION = "Doctrine\\ORM\\Mapping\\Column";
+	public static final String DEFAULT_FIELD = "value";
 }

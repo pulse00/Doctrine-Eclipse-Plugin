@@ -10,22 +10,17 @@ import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.php.core.compiler.PHPSourceElementRequestorExtension;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
-import org.eclipse.php.internal.core.compiler.ast.parser.ASTUtils;
-import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
 import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.ArgumentValueType;
 import com.dubture.doctrine.annotation.model.ArrayValue;
 import com.dubture.doctrine.annotation.model.IArgumentValue;
-import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.compiler.DoctrineFlags;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.core.compiler.IDoctrineModifiers;
 import com.dubture.doctrine.core.log.Logger;
-import com.dubture.doctrine.core.utils.AnnotationUtils;
 
 public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExtension {
 	private final static String ANNOTATION_TAG = "Annotation"; //$NON-NLS-1$

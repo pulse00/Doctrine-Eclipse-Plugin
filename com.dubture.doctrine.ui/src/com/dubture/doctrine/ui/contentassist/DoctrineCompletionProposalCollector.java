@@ -40,77 +40,74 @@ import com.dubture.doctrine.core.codeassist.DoctrineCompletionStrategyFactory;
  */
 @SuppressWarnings("restriction")
 public class DoctrineCompletionProposalCollector extends PHPCompletionProposalCollector
-	implements IPHPCompletionRequestorExtension {
+		implements IPHPCompletionRequestorExtension {
 
-    private CompletionProposalLabelProvider labelProvider;
+	private CompletionProposalLabelProvider labelProvider;
 
-    public DoctrineCompletionProposalCollector(IDocument document, ISourceModule cu, boolean explicit) {
-	super(document, cu, explicit);
+	public DoctrineCompletionProposalCollector(IDocument document, ISourceModule cu, boolean explicit) {
+		super(document, cu, explicit);
+
+	}
+
+	@Override
+	public CompletionProposalLabelProvider getLabelProvider() {
+
+		if (labelProvider == null)
+			labelProvider = new DoctrineCompletionProposalLabelProvider();
+
+		return labelProvider;
+
+	}
+
+	@Override
+	protected IScriptCompletionProposal createTypeProposal(CompletionProposal proposal) {
+		IModelElement element = proposal.getModelElement();
+
+		if (element == null) {
+			return null;
+		}
+
+		ProposalInfo proposalInfo = new TypeProposalInfo(getSourceModule().getScriptProject(), proposal);
+		ImageDescriptor imageDescriptor = ((PHPCompletionProposalLabelProvider) getLabelProvider())
+				.createTypeImageDescriptor(proposal);
+
+		// if (proposalInfo != null) {
+		ScriptCompletionProposal doctrineProposal = generateDoctrineProposal(proposal, imageDescriptor);
+		if (proposalInfo != null) {
+			doctrineProposal.setProposalInfo(proposalInfo);
+		}
+		doctrineProposal.setRelevance(computeRelevance(proposal));
+		return doctrineProposal;
+	}
+
+	private ScriptCompletionProposal generateDoctrineProposal(final CompletionProposal typeProposal,
+			ImageDescriptor descriptor) {
+
+		String completion = new String(typeProposal.getCompletion());
+		int replaceStart = typeProposal.getReplaceStart();
+		int length = getLength(typeProposal);
+		Image image = getImage(descriptor);
+
+		String displayString = ((DoctrineCompletionProposalLabelProvider) getLabelProvider())
+				.createTypeProposalLabel(typeProposal);
+		ScriptCompletionProposal scriptProposal = new DoctrineCompletionProposal(typeProposal, getDocument(),
+				getSourceModule(), completion, replaceStart, length, image, displayString, 0);
+
+		return scriptProposal;
+	}
 	
-
-    }
-
-    @Override
-    public CompletionProposalLabelProvider getLabelProvider() {
-
-	if (labelProvider == null)
-	    labelProvider = new DoctrineCompletionProposalLabelProvider();
-
-	return labelProvider;
-
-    }
-
-    @Override
-    protected IScriptCompletionProposal createTypeProposal(CompletionProposal proposal) {
-
-	IModelElement element = proposal.getModelElement();
-
-	if (element == null) {
-	    return null;
+	@Override
+	protected String getNatureId() {
+		return DoctrineNature.NATURE_ID;
 	}
 
-	ProposalInfo proposalInfo = new TypeProposalInfo(getSourceModule().getScriptProject(), proposal);
-	ImageDescriptor imageDescriptor = ((PHPCompletionProposalLabelProvider) getLabelProvider())
-		.createTypeImageDescriptor(proposal);
-
-	// if (proposalInfo != null) {
-	ScriptCompletionProposal doctrineProposal = generateDoctrineProposal(proposal, imageDescriptor);
-	if (proposalInfo != null) {
-	    doctrineProposal.setProposalInfo(proposalInfo);
+	@Override
+	public ICompletionContextResolver[] getContextResolvers() {
+		return new ICompletionContextResolver[] { new DoctrineCompletionContextResolver() };
 	}
-	doctrineProposal.setRelevance(computeRelevance(proposal));
-	return doctrineProposal;
-    }
 
-    private ScriptCompletionProposal generateDoctrineProposal(final CompletionProposal typeProposal,
-	    ImageDescriptor descriptor) {
-
-	String completion = new String(typeProposal.getCompletion());
-	int replaceStart = typeProposal.getReplaceStart();
-	int length = getLength(typeProposal);
-	Image image = getImage(descriptor);
-
-	String displayString = ((DoctrineCompletionProposalLabelProvider) getLabelProvider())
-		.createTypeProposalLabel(typeProposal);
-	ScriptCompletionProposal scriptProposal = new DoctrineCompletionProposal(typeProposal, getDocument(), getSourceModule(), completion, replaceStart,
-		length, image, displayString, 0);
-
-	return scriptProposal;
-
-    }
-
-    @Override
-    protected String getNatureId() {
-	return DoctrineNature.NATURE_ID;
-    }
-
-    @Override
-    public ICompletionContextResolver[] getContextResolvers() {
-	return new ICompletionContextResolver[] { new DoctrineCompletionContextResolver() };
-    }
-
-    @Override
-    public ICompletionStrategyFactory[] getStrategyFactories() {
-	return new ICompletionStrategyFactory[] { new DoctrineCompletionStrategyFactory() };
-    }
+	@Override
+	public ICompletionStrategyFactory[] getStrategyFactories() {
+		return new ICompletionStrategyFactory[] { new DoctrineCompletionStrategyFactory() };
+	}
 }

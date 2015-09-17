@@ -10,26 +10,18 @@ package com.dubture.doctrine.core.codeassist.contexts;
 
 import org.eclipse.dltk.core.CompletionRequestor;
 import org.eclipse.dltk.core.ISourceModule;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.internal.core.util.text.PHPTextSequenceUtilities;
 import org.eclipse.php.internal.core.util.text.TextSequence;
 
 import com.dubture.doctrine.core.log.Logger;
+import com.dubture.doctrine.core.preferences.DoctrineCoreConstants;
 import com.dubture.doctrine.internal.core.text.PHPDocTextSequenceUtilities;
 
-/**
- * 
- * {@link AnnotationFieldContext} checks if we're in a valid PHPDocTag
- * completion context for annotations.
- * 
- * 
- * @author Robert Gruendler <r.gruendler@gmail.com>
- *
- */
 @SuppressWarnings("restriction")
-public class AnnotationFieldContext extends AnnotationBodyContext {
+public class AnnotationFieldValueContext extends AnnotationBodyContext {
 
-	protected String prefix;
+	private String fieldName;
+	private String valuePrefix;
 
 	@Override
 	public boolean isValid(ISourceModule sourceModule, int offset, CompletionRequestor requestor) {
@@ -41,22 +33,30 @@ public class AnnotationFieldContext extends AnnotationBodyContext {
 		try {
 			TextSequence sequence = getStatementText();
 			offset = sequence.length() - 1;
-			char curr = sequence.charAt(offset);
-			if (!PHPDocTextSequenceUtilities.isWhiteSpace(curr)) {
-				if (curr == '(' || curr == ',') {
-					prefix = "";
-					return true;
-				} else if (!PHPDocTextSequenceUtilities.isIdentPart(curr)) {
-					return false;
-				}
-			}
 			offset = PHPDocTextSequenceUtilities.readBackwardSpaces(sequence, offset);
 			int start = PHPTextSequenceUtilities.readIdentifierStartIndex(sequence, offset, false);
-			curr = sequence.charAt(PHPDocTextSequenceUtilities.readBackwardSpaces(sequence, start) - 1);
-			if (curr == ',' || curr == '(') {
-				prefix = sequence.toString().substring(start, offset).trim();
-				return true;
+			int end = PHPDocTextSequenceUtilities.readBackwardSpaces(sequence, start) - 1;
+			StringBuilder prefixBuilder = new StringBuilder();
+			for (; offset > 0; offset--) {
+				char ch = sequence.charAt(offset);
+				if (ch == '=') {
+					valuePrefix = prefixBuilder.toString();
+					break;
+				} else if (ch == '(') {
+					valuePrefix = prefixBuilder.toString();
+					fieldName = DoctrineCoreConstants.DEFAULT_FIELD;
+					return true;
+				}
+				prefixBuilder.insert(0, ch);
 			}
+			end = PHPDocTextSequenceUtilities.readBackwardSpaces(sequence, offset);
+			start = PHPTextSequenceUtilities.readIdentifierStartIndex(sequence, offset, false);
+			if (start >= end) {
+				return false;
+			}
+			fieldName = sequence.toString().substring(start, end);
+
+			return true;
 		} catch (Exception e) {
 			Logger.logException(e);
 		}
@@ -64,8 +64,11 @@ public class AnnotationFieldContext extends AnnotationBodyContext {
 		return false;
 	}
 
-	public String getKeyPrefix() throws BadLocationException {
-		return prefix;
+	public String getFieldName() {
+		return fieldName;
 	}
 
+	public String getValuePrefix() {
+		return valuePrefix;
+	}
 }
