@@ -61,7 +61,7 @@ public class AnnotationEnumStrategy extends PHPDocTagStrategy {
 
 	static {
 		builtIn.put(DoctrineCoreConstants.COLUMN_ANNOTATION + "#$type",
-				new String[] { "smallint", "integer", "bigint", "decimal", "string", "text", "giud", "binary", "blob",
+				new String[] { "smallint", "integer", "bigint", "decimal", "string", "text", "guid", "binary", "blob",
 						"boolean", "date", "datetime", "datetimez", "time", "dateinterval", "array", "simple_array",
 						"json_array", "object" });
 		builtIn.put(DoctrineCoreConstants.TARGET_ANNOTATION + "#$value",
