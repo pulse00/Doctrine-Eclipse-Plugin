@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Doctrine Core Plugin
 Bundle-SymbolicName: com.dubture.doctrine.core;singleton:=true
-Bundle-Version: 1.1.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: com.dubture.doctrine.core.DoctrineCorePlugin
 Bundle-Vendor: https://github.com/pulse00
 Bundle-Localization: plugin
