@@ -3,8 +3,8 @@ package com.dubture.doctrine.internal.core.build;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dltk.compiler.problem.ProblemCollector;
 import org.eclipse.dltk.core.IScriptProject;
-import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.dltk.core.ISourceModuleInfoCache.ISourceModuleInfo;
+import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.dltk.core.builder.AbstractBuildParticipantType;
 import org.eclipse.dltk.core.builder.IBuildContext;
 import org.eclipse.dltk.core.builder.IBuildParticipant;
@@ -24,6 +24,9 @@ public class AnnotationBuildParticipantFactory extends AbstractBuildParticipantT
 
 	@Override
 	public IBuildParticipant createBuildParticipant(IScriptProject project) throws CoreException {
+		if (!project.getProject().isAccessible()) {
+			return null;
+		}
 		if (project.getProject().hasNature(DoctrineNature.NATURE_ID)) {
 			return new AnnotationBuildParticipant();
 		}
