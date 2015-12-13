@@ -11,6 +11,7 @@ import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IProjectFragment;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.core.ISourceRange;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
@@ -23,6 +24,7 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
+import org.eclipse.php.internal.core.util.text.PHPTextSequenceUtilities;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
@@ -147,6 +149,23 @@ public class DoctrineSelectionEngine extends ScriptSelectionEngine {
 					return PhpModelAccess.getDefault().findTypes(null, sb.toString(), MatchRule.EXACT, IDoctrineModifiers.AccNameSpace, 0, scope, null);
 				}
 				return PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, 0, 0, scope, null);
+			} else {
+				String text = document.getText();
+				int nameStart = PHPTextSequenceUtilities.readNamespaceStartIndex(text, offset, false);
+				int nameEnd = PHPTextSequenceUtilities.readNamespaceEndIndex(text, offset, false);
+				if (nameStart > 0 && nameStart < nameEnd) {
+					char next = text.charAt(PHPTextSequenceUtilities.readForwardSpaces(text, nameEnd));
+					
+					if (next != '=') {
+						String name = text.substring(nameStart, nameEnd);
+						if (nameStart + name.lastIndexOf('\\') > offset) {
+							name = name.substring(0, name.lastIndexOf('\\'));
+							return PhpModelAccess.getDefault().findNamespaces(null, name, MatchRule.EXACT, 0, 0, createSearchScope(sourceModule), null);
+						} else {
+							return PhpModelAccess.getDefault().findTypes(name, MatchRule.EXACT, 0, 0, createSearchScope(sourceModule), null);
+						}
+					}
+				}
 			}
 		} catch (BadLocationException e) {
 			Logger.logException(e);
