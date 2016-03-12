@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Doctrine Tests
 Bundle-SymbolicName: com.dubture.doctrine.test;singleton:=true
 Bundle-Activator: com.dubture.doctrine.test.DoctrineTestPlugin
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.3.0.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: https://github.com/pulse00
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
