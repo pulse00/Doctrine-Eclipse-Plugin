@@ -13,6 +13,7 @@ import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
+import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocTag.TagKind;
 
 import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
@@ -117,7 +118,11 @@ public class AnnotationUtils {
     // FIXME: This has been copied from AnnotationUtils that can be found in com.dubture.symfony.core
 	public static AnnotationCommentParser createParser(String[] includedClassNames) {
         AnnotationCommentParser parser = new AnnotationCommentParser();
-        parser.addExcludedClassNames(PHPDocTagStrategy.PHPDOC_TAGS);
+        List<String> phpDocTags = new LinkedList<String>();
+        for (TagKind tag : TagKind.values()) {
+        	phpDocTags.add(tag.toString());
+        }
+        parser.addExcludedClassNames(phpDocTags.toArray(new String[0]));
         parser.addExcludedClassNames(PHPDOC_TAGS_EXTRA);
         if (includedClassNames != null) {
             parser.addIncludedClassNames(includedClassNames);

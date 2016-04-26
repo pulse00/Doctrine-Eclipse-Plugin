@@ -54,7 +54,7 @@ public class PHPDocTextSequenceUtilities {
 
 	public static boolean isPHPDoc(IStructuredDocument document, int offset) {
 		String region = getPHPRegionType(document, offset);
-		return PHPRegionTypes.PHPDOC_COMMENT.equals(region) || PHPRegionTypes.PHPDOC_PARAM.equals(region) || PHPRegionTypes.PHPDOC_DESC.equals(region);
+		return PHPRegionTypes.PHPDOC_COMMENT.equals(region) || PHPRegionTypes.PHPDOC_GENERIC_TAG.equals(region) || PHPRegionTypes.PHPDOC_TODO.equals(region);
 	}
 
 	public static String getAnnotationName(IDocument document, int offset) throws BadLocationException {
