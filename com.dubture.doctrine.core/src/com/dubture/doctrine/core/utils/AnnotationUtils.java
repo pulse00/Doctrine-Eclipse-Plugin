@@ -8,7 +8,6 @@ import java.util.List;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.php.internal.core.ast.nodes.Comment;
-import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
@@ -22,7 +21,6 @@ import com.dubture.doctrine.core.log.Logger;
 
 @SuppressWarnings("restriction")
 public class AnnotationUtils {
-	// FIXME: Those two have been copied from AnnotationUtils that can be found in com.dubture.symfony.core
     protected static final String[] PHPDOC_TAGS_EXTRA = {"api", "inheritdoc"};
     protected static final AnnotationBlock EMPTY_ANNOTATIONS = new AnnotationBlock(Collections.unmodifiableList(new ArrayList<Annotation>(0)));
 	
@@ -37,7 +35,6 @@ public class AnnotationUtils {
      *
      * @return A list of valid annotations according to the parser
      */
-    // FIXME: This has been copied from AnnotationUtils that can be found in com.dubture.symfony.core
     public static AnnotationBlock extractAnnotations(AnnotationCommentParser parser,
                                                       IPHPDocAwareDeclaration declaration,
                                                       ISourceModule sourceModule) {
@@ -115,12 +112,11 @@ public class AnnotationUtils {
      *
      * @return A default {@link AnnotationCommentParser} set to include only the classes specified
      */
-    // FIXME: This has been copied from AnnotationUtils that can be found in com.dubture.symfony.core
 	public static AnnotationCommentParser createParser(String[] includedClassNames) {
         AnnotationCommentParser parser = new AnnotationCommentParser();
         List<String> phpDocTags = new LinkedList<String>();
         for (TagKind tag : TagKind.values()) {
-        	phpDocTags.add(tag.toString());
+        	phpDocTags.add(tag.getName());
         }
         parser.addExcludedClassNames(phpDocTags.toArray(new String[0]));
         parser.addExcludedClassNames(PHPDOC_TAGS_EXTRA);
