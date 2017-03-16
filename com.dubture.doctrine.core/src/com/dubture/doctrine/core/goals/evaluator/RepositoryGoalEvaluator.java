@@ -1,8 +1,5 @@
 package com.dubture.doctrine.core.goals.evaluator;
 
-import java.util.List;
-
-import org.eclipse.dltk.core.INamespace;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
@@ -20,9 +17,8 @@ import org.eclipse.php.internal.core.typeinference.context.IModelCacheContext;
 import com.dubture.doctrine.core.goals.RepositoryTypeGoal;
 import com.dubture.doctrine.core.log.Logger;
 import com.dubture.doctrine.core.model.DoctrineModelAccess;
-import com.dubture.doctrine.core.model.Entity;
-import com.dubture.doctrine.core.model.IDoctrineModelElement;
 
+@SuppressWarnings("restriction")
 public class RepositoryGoalEvaluator extends GoalEvaluator {
 
 	private RepositoryTypeGoal goal;
