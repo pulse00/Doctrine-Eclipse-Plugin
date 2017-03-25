@@ -7,19 +7,18 @@ import java.util.List;
 
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
-import org.eclipse.php.internal.core.ast.nodes.Comment;
-import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocBlock;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPDocTag.TagKind;
+import org.eclipse.php.core.ast.nodes.Comment;
+import org.eclipse.php.core.compiler.ast.nodes.ClassDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPDocBlock;
+import org.eclipse.php.core.compiler.ast.nodes.PHPMethodDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPDocTag.TagKind;
 
 import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.log.Logger;
 
-@SuppressWarnings("restriction")
 public class AnnotationUtils {
     protected static final String[] PHPDOC_TAGS_EXTRA = {"api", "inheritdoc"};
     protected static final AnnotationBlock EMPTY_ANNOTATIONS = new AnnotationBlock(Collections.unmodifiableList(new ArrayList<Annotation>(0)));

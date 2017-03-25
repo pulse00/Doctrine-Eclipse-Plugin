@@ -9,7 +9,7 @@ import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.compiler.problem.ProblemCollector;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceModuleInfoCache.ISourceModuleInfo;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.dltk.core.SourceParserUtil;
 
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;

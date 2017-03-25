@@ -21,13 +21,12 @@ import org.eclipse.php.internal.core.PHPCorePlugin;
 import org.eclipse.php.core.PHPVersion;
 import org.eclipse.php.internal.core.codeassist.AliasType;
 import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
-import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
-import org.eclipse.php.internal.core.project.ProjectOptions;
+import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
+import org.eclipse.php.core.project.ProjectOptions;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.php.internal.ui.PHPUiPlugin;
 import org.eclipse.php.internal.ui.editor.contentassist.AutoActivationTrigger;
 import org.eclipse.php.internal.ui.editor.contentassist.PHPCompletionProposal;
-import org.eclipse.php.internal.ui.editor.contentassist.PHPCompletionProposalCollector;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -98,7 +97,7 @@ public class DoctrineCompletionProposal extends PHPCompletionProposal {
 			IType currentNamespace = PHPModelUtils.getCurrentNamespaceIfAny(sourceModule, getReplacementOffset());
 			IType namespace = PHPModelUtils.getCurrentNamespace(type);
 			if (!PHPFlags.isNamespace(flags) && namespace == null && currentNamespace != null
-					&& !ProjectOptions.getPhpVersion(sourceModule.getScriptProject().getProject())
+					&& !ProjectOptions.getPHPVersion(sourceModule.getScriptProject().getProject())
 							.isLessThan(PHPVersion.PHP5_3)
 					&& document.getChar(getReplacementOffset() - 1) != NamespaceReference.NAMESPACE_SEPARATOR) {
 				prefix = prefix + NamespaceReference.NAMESPACE_SEPARATOR;

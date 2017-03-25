@@ -9,11 +9,11 @@ import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.SourceParserUtil;
-import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPFieldDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPMethodDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.TraitDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.ClassDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPFieldDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPMethodDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.TraitDeclaration;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;

@@ -33,11 +33,11 @@ import org.eclipse.php.core.codeassist.ICompletionContext;
 import org.eclipse.php.internal.core.Logger;
 import org.eclipse.php.internal.core.codeassist.AliasType;
 import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
-import org.eclipse.php.internal.core.codeassist.ICompletionReporter;
+import org.eclipse.php.core.codeassist.ICompletionReporter;
 import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
-import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
-import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
+import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
+import org.eclipse.php.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 

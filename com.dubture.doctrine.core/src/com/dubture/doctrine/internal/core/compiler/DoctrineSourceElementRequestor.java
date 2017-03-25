@@ -9,7 +9,7 @@ import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.php.core.compiler.PHPSourceElementRequestorExtension;
-import org.eclipse.php.internal.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
 
 import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.ArgumentValueType;

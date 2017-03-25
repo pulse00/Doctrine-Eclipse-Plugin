@@ -10,7 +10,7 @@ import org.eclipse.dltk.core.builder.IBuildContext;
 import org.eclipse.dltk.core.builder.IBuildParticipant;
 import org.eclipse.dltk.core.builder.IBuildParticipantFactory;
 import org.eclipse.dltk.core.builder.IScriptBuilder;
-import org.eclipse.php.internal.core.compiler.ast.nodes.PHPModuleDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPModuleDeclaration;
 
 import com.dubture.doctrine.core.AnnotationParserUtil;
 import com.dubture.doctrine.core.DoctrineNature;

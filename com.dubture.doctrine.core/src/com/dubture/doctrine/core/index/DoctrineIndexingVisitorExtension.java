@@ -11,11 +11,11 @@ import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.DeclarationInfo;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.ReferenceInfo;
 import org.eclipse.php.core.index.PhpIndexingVisitorExtension;
-import org.eclipse.php.internal.core.compiler.ast.nodes.ClassDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
-import org.eclipse.php.internal.core.compiler.ast.nodes.UsePart;
-import org.eclipse.php.internal.core.compiler.ast.nodes.UseStatement;
+import org.eclipse.php.core.compiler.ast.nodes.ClassDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.NamespaceDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
+import org.eclipse.php.core.compiler.ast.nodes.UsePart;
+import org.eclipse.php.core.compiler.ast.nodes.UseStatement;
 import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
 
 import com.dubture.doctrine.annotation.model.Annotation;

@@ -33,7 +33,7 @@ import org.eclipse.dltk.core.WorkingCopyOwner;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.php.core.codeassist.ICompletionContextResolver;
 import org.eclipse.php.core.codeassist.ICompletionStrategyFactory;
-import org.eclipse.php.core.tests.PHPCoreTests;
+import org.eclipse.php.core.tests.TestUtils;
 import org.eclipse.php.core.tests.filenetwork.FileUtil;
 import org.eclipse.php.core.tests.runner.AbstractPDTTRunner.Context;
 import org.eclipse.php.core.tests.runner.PDTTList.AfterList;
@@ -43,7 +43,7 @@ import org.eclipse.php.internal.core.codeassist.AliasType;
 import org.eclipse.php.internal.core.codeassist.IPHPCompletionRequestorExtension;
 import org.eclipse.php.internal.core.facet.PHPFacets;
 import org.eclipse.php.internal.core.project.PHPNature;
-import org.eclipse.php.internal.core.project.ProjectOptions;
+import org.eclipse.php.core.project.ProjectOptions;
 import org.eclipse.php.internal.core.typeinference.FakeConstructor;
 import org.junit.After;
 import org.osgi.framework.Bundle;
@@ -93,15 +93,15 @@ abstract public class AbstractCodeAssistTest {
 		desc.setNatureIds(new String[] { PHPNature.ID, DoctrineNature.NATURE_ID });
 		project.setDescription(desc, null);
 
-		ProjectOptions.setPhpVersion(PHPVersion.getLatestVersion(), project);
+		ProjectOptions.setPHPVersion(PHPVersion.getLatestVersion(), project);
 
 		PHPFacets.setFacetedVersion(project, PHPVersion.getLatestVersion());
 
 		project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-
-		PHPCoreTests.waitForIndexer();
-		PHPCoreTests.waitForAutoBuild();
+		
+		TestUtils.waitForIndexer();
+		TestUtils.waitForAutoBuild();
 
 	}
 
@@ -160,7 +160,7 @@ abstract public class AbstractCodeAssistTest {
 		project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 
-		PHPCoreTests.waitForIndexer();
+		TestUtils.waitForIndexer();
 
 		return offset;
 	}

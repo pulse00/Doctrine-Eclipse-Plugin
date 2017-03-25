@@ -32,7 +32,7 @@ import org.eclipse.dltk.ui.search.IQueryParticipant;
 import org.eclipse.dltk.ui.search.ISearchRequestor;
 import org.eclipse.dltk.ui.search.QuerySpecification;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
-import org.eclipse.php.internal.core.compiler.ast.nodes.NamespaceReference;
+import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.search.ui.text.Match;
 

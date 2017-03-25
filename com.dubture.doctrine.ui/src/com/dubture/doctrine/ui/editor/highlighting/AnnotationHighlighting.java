@@ -11,13 +11,12 @@ package com.dubture.doctrine.ui.editor.highlighting;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IModelElementVisitor;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceReference;
 import org.eclipse.dltk.core.ModelException;
-import org.eclipse.php.internal.core.ast.nodes.Program;
+import org.eclipse.php.core.ast.nodes.Program;
 import org.eclipse.php.internal.ui.Logger;
 import org.eclipse.php.internal.ui.editor.highlighter.AbstractSemanticApply;
 import org.eclipse.php.internal.ui.editor.highlighter.AbstractSemanticHighlighting;
