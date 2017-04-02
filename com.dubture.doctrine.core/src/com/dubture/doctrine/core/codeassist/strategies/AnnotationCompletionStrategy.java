@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ISourceRange;
@@ -30,14 +31,13 @@ import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.dltk.internal.core.hierarchy.FakeType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.core.codeassist.ICompletionContext;
-import org.eclipse.php.internal.core.Logger;
-import org.eclipse.php.internal.core.codeassist.AliasType;
-import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
 import org.eclipse.php.core.codeassist.ICompletionReporter;
-import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
-import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
+import org.eclipse.php.internal.core.Logger;
+import org.eclipse.php.internal.core.codeassist.AliasType;
+import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
+import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
@@ -134,7 +134,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), //$NON-NLS-1$
 					namespace, false);
 			for (Entry<String, UsePart> entry : map.entrySet()) {
-				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
+				if (!StringUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
 				}
 				IType[] findTypes = PhpModelAccess.getDefault().findTypes(

@@ -11,6 +11,7 @@ package com.dubture.doctrine.core.codeassist.strategies;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
@@ -27,7 +28,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.core.codeassist.ICompletionContext;
 import org.eclipse.php.core.compiler.PHPFlags;
 import org.eclipse.php.internal.core.Logger;
-import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
 import org.eclipse.php.core.codeassist.ICompletionReporter;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
@@ -118,7 +118,7 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), //$NON-NLS-1$
 					namespace, false);
 			for (Entry<String, UsePart> entry : map.entrySet()) {
-				if (!CodeAssistUtils.startsWithIgnoreCase(entry.getKey(), name)) {
+				if (!StringUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
 				}
 				name = entry.getValue().getNamespace().getName();

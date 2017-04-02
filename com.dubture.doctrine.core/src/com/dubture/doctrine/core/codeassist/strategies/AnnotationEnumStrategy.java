@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
@@ -27,7 +28,6 @@ import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.core.codeassist.ICompletionContext;
 import org.eclipse.php.internal.core.Logger;
-import org.eclipse.php.internal.core.codeassist.CodeAssistUtils;
 import org.eclipse.php.internal.core.codeassist.CompletionFlag;
 import org.eclipse.php.core.codeassist.ICompletionReporter;
 import org.eclipse.php.internal.core.codeassist.IPHPCompletionRequestor;
@@ -159,7 +159,7 @@ public class AnnotationEnumStrategy extends PHPDocTagStrategy {
 		if (builtIn.containsKey(n)) {
 			phpCompletionRequestor.addFlag(CompletionFlag.STOP_REPORT_TYPE);
 			for (String key : builtIn.get(n)) {
-				if (CodeAssistUtils.startsWithIgnoreCase(key, context.getValuePrefix())) {
+				if (StringUtils.startsWithIgnoreCase(key, context.getValuePrefix())) {
 					reporter.reportKeyword(key, "", replaceRange);
 				}
 			}
@@ -185,7 +185,7 @@ public class AnnotationEnumStrategy extends PHPDocTagStrategy {
 				for (IArgumentValue en : arr) {
 					if (en instanceof StringValue) {
 						String string = (String) en.getValue();
-						if (CodeAssistUtils.startsWithIgnoreCase(string, context.getValuePrefix())) {
+						if (StringUtils.startsWithIgnoreCase(string, context.getValuePrefix())) {
 							reporter.reportKeyword(string, "", replaceRange);
 						}
 					}
