@@ -27,7 +27,7 @@ import org.eclipse.php.core.compiler.ast.nodes.PHPMethodDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.TraitDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.core.compiler.ast.nodes.UseStatement;
-import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
+import org.eclipse.php.core.compiler.ast.visitor.PHPASTVisitor;
 import org.eclipse.php.internal.core.model.PhpModelAccess;
 import org.eclipse.php.internal.core.preferences.TaskPatternsProvider;
 import org.pdtextensions.semanticanalysis.validation.IValidatorContext;

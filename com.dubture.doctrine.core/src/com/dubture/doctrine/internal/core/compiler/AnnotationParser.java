@@ -14,7 +14,7 @@ import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.PHPFieldDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.PHPMethodDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.TraitDeclaration;
-import org.eclipse.php.internal.core.compiler.ast.visitor.PHPASTVisitor;
+import org.eclipse.php.core.compiler.ast.visitor.PHPASTVisitor;
 
 import com.dubture.doctrine.annotation.parser.AnnotationCommentParser;
 import com.dubture.doctrine.core.DoctrineCorePlugin;
