@@ -38,7 +38,7 @@ import org.eclipse.php.internal.core.Logger;
 import org.eclipse.php.internal.core.codeassist.AliasType;
 import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.model.PHPModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationCompletionContext;
@@ -137,7 +137,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 				if (!StringUtils.startsWithIgnoreCase(entry.getKey(), name)) {
 					continue;
 				}
-				IType[] findTypes = PhpModelAccess.getDefault().findTypes(
+				IType[] findTypes = PHPModelAccess.getDefault().findTypes(
 						entry.getValue().getNamespace().getFullyQualifiedName(), MatchRule.EXACT, 0, 0, scope, null);
 				if (findTypes.length != 0) {
 					try {
@@ -186,19 +186,19 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 	private IType[] getTypes(AnnotationCompletionContext context, IDLTKSearchScope scope, String qualifier,
 			String prefix) {
 		if (context.getCompletionRequestor().isContextInformationMode()) {
-			return PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.EXACT, trueFlag, falseFlag, scope,
+			return PHPModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.EXACT, trueFlag, falseFlag, scope,
 					null);
 		}
 
 		List<IType> result = new LinkedList<IType>();
 		if (prefix.length() > 1 && prefix.toUpperCase().equals(prefix)) {
 			// Search by camel-case
-			IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.CAMEL_CASE, trueFlag,
+			IType[] types = PHPModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.CAMEL_CASE, trueFlag,
 					falseFlag, scope, null);
 			result.addAll(Arrays.asList(types));
 		}
 
-		IType[] types = PhpModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.PREFIX, trueFlag, falseFlag,
+		IType[] types = PHPModelAccess.getDefault().findTypes(qualifier, prefix, MatchRule.PREFIX, trueFlag, falseFlag,
 				scope, null);
 		result.addAll(Arrays.asList(types));
 

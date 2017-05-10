@@ -17,7 +17,7 @@ import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
 import org.eclipse.dltk.internal.core.util.LRUCache;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.model.PHPModelAccess;
 
 import com.dubture.doctrine.core.goals.IEntityResolver;
 import com.dubture.doctrine.core.index.ICleanListener;
@@ -32,7 +32,7 @@ import com.dubture.doctrine.core.log.Logger;
  *
  */
 @SuppressWarnings("restriction")
-public class DoctrineModelAccess extends PhpModelAccess implements ICleanListener {
+public class DoctrineModelAccess extends PHPModelAccess implements ICleanListener {
 
 	private static final String ENTITYRESOLVER_ID = "com.dubture.doctrine.core.entityResolvers";
 

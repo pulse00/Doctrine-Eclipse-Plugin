@@ -22,7 +22,7 @@ import org.eclipse.php.internal.core.PHPCorePlugin;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.core.compiler.ast.nodes.PHPModuleDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.model.PHPModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 import org.eclipse.php.internal.core.util.text.PHPTextSequenceUtilities;
 import org.eclipse.wst.sse.core.StructuredModelManager;
@@ -146,9 +146,9 @@ public class DoctrineSelectionEngine extends ScriptSelectionEngine {
 					sb.append(NamespaceReference.NAMESPACE_SEPARATOR).append(name);
 					
 					
-					return PhpModelAccess.getDefault().findTypes(null, sb.toString(), MatchRule.EXACT, IDoctrineModifiers.AccNameSpace, 0, scope, null);
+					return PHPModelAccess.getDefault().findTypes(null, sb.toString(), MatchRule.EXACT, IDoctrineModifiers.AccNameSpace, 0, scope, null);
 				}
-				return PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, 0, 0, scope, null);
+				return PHPModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, 0, 0, scope, null);
 			} else {
 				String text = document.getText();
 				int nameStart = PHPTextSequenceUtilities.readNamespaceStartIndex(text, offset, false);
@@ -160,9 +160,9 @@ public class DoctrineSelectionEngine extends ScriptSelectionEngine {
 						String name = text.substring(nameStart, nameEnd);
 						if (nameStart + name.lastIndexOf('\\') > offset) {
 							name = name.substring(0, name.lastIndexOf('\\'));
-							return PhpModelAccess.getDefault().findNamespaces(null, name, MatchRule.EXACT, 0, 0, createSearchScope(sourceModule), null);
+							return PHPModelAccess.getDefault().findNamespaces(null, name, MatchRule.EXACT, 0, 0, createSearchScope(sourceModule), null);
 						} else {
-							return PhpModelAccess.getDefault().findTypes(name, MatchRule.EXACT, 0, 0, createSearchScope(sourceModule), null);
+							return PHPModelAccess.getDefault().findTypes(name, MatchRule.EXACT, 0, 0, createSearchScope(sourceModule), null);
 						}
 					}
 				}

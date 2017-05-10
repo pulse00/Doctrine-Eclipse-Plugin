@@ -10,7 +10,7 @@ import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.DeclarationInfo;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.ReferenceInfo;
-import org.eclipse.php.core.index.PhpIndexingVisitorExtension;
+import org.eclipse.php.core.index.PHPIndexingVisitorExtension;
 import org.eclipse.php.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
@@ -41,7 +41,7 @@ import com.dubture.doctrine.internal.core.compiler.DoctrineSourceElementRequesto
  *
  */
 @SuppressWarnings("restriction")
-public class DoctrineIndexingVisitorExtension extends PhpIndexingVisitorExtension {
+public class DoctrineIndexingVisitorExtension extends PHPIndexingVisitorExtension {
 
 	private NamespaceDeclaration namespace;
 	private IAnnotationModuleDeclaration decl;

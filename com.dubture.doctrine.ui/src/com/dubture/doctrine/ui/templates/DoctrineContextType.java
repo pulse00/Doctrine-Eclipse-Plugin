@@ -4,7 +4,7 @@ import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.ui.templates.ScriptTemplateContext;
 import org.eclipse.dltk.ui.templates.ScriptTemplateContextType;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.php.internal.ui.editor.templates.PhpTemplateContext;
+import org.eclipse.php.internal.ui.editor.templates.PHPTemplateContext;
 
 @SuppressWarnings("restriction")
 public class DoctrineContextType extends ScriptTemplateContextType {
@@ -13,7 +13,7 @@ public class DoctrineContextType extends ScriptTemplateContextType {
 
 	public ScriptTemplateContext createContext(IDocument document, int offset,
 			int length, ISourceModule sourceModule) {
-		return new PhpTemplateContext(this, document, offset, length,
+		return new PHPTemplateContext(this, document, offset, length,
 				sourceModule);
 	}
 

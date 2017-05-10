@@ -12,7 +12,7 @@ import org.eclipse.dltk.core.CompletionRequestor;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.internal.core.codeassist.contexts.PHPDocTagContext;
-import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
+import org.eclipse.php.internal.core.documentModel.parser.regions.IPHPScriptRegion;
 import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
 import org.eclipse.php.internal.core.documentModel.partitioner.PHPPartitionTypes;
 import org.eclipse.php.internal.core.util.text.TextSequence;
@@ -82,14 +82,14 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 
 		IStructuredDocumentRegion sdRegion = getDocument().getRegionAtCharacterOffset(getOffset());
 		ITextRegion textRegion = sdRegion.getRegionAtCharacterOffset(getOffset());
-		if (!(textRegion instanceof IPhpScriptRegion)) {
+		if (!(textRegion instanceof IPHPScriptRegion)) {
 			return -1;
 		}
 
-		IPhpScriptRegion phpScriptRegion = (IPhpScriptRegion) textRegion;
+		IPHPScriptRegion phpScriptRegion = (IPHPScriptRegion) textRegion;
 		int position = getOffset();
 		try {
-			textRegion = phpScriptRegion.getPhpToken(position - phpScriptRegion.getStart() - sdRegion.getStartOffset());
+			textRegion = phpScriptRegion.getPHPToken(position - phpScriptRegion.getStart() - sdRegion.getStartOffset());
 			if (textRegion != null && PHPDocTextSequenceUtilities.isInsideAnnotation(
 					sdRegion.getParentDocument().get(textRegion.getStart(),
 							textRegion.getEnd() + sdRegion.getStartOffset() > getOffset()
@@ -101,7 +101,7 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 
 				if (PHPPartitionTypes.isPHPCommentState(textRegion.getType())
 						|| PHPRegionTypes.WHITESPACE.equals(textRegion.getType())) {
-					textRegion = phpScriptRegion.getPhpToken(textRegion.getEnd() + 1);
+					textRegion = phpScriptRegion.getPHPToken(textRegion.getEnd() + 1);
 					continue;
 				}
 				if (PHPRegionTypes.PHP_CURLY_OPEN.equals(textRegion.getType())
@@ -120,7 +120,7 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 				if (PHPRegionTypes.PHP_CLASS.equals(textRegion.getType())) {
 					return IDoctrineModifiers.AccTargetClass;
 				}
-				textRegion = phpScriptRegion.getPhpToken(textRegion.getEnd() + 1);
+				textRegion = phpScriptRegion.getPHPToken(textRegion.getEnd() + 1);
 			}
 		} catch (BadLocationException e) {
 			Logger.logException(e);

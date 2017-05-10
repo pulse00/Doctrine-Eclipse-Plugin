@@ -4,7 +4,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.documentModel.parser.PHPRegionContext;
-import org.eclipse.php.internal.core.documentModel.parser.regions.IPhpScriptRegion;
+import org.eclipse.php.internal.core.documentModel.parser.regions.IPHPScriptRegion;
 import org.eclipse.php.internal.core.documentModel.parser.regions.PHPRegionTypes;
 import org.eclipse.php.internal.core.util.text.TextSequence;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
@@ -39,9 +39,9 @@ public class PHPDocTextSequenceUtilities {
 		if (tRegion == null || tRegion.getType() != PHPRegionContext.PHP_CONTENT) {
 			return null;
 		}
-		IPhpScriptRegion phpScriptRegion = (IPhpScriptRegion) tRegion;
+		IPHPScriptRegion phpScriptRegion = (IPHPScriptRegion) tRegion;
 		try {
-			tRegion = phpScriptRegion.getPhpToken(offset - container.getStartOffset() - phpScriptRegion.getStart());
+			tRegion = phpScriptRegion.getPHPToken(offset - container.getStartOffset() - phpScriptRegion.getStart());
 		} catch (BadLocationException e) {
 		}
 

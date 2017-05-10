@@ -35,7 +35,7 @@ import org.eclipse.php.internal.core.codeassist.contexts.AbstractCompletionConte
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.model.PHPModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
 import com.dubture.doctrine.annotation.model.Annotation;
@@ -134,7 +134,7 @@ public class AnnotationEnumStrategy extends PHPDocTagStrategy {
 				qualifier = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE;
 			}
 		}
-		IType[] findTypes = PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag,
+		IType[] findTypes = PHPModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag,
 				scope, null);
 		for (IType type : findTypes) {
 			try {

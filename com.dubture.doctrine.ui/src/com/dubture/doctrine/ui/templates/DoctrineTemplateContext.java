@@ -3,10 +3,10 @@ package com.dubture.doctrine.ui.templates;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.ui.templates.ScriptTemplateContextType;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.php.internal.ui.editor.templates.PhpTemplateContext;
+import org.eclipse.php.internal.ui.editor.templates.PHPTemplateContext;
 
 @SuppressWarnings("restriction")
-public class DoctrineTemplateContext extends PhpTemplateContext {
+public class DoctrineTemplateContext extends PHPTemplateContext {
 
 	public DoctrineTemplateContext(
 			ScriptTemplateContextType phpTemplateContextType,

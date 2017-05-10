@@ -32,7 +32,7 @@ import org.eclipse.php.core.codeassist.ICompletionReporter;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.model.PHPModelAccess;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
 
 import com.dubture.doctrine.core.codeassist.contexts.AnnotationFieldContext;
@@ -125,7 +125,7 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 				qualifier = entry.getValue().getNamespace().getNamespace().getName();
 			}
 		}
-		IType[] findTypes = PhpModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag,
+		IType[] findTypes = PHPModelAccess.getDefault().findTypes(qualifier, name, MatchRule.EXACT, trueFlag, falseFlag,
 				scope, null);
 		for (IType type : findTypes) {
 			try {

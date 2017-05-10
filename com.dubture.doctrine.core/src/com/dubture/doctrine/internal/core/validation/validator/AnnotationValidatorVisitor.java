@@ -28,7 +28,7 @@ import org.eclipse.php.core.compiler.ast.nodes.TraitDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.core.compiler.ast.nodes.UseStatement;
 import org.eclipse.php.core.compiler.ast.visitor.PHPASTVisitor;
-import org.eclipse.php.internal.core.model.PhpModelAccess;
+import org.eclipse.php.internal.core.model.PHPModelAccess;
 import org.eclipse.php.internal.core.preferences.TaskPatternsProvider;
 import org.pdtextensions.semanticanalysis.validation.IValidatorContext;
 
@@ -191,7 +191,7 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 				String lower = fullName.toLowerCase();
 				if (!resolved.containsKey(lower)) {
 					IDLTKSearchScope searchScope = SearchEngine.createSearchScope(sourceModule.getScriptProject());
-					IType[] types = PhpModelAccess.getDefault().findTypes(fullName,
+					IType[] types = PHPModelAccess.getDefault().findTypes(fullName,
 							MatchRule.EXACT, 0, 0, searchScope, new NullProgressMonitor());
 
 					
