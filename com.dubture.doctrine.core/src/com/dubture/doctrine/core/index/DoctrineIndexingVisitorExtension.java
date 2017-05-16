@@ -40,7 +40,6 @@ import com.dubture.doctrine.internal.core.compiler.DoctrineSourceElementRequesto
  * @author Robert Gruendler <r.gruendler@gmail.com>
  *
  */
-@SuppressWarnings("restriction")
 public class DoctrineIndexingVisitorExtension extends PHPIndexingVisitorExtension {
 
 	private NamespaceDeclaration namespace;

@@ -10,22 +10,22 @@ public interface IDoctrineModifiers extends IPHPModifiers {
 	/**
 	 * @since 1.0.8
 	 */
-	public static final int AccTargetClass = (1 << IPHPModifiers.USER_MODIFIER + 2);
+	public static final int AccTargetClass = IPHPModifiers.AccUpVar; // int end, switch to unused flag for this context
 	
 	/**
 	 * @since 1.0.8
 	 */
-	public static final int AccTargetField = (1 << IPHPModifiers.USER_MODIFIER + 3);
+	public static final int AccTargetField = IPHPModifiers.AccVariadic; // int end, switch to unused flag for this context
 	
 	/**
 	 * @since 1.0.8
 	 */
-	public static final int AccTargetMethod = (1 << IPHPModifiers.USER_MODIFIER + 4);
+	public static final int AccTargetMethod = IPHPModifiers.AccNullable; // int end, switch to unused flag for this context
 	
 	/**
 	 * @since 1.0.8
 	 */
-	public static final int AccTargetAnnotation = (1 << IPHPModifiers.USER_MODIFIER + 5);
+	public static final int AccTargetAnnotation =IPHPModifiers.AccReturn; // int end, switch to unused flag for this context
 	
 	public static final int USER_MODIFIER = IPHPModifiers.USER_MODIFIER + 6;
 }
