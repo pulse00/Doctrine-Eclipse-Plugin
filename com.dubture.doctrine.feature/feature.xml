@@ -2,7 +2,7 @@
 <feature
       id="com.dubture.doctrine.feature"
       label="Doctrine Feature"
-      version="1.3.0.qualifier"
+      version="1.4.0.qualifier"
       provider-name="https://github.com/pulse00">
 
    <description url="https://github.com/pulse00/Doctrine-Eclipse-Plugin">
@@ -30,21 +30,21 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
          id="com.dubture.doctrine.core"
          download-size="0"
          install-size="0"
-         version="1.3.0.qualifier"
+         version="1.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="com.dubture.doctrine.ui"
          download-size="0"
          install-size="0"
-         version="1.3.0.qualifier"
+         version="1.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="com.dubture.doctrine.annotation"
          download-size="0"
          install-size="0"
-         version="1.3.0.qualifier"
+         version="1.4.0.qualifier"
          unpack="false"/>
 
 </feature>
