@@ -6,7 +6,7 @@
     <property name="p2.timestamp" value="1243822502445"/>
   </properties>
   <children size="1">
-    <child location="http://dl.bintray.com/zulus/doctrine-plugin/release/1.3.0/"/>
+    <child location="http://dl.bintray.com/zulus/doctrine-plugin/release/1.4.0/"/>
   </children>
 </repository>
 
