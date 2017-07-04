@@ -7,8 +7,8 @@ Eclipse Plugin for the Doctrine ORM
 
 ### Minimum Requirements
 
-- Java 6
-- Eclipse 4.4 (Luna)
+- Java 8
+- Eclipse 4.6 (Neon)
 
 ### Features
 
