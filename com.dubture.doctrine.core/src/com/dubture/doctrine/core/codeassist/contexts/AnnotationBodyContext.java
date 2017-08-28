@@ -10,6 +10,7 @@ package com.dubture.doctrine.core.codeassist.contexts;
 
 import org.eclipse.dltk.core.CompletionRequestor;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.php.internal.core.codeassist.contexts.PHPDocTagContext;
 import org.eclipse.php.internal.core.util.text.TextSequence;
 

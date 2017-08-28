@@ -101,7 +101,7 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 			int length = name.length();
 
 			int start = context.getOffset() - length;
-			int prefixEnd = context.getPrefixEnd();
+			int prefixEnd = context.getReplacementEnd();
 
 			if (start + length < prefixEnd) {
 				length = prefixEnd - start;
