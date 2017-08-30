@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * This file is part of the Symfony eclipse plugin.
+ *
+ * (c) Dawid Pakuła <zulus@w3des.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ ******************************************************************************/
 package com.dubture.doctrine.internal.core.validation.validator;
 
 import org.eclipse.core.runtime.CoreException;
