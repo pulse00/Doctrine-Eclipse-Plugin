@@ -106,4 +106,10 @@
              namespace="com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier">
        </problemIdentifierFactory>
     </extension>
+   <extension
+         point="org.eclipse.php.core.validatorExtension">
+      <validator
+            class="com.dubture.doctrine.internal.core.validation.validator.PHPValidatorExtension">
+      </validator>
+   </extension>
 </plugin>
