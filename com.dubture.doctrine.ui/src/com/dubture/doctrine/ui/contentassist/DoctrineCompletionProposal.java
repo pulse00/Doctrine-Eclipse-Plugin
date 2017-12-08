@@ -81,7 +81,7 @@ public class DoctrineCompletionProposal extends PHPCompletionProposal {
 		fReplacementStringComputed = true;
 		IType type = (IType) typeProposal.getModelElement();
 
-		if (ProposalExtraInfo.isClassInNamespace(typeProposal.getExtraInfo())) {
+		if (ProposalExtraInfo.isMemberInNamespace(typeProposal.getExtraInfo())) {
 			return PHPModelUtils.getFullName(type);
 			// String result = PHPModelUtils.getFullName(type);
 			// if (ProposalExtraInfo.isAddQuote(typeProposal

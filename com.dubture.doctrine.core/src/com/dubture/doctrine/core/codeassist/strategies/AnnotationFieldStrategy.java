@@ -29,6 +29,7 @@ import org.eclipse.php.core.codeassist.ICompletionContext;
 import org.eclipse.php.core.compiler.PHPFlags;
 import org.eclipse.php.internal.core.Logger;
 import org.eclipse.php.core.codeassist.ICompletionReporter;
+import org.eclipse.php.internal.core.codeassist.ProposalExtraInfo;
 import org.eclipse.php.internal.core.codeassist.strategies.PHPDocTagStrategy;
 import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
@@ -138,7 +139,7 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 						if ("string".equalsIgnoreCase(f.getType())) {
 							suffix = "=\"\"";
 						}
-						reporter.reportField(f, suffix, replaceRange, true, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
+						reporter.reportField(f, suffix, replaceRange, true, ICompletionReporter.RELEVANCE_KEYWORD + 1, ProposalExtraInfo.NO_INSERT_USE);
 						continue;
 						// TODO FOrmatter settings:
 					}
@@ -147,7 +148,7 @@ public class AnnotationFieldStrategy extends PHPDocTagStrategy {
 							true, new NullProgressMonitor());
 					if (setter != null && setter.length > 0 && PHPFlags.isPublic(setter[0].getFlags())
 							&& !PHPFlags.isStatic(setter[0].getFlags())) {
-						reporter.reportField(f, "=", replaceRange, true, 0, ICompletionReporter.RELEVANCE_KEYWORD + 1);
+						reporter.reportField(f, "=", replaceRange, true, ICompletionReporter.RELEVANCE_KEYWORD + 1, ProposalExtraInfo.NO_INSERT_USE);
 						continue;
 					}
 				}
