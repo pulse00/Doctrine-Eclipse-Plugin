@@ -9,7 +9,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.dltk.core,
- org.eclipse.php.core,
+ org.eclipse.php.core;bundle-version="5.3.0",
  com.dubture.doctrine.annotation,
  org.eclipse.text,
  org.eclipse.wst.sse.core,
@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ltk.core.refactoring,
  org.pdtextensions.semanticanalysis,
  org.eclipse.dltk.core.manipulation
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.dubture.doctrine.core,
  com.dubture.doctrine.core.codeassist,

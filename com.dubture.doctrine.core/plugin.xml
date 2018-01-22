@@ -112,4 +112,26 @@
             class="com.dubture.doctrine.internal.core.validation.validator.PHPValidatorExtension">
       </validator>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.dubture.doctrine.internal.core.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.php.ui.problemConfiguration">
+      <category
+            id="com.dubture.doctrine.problem.category"
+            name="Doctrine"
+            priority="0">
+      </category>
+      <problem
+            category="com.dubture.doctrine.problem.category"
+            class="com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier">
+         <identifier
+               id="UNRESOVABLE"
+               name="Annotation not found">
+         </identifier>
+      </problem>
+   </extension>
 </plugin>

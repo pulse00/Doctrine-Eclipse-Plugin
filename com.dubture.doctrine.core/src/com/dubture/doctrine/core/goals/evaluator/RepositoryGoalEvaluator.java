@@ -51,7 +51,7 @@ public class RepositoryGoalEvaluator extends GoalEvaluator {
 			try {
 				IType[] types = PHPModelUtils.getTypes(goal.getEtityName(), sourceModule,0, cache, null);
 				if (types != null && types.length > 0) {
-					model.getRepositoryClass(PHPModelUtils.extractElementName(goal.getEtityName()), PHPModelUtils.extractNameSpaceName(goal.getEtityName()), project);
+					repo = model.getRepositoryClass(PHPModelUtils.extractElementName(goal.getEtityName()), PHPModelUtils.extractNameSpaceName(goal.getEtityName()), project);
 					if (repo != null) {
 						result = new PHPClassType(repo);
 						return IGoal.NO_GOALS;
