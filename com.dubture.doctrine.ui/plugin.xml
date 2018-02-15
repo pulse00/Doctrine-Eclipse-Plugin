@@ -14,20 +14,69 @@
       </include>
    </extension>
    <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="com.dubture.doctrine.ui.contextmenu"
-            objectClass="org.eclipse.dltk.core.IScriptProject">
-         <action
-               class="com.dubture.doctrine.ui.ConfigureDoctrineNatureAction"
-               enablesFor="+"
-               id="com.dubture.doctrine.ui.action1"
-               label="Convert to Doctrine project"
-               menubarPath="org.eclipse.ui.projectConfigure/additions">
-         </action>
-      </objectContribution>
-   </extension>
+       point="org.eclipse.ui.menus">
+       <menuContribution
+          allPopups="false"
+          locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+          <command
+             commandId="com.dubture.doctrine.ui.command.addDoctrineSupport"
+             label="Add Doctrine support"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <and>
+                <iterate operator="and">
+                    <adapt
+                          type="org.eclipse.core.resources.IProject">
+                       <instanceof
+                             value="org.eclipse.core.resources.IProject">
+                       </instanceof>
+                       <test
+                             property="org.eclipse.core.resources.projectNature"
+                             value="org.eclipse.php.core.PHPNature">
+                       </test>
+                    </adapt>
+                </iterate>
+                <not>
+                   <iterate operator="and">
+                    <adapt
+                          type="org.eclipse.core.resources.IProject">
+                       <instanceof
+                             value="org.eclipse.core.resources.IProject">
+                       </instanceof>
+                       <test
+                             property="org.eclipse.core.resources.projectNature"
+                             value="com.dubture.doctrine.core.doctrineNature">
+                       </test>
+                    </adapt>
+                </iterate>
+                </not>
+             </and>
+          </visibleWhen>
+       </command>
+       <command
+             commandId="com.dubture.doctrine.ui.command.removeDoctrineSupport"
+             label="Remove Doctrine support"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+            <iterate operator="and">
+                    <adapt
+                          type="org.eclipse.core.resources.IProject">
+                       <instanceof
+                             value="org.eclipse.core.resources.IProject">
+                       </instanceof>
+                       <test
+                             property="org.eclipse.core.resources.projectNature"
+                             value="com.dubture.doctrine.core.doctrineNature">
+                       </test>
+                    </adapt>
+            </iterate>
+          </visibleWhen>
+       </command>
+       
+       </menuContribution>
+    </extension>
    <extension
        id="com.dubture.doctrine.ui.doctrineCompletionProposalComputer"
        point="org.eclipse.dltk.ui.scriptCompletionProposalComputer">
@@ -43,7 +92,7 @@
  </extension>
  <extension point="org.eclipse.wst.sse.ui.editorConfiguration">
    <provisionalConfiguration
-			type="autoeditstrategy"	
+            type="autoeditstrategy"    
             class="com.dubture.doctrine.ui.autoedit.AnnotationAutoEditStrategy"
             target="org.eclipse.php.PHP_DEFAULT" />
  </extension>
@@ -56,10 +105,10 @@
  </extension>
   <!-- dark theme defaults -->
   <extension
-	   point="org.eclipse.e4.ui.css.swt.theme">
-	  <stylesheet uri="resources/css/dark/preferencestyle.css"> 
-	      <themeid refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
-	  </stylesheet>
+       point="org.eclipse.e4.ui.css.swt.theme">
+      <stylesheet uri="resources/css/dark/preferencestyle.css"> 
+          <themeid refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
+      </stylesheet>
   </extension>
   <extension
        point="org.eclipse.dltk.ui.queryParticipants"> 
@@ -71,4 +120,20 @@
           nature="com.dubture.doctrine.core.doctrineNature">
     </queryParticipant>
  </extension>
+ 
+ <extension
+       point="org.eclipse.ui.commands">
+ 
+ <command
+        defaultHandler="com.dubture.doctrine.ui.handler.AddDoctrineSupportHandler"
+        id="com.dubture.doctrine.ui.command.addDoctrineSupport"
+        name="Add Doctrine support">
+  </command>
+  <command
+        defaultHandler="com.dubture.doctrine.ui.handler.RemoveDoctrineSupportHandler"
+        id="com.dubture.doctrine.ui.command.removeDoctrineSupport"
+        name="Remove Doctrine support">
+  </command>
+  </extension>
+ 
 </plugin>
