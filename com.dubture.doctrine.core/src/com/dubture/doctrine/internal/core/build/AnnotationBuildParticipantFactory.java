@@ -17,7 +17,6 @@ import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.internal.core.compiler.AnnotationParser;
 
-@SuppressWarnings("restriction")
 public class AnnotationBuildParticipantFactory extends AbstractBuildParticipantType implements IBuildParticipantFactory {
 	public AnnotationBuildParticipantFactory() {
 	}

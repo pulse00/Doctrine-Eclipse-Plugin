@@ -39,7 +39,7 @@
          </run>
       </builder>
    </extension>
-   <extension
+   <!--extension
          point="org.eclipse.dltk.core.buildParticipant">
       <buildParticipant
             class="com.dubture.doctrine.internal.core.build.AnnotationBuildParticipantFactory"
@@ -50,7 +50,7 @@
                id="org.eclipse.php.core.buildParticipant.parser">
          </requires>
       </buildParticipant>
-   </extension>
+   </extension-->
    <extension
          point="org.eclipse.dltk.core.selectionEngine">
       <selectionEngine
