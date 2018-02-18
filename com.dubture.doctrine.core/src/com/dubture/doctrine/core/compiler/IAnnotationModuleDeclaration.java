@@ -8,7 +8,6 @@ import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
 
 
-@SuppressWarnings("restriction")
 public interface IAnnotationModuleDeclaration {
 	
 	public AnnotationBlock readAnnotations(IPHPDocAwareDeclaration astNode);

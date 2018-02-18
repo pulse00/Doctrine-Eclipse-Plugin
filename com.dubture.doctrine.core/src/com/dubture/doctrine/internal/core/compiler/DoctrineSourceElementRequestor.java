@@ -8,8 +8,10 @@ import org.eclipse.dltk.compiler.IElementRequestor.TypeInfo;
 import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.internal.core.ExternalSourceModule;
 import org.eclipse.php.core.compiler.PHPSourceElementRequestorExtension;
 import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.PHPDocTag.TagKind;
 
 import com.dubture.doctrine.annotation.model.Annotation;
 import com.dubture.doctrine.annotation.model.ArgumentValueType;
@@ -33,6 +35,20 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 
 	private boolean enabled = false;
 	private IAnnotationModuleDeclaration decl;
+	private boolean declarationInitialized = false;
+
+	private IAnnotationModuleDeclaration getAnnotationDeclaration() {
+		if (!declarationInitialized) {
+			declarationInitialized = true;
+			try {
+				decl = AnnotationParserUtil.getModule((ISourceModule) getSourceModule().getModelElement());
+			} catch (CoreException e) {
+				Logger.logException(e);
+			}
+		}
+
+		return decl;
+	}
 
 	public DoctrineSourceElementRequestor() {
 	}
@@ -40,13 +56,14 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 	@Override
 	public void setSourceModule(IModuleSource sourceModule) {
 		super.setSourceModule(sourceModule);
-		IScriptProject scriptProject = sourceModule.getModelElement().getScriptProject();
+		IScriptProject scriptProject = getSourceModule().getModelElement().getScriptProject();
 		try {
-			if (scriptProject.exists() && scriptProject.getProject().hasNature(DoctrineNature.NATURE_ID)) {
+			if (!(sourceModule instanceof ExternalSourceModule) && scriptProject.exists()
+					&& scriptProject.getProject().hasNature(DoctrineNature.NATURE_ID)) {
 				enabled = true;
-				decl = AnnotationParserUtil.getModule((ISourceModule) sourceModule.getModelElement());
 			} else {
 				enabled = false;
+				declarationInitialized = true;
 			}
 		} catch (CoreException e) {
 			Logger.logException(e);
@@ -60,18 +77,17 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 
 	@Override
 	public void modifyClassInfo(TypeDeclaration typeDeclaration, TypeInfo ti) {
-		super.modifyClassInfo(typeDeclaration, ti);
-		if (!enabled) {
+		if (!enabled || !DoctrineFlags.isClass(ti.modifiers)) {
 			return;
 		}
-		if (DoctrineFlags.isClass(ti.modifiers)) {
-			checkAnnotation(typeDeclaration, ti);
-		}
+		checkAnnotation(typeDeclaration, ti);
 	}
 
 	private void checkAnnotation(TypeDeclaration typeDeclaration, TypeInfo ti) {
-		if (typeDeclaration instanceof IPHPDocAwareDeclaration) {
-			List<Annotation> annotations = decl.readAnnotations(typeDeclaration).getAnnotations(); 
+		if (typeDeclaration instanceof IPHPDocAwareDeclaration
+				&& ((IPHPDocAwareDeclaration) typeDeclaration).getPHPDoc() != null
+				&& ((IPHPDocAwareDeclaration) typeDeclaration).getPHPDoc().getTags(TagKind.UNKNOWN).length > 0) {
+			List<Annotation> annotations = getAnnotationDeclaration().readAnnotations(typeDeclaration).getAnnotations();
 			ti.modifiers = prepareAnnotationFlags(ti.modifiers, annotations);
 			typeDeclaration.setModifiers(ti.modifiers);
 		}
@@ -85,7 +101,8 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 			if (el.getFirstNamespacePart() == null && el.getAnnotationClass().getClassName().equals(ANNOTATION_TAG)) {
 				flags |= DoctrineFlags.AccAnnotation;
 				isAnnotation = true;
-			} else if (el.getFirstNamespacePart() == null && el.getAnnotationClass().getClassName().equals(TARGET_TAG)) {
+			} else if (el.getFirstNamespacePart() == null
+					&& el.getAnnotationClass().getClassName().equals(TARGET_TAG)) {
 				target = el;
 			}
 		}
@@ -93,13 +110,15 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 			return flags;
 		}
 		if (target == null) {
-			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
-			
+			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass
+					| IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
+
 		} else if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.ARRAY) {
 			ArrayValue val = (ArrayValue) target.getArgumentValue(0);
 			for (IArgumentValue pos : (List<IArgumentValue>) val.getValue()) {
 				if (TARGET_ALL.equals(pos.getValue())) {
-					flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
+					flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass
+							| IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 				} else if (TARGET_ANNOTATION.equals(pos.getValue())) {
 					flags |= IDoctrineModifiers.AccTargetAnnotation;
 				} else if (TARGET_FIELD.equals(pos.getValue())) {
@@ -113,7 +132,8 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 		} else if (target.hasArgument(0) && target.getArgumentValue(0).getType() == ArgumentValueType.STRING) {
 			Object value = target.getArgumentValue(0).getValue();
 			if (TARGET_ALL.equals(value)) {
-				flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
+				flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass
+						| IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 			} else if (TARGET_ANNOTATION.equals(value)) {
 				flags |= IDoctrineModifiers.AccTargetAnnotation;
 			} else if (TARGET_FIELD.equals(value)) {
@@ -124,7 +144,8 @@ public class DoctrineSourceElementRequestor extends PHPSourceElementRequestorExt
 				flags |= IDoctrineModifiers.AccTargetClass;
 			}
 		} else {
-			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass | IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
+			flags |= IDoctrineModifiers.AccTargetField | IDoctrineModifiers.AccTargetClass
+					| IDoctrineModifiers.AccTargetMethod | IDoctrineModifiers.AccTargetAnnotation;
 		}
 
 		return flags;

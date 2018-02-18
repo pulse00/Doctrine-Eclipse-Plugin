@@ -9,8 +9,10 @@ import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.SourceParserUtil;
+import org.eclipse.dltk.internal.core.ExternalSourceModule;
 import org.eclipse.php.core.compiler.ast.nodes.ClassDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.IPHPDocAwareDeclaration;
+import org.eclipse.php.core.compiler.ast.nodes.InterfaceDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.PHPFieldDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.PHPMethodDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.TraitDeclaration;
@@ -21,11 +23,12 @@ import com.dubture.doctrine.core.DoctrineCorePlugin;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
 import com.dubture.doctrine.core.utils.AnnotationUtils;
 
-public class AnnotationParser extends PHPASTVisitor {
+public class AnnotationParser {
 	private class ASTVisitor extends PHPASTVisitor {
 		private ISourceModule sourceModule;
 		private AnnotationModuleDeclaration ad;
 		private AnnotationCommentParser parser;
+		private boolean inType = false;
 
 		public ASTVisitor(ISourceModule sourceModule, AnnotationModuleDeclaration ad) {
 			this.sourceModule = sourceModule;
@@ -35,26 +38,50 @@ public class AnnotationParser extends PHPASTVisitor {
 
 		@Override
 		public boolean visit(PHPMethodDeclaration s) throws Exception {
+			if (!inType) {
+				return false;
+			}
 			parse(s);
 
-			return super.visit(s);
+			return false;
 		}
 
 		public boolean visit(PHPFieldDeclaration s) throws Exception {
+			if (!inType) {
+				return false;
+			}
 			parse(s);
-			return super.visit(s);
+			return false;
 		};
 
 		@Override
 		public boolean visit(TraitDeclaration s) throws Exception {
+			inType = true;
 			parse(s);
 			return super.visit(s);
+		}
+		
+		@Override
+		public boolean visit(InterfaceDeclaration s) throws Exception {
+			return false;
 		}
 
 		@Override
 		public boolean visit(ClassDeclaration s) throws Exception {
+			inType = true;
 			parse(s);
-			return super.visit(s);
+			return true;
+		}
+		@Override
+		public boolean endvisit(ClassDeclaration s) throws Exception {
+			inType = false;
+			return false;
+		}
+		
+		@Override
+		public boolean endvisit(TraitDeclaration s) throws Exception {
+			inType = false;
+			return false;
 		}
 
 		private void parse(IPHPDocAwareDeclaration node) throws Exception {
@@ -68,8 +95,10 @@ public class AnnotationParser extends PHPASTVisitor {
 
 	public IAnnotationModuleDeclaration parse(ISourceModule sourceModule, IModuleDeclaration moduleDeclaration, IProblemReporter reporter)
 			throws CoreException {
+		if (sourceModule instanceof ExternalSourceModule) {
+			return null;
+		}
 		AnnotationModuleDeclaration decl = new AnnotationModuleDeclaration();
-
 		ASTVisitor astVisitor = new ASTVisitor(sourceModule, decl);
 		if (moduleDeclaration instanceof ModuleDeclaration) {
 			try {

@@ -30,7 +30,6 @@ public class AnnotationParserUtil {
 	
 	public static IAnnotationModuleDeclaration getModule(ISourceModule module, IProblemReporter reporter) throws CoreException {
 		IAnnotationModuleDeclaration moduleDeclaration = null;
-		
 		final ISourceModuleInfo mifo = SourceParserUtil.getCache().get(module);
 		if (mifo != null) {
 			moduleDeclaration = (IAnnotationModuleDeclaration) mifo.get(MODULE_KEY);
@@ -53,7 +52,7 @@ public class AnnotationParserUtil {
 		AnnotationParser annotationParser = new AnnotationParser();
 		try {
 			ProblemCollector collector = new ProblemCollector();
-			moduleDeclaration = annotationParser.parse(module, collector);
+			moduleDeclaration = annotationParser.parse(module, md, collector);
 			
 			putModuleToCache(mifo, moduleDeclaration, collector);
 			if (reporter != null) {
