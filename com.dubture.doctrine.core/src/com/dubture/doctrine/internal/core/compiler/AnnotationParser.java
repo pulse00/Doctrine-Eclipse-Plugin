@@ -29,6 +29,7 @@ public class AnnotationParser {
 		private AnnotationModuleDeclaration ad;
 		private AnnotationCommentParser parser;
 		private boolean inType = false;
+		private String content;
 
 		public ASTVisitor(ISourceModule sourceModule, AnnotationModuleDeclaration ad) {
 			this.sourceModule = sourceModule;
@@ -85,7 +86,14 @@ public class AnnotationParser {
 		}
 
 		private void parse(IPHPDocAwareDeclaration node) throws Exception {
-			ad.addBlock(((ASTNode) node).sourceStart(), AnnotationUtils.extractAnnotations(parser, node, sourceModule));
+			if (content == null) {
+				if (sourceModule.getBuffer() != null) {
+					content = new String(sourceModule.getBuffer().getCharacters());
+				} else {
+					content = sourceModule.getSource();
+				}
+			}
+			ad.addBlock(((ASTNode) node).sourceStart(), AnnotationUtils.extractAnnotations(parser, node, content));
 		}
 
 	}
@@ -112,9 +120,4 @@ public class AnnotationParser {
 
 		return decl;
 	}
-
-	public IAnnotationModuleDeclaration parse(ISourceModule sourceModule, IProblemReporter reporter) throws CoreException {
-		return parse(sourceModule, SourceParserUtil.getModuleDeclaration(sourceModule, reporter), reporter);
-	}
-
 }
