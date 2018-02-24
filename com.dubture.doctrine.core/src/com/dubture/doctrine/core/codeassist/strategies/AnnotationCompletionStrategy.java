@@ -94,13 +94,13 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 		String prefix = context.getPrefix();
 		String name = prefix;
 		String qualifier = null;
-		ISourceModule sourceModule = context.getSourceModule();
+		ISourceModule sourceModule = getCompanion().getSourceModule();
 		if (sourceModule == null) {
 			return;
 		}
 
 		ModuleDeclaration moduleDeclaration = SourceParserUtil.getModuleDeclaration(sourceModule);
-		IType namespace = PHPModelUtils.getCurrentNamespace(sourceModule, context.getOffset());
+		IType namespace = PHPModelUtils.getCurrentNamespace(sourceModule, getCompanion().getOffset());
 		Set<IType> collected = new HashSet<IType>();
 		if (prefix.contains(String.valueOf(NamespaceReference.NAMESPACE_SEPARATOR))) {
 			int i = name.lastIndexOf(NamespaceReference.NAMESPACE_SEPARATOR);
@@ -114,7 +114,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 			}
 			int length = name.length();
 
-			int start = context.getOffset() - length;
+			int start = getCompanion().getOffset() - length;
 			int prefixEnd = context.getReplacementEnd();
 
 			if (start + length < prefixEnd) {
@@ -122,7 +122,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 			}
 			replaceRange = new SourceRange(start, length); // set valid replace
 			// range
-			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, context.getOffset(),
+			Map<String, UsePart> aliases = PHPModelUtils.getAliasToNSMap(alias, moduleDeclaration, getCompanion().getOffset(),
 					namespace, false);
 			for (Entry<String, UsePart> entry : aliases.entrySet()) {
 				if (alias.equalsIgnoreCase(entry.getKey())) {
@@ -131,7 +131,7 @@ public class AnnotationCompletionStrategy extends PHPDocTagStrategy {
 				}
 			}
 		} else {
-			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, context.getOffset(), //$NON-NLS-1$
+			Map<String, UsePart> map = PHPModelUtils.getAliasToNSMap("", moduleDeclaration, getCompanion().getOffset(), //$NON-NLS-1$
 					namespace, false);
 			for (Entry<String, UsePart> entry : map.entrySet()) {
 				if (!StringUtils.startsWithIgnoreCase(entry.getKey(), name)) {

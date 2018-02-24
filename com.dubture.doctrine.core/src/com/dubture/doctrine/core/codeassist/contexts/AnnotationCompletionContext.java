@@ -79,22 +79,22 @@ public class AnnotationCompletionContext extends PHPDocTagContext {
 	}
 
 	public int getTarget() {
-
-		IStructuredDocumentRegion sdRegion = getDocument().getRegionAtCharacterOffset(getOffset());
-		ITextRegion textRegion = sdRegion.getRegionAtCharacterOffset(getOffset());
+		final int offset = getCompanion().getOffset();
+		IStructuredDocumentRegion sdRegion = getCompanion().getDocument().getRegionAtCharacterOffset(offset);
+		ITextRegion textRegion = sdRegion.getRegionAtCharacterOffset(offset);
 		if (!(textRegion instanceof IPHPScriptRegion)) {
 			return -1;
 		}
 
 		IPHPScriptRegion phpScriptRegion = (IPHPScriptRegion) textRegion;
-		int position = getOffset();
+		int position = offset;
 		try {
 			textRegion = phpScriptRegion.getPHPToken(position - phpScriptRegion.getStart() - sdRegion.getStartOffset());
 			if (textRegion != null && PHPDocTextSequenceUtilities.isInsideAnnotation(
 					sdRegion.getParentDocument().get(textRegion.getStart(),
-							textRegion.getEnd() + sdRegion.getStartOffset() > getOffset()
-									? textRegion.getEnd() + sdRegion.getStartOffset() : getOffset()),
-					getOffset() - textRegion.getStart())) {
+							textRegion.getEnd() + sdRegion.getStartOffset() > offset
+									? textRegion.getEnd() + sdRegion.getStartOffset() : offset),
+					offset - textRegion.getStart())) {
 				return IDoctrineModifiers.AccTargetAnnotation;
 			}
 			while (textRegion != null) {
