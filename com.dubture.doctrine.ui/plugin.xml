@@ -151,4 +151,9 @@
          </identifier>
       </problem>
    </extension>
+   <extension point="org.eclipse.ui.ide.markerSupport">
+      <markerTypeCategory name="PHP">
+         <markerTypeReference id="com.dubture.doctrine.core.problem" />
+      </markerTypeCategory>
+   </extension>
 </plugin>
