@@ -22,12 +22,15 @@ import com.dubture.doctrine.annotation.model.AnnotationBlock;
 import com.dubture.doctrine.annotation.model.AnnotationClass;
 import com.dubture.doctrine.annotation.model.AnnotationVisitor;
 import com.dubture.doctrine.core.AnnotationParserUtil;
+import com.dubture.doctrine.core.DoctrineCorePlugin;
 import com.dubture.doctrine.core.DoctrineNature;
 import com.dubture.doctrine.core.compiler.IAnnotationModuleDeclaration;
+import com.dubture.doctrine.core.log.Logger;
 
 public class PHPValidatorExtension implements IValidatorExtension {
 	private IBuildContext context;
 	private IValidatorVisitor validator;
+	private IAnnotationModuleDeclaration annotationModule;
 
 	@Override
 	public void visit(ASTNode s) throws Exception {
@@ -40,7 +43,9 @@ public class PHPValidatorExtension implements IValidatorExtension {
 			if (!validator.hasNamespace()) {
 				validate(s.sourceStart(), s.sourceEnd());
 			}
-			
+			if (annotationModule != null) {
+				s.traverse(new AnnotationValidatorVisitor(context, validator, annotationModule));
+			}
 		} else if (s instanceof NamespaceDeclaration) {
 			validate(s.sourceStart(), s.sourceEnd());
 		}
@@ -48,7 +53,6 @@ public class PHPValidatorExtension implements IValidatorExtension {
 	
 	protected void validate(int start, int end) throws CoreException
 	{
-		IAnnotationModuleDeclaration module = AnnotationParserUtil.getModule(context.getSourceModule());
 		AnnotationVisitor visitor = new AnnotationVisitor() {
 			@Override
 			public boolean visit(AnnotationClass node) {
@@ -59,7 +63,7 @@ public class PHPValidatorExtension implements IValidatorExtension {
 				return super.visit(node);
 			}
 		};
-		for (AnnotationBlock block : module.getBlocks()) {
+		for (AnnotationBlock block : annotationModule.getBlocks()) {
 			if (block.getSourcePosition().startOffset >= start && block.getSourcePosition().endOffset <= end) {
 				block.traverse(visitor);
 			}
@@ -70,6 +74,12 @@ public class PHPValidatorExtension implements IValidatorExtension {
 	public void init(IBuildContext buildContext, IValidatorVisitor validator) {
 		this.context = buildContext;
 		this.validator = validator;
+		try {
+			annotationModule = AnnotationParserUtil.getModule(context.getSourceModule());
+		} catch (CoreException e) {
+			Logger.logException(e);
+		}
+		
 	}
 
 	@Override
@@ -77,7 +87,7 @@ public class PHPValidatorExtension implements IValidatorExtension {
 		try {
 			return buildContext.getSourceModule().getScriptProject().getProject().hasNature(DoctrineNature.NATURE_ID);
 		} catch (CoreException e) {
-			System.out.println(e);
+			Logger.logException(e);
 			return false;
 		}
 	}

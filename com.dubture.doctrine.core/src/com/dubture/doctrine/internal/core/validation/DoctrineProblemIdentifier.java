@@ -1,35 +1,22 @@
 package com.dubture.doctrine.internal.core.validation;
 
 import org.eclipse.dltk.compiler.problem.IProblemCategory;
+import org.eclipse.dltk.compiler.problem.IProblemIdentifier;
+import org.eclipse.dltk.compiler.problem.IProblemIdentifierExtension;
+import org.eclipse.dltk.compiler.problem.IProblemIdentifierExtension3;
 import org.eclipse.dltk.compiler.problem.ProblemCategory;
-import org.pdtextensions.semanticanalysis.validation.IValidatorIdentifier;
-import org.pdtextensions.semanticanalysis.validation.Problem;
 
 import com.dubture.doctrine.core.DoctrineCorePlugin;
-import com.dubture.doctrine.internal.core.validation.validator.AnnotationValidator;
 
-public enum DoctrineProblemIdentifier implements IValidatorIdentifier {
-	UNRESOVABLE("use", Problem.CAT_IMPORT, AnnotationValidator.ID); //$NON-NLS-1$
-	private String type;
-	private String validator;
-	private int category;
+public enum DoctrineProblemIdentifier
+		implements IProblemIdentifier, IProblemIdentifierExtension, IProblemIdentifierExtension3 {
+	UNRESOVABLE(ProblemCategory.IMPORT);
+	private IProblemCategory category;
 
-	public static final String MARKER_TYPE = "org.pdtextensions.semanticanalysis.problem"; //$NON-NLS-1$
+	public static final String MARKER_TYPE = "com.dubture.doctrine.core.problem"; //$NON-NLS-1$
 
-	private DoctrineProblemIdentifier(String type, int category, String validator) {
-		this.type = type;
-		this.validator = validator;
+	private DoctrineProblemIdentifier(IProblemCategory category) {
 		this.category = category;
-	}
-
-	@Override
-	public String type() {
-		return type;
-	}
-
-	@Override
-	public String validator() {
-		return validator;
 	}
 
 	@Override
@@ -39,21 +26,11 @@ public enum DoctrineProblemIdentifier implements IValidatorIdentifier {
 
 	@Override
 	public boolean belongsTo(IProblemCategory category) {
-		if (category == ProblemCategory.IMPORT && this.category == Problem.CAT_IMPORT) {
-			return true;
-		}
-
-		return false;
+		return category == this.category;
 	}
 
 	@Override
 	public String getMarkerType() {
 		return MARKER_TYPE;
 	}
-
-	@Override
-	public int getCategory() {
-		return category;
-	}
-
 }

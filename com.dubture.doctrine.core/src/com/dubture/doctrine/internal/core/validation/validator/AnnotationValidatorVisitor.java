@@ -14,8 +14,10 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dltk.ast.ASTNode;
+import org.eclipse.dltk.compiler.problem.ProblemSeverity;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
+import org.eclipse.dltk.core.builder.IBuildContext;
 import org.eclipse.dltk.core.index2.search.ISearchEngine.MatchRule;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchEngine;
@@ -27,10 +29,10 @@ import org.eclipse.php.core.compiler.ast.nodes.PHPMethodDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.TraitDeclaration;
 import org.eclipse.php.core.compiler.ast.nodes.UsePart;
 import org.eclipse.php.core.compiler.ast.nodes.UseStatement;
+import org.eclipse.php.core.compiler.ast.validator.IValidatorVisitor;
 import org.eclipse.php.core.compiler.ast.visitor.PHPASTVisitor;
 import org.eclipse.php.internal.core.model.PHPModelAccess;
 import org.eclipse.php.internal.core.preferences.TaskPatternsProvider;
-import org.pdtextensions.semanticanalysis.validation.IValidatorContext;
 
 import com.dubture.doctrine.annotation.model.AnnotationBlock;
 import com.dubture.doctrine.annotation.model.AnnotationClass;
@@ -57,9 +59,9 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 
 	final private static String MESSAGE_CANNOT_RESOLVE_TYPE = "The annotation %s cannot be resolved";
 	final private static String TASK_ATTRIBUTE_KEY = AnnotationValidatorVisitor.class.getName() + "_task_tags:"; //$NON-NLS-1$
+	final public static String ID = "com.dubture.doctrine.core.annotationValidator";
 
-
-	private IValidatorContext context;
+	private IValidatorVisitor validator;
 	private ISourceModule sourceModule;
 	private IAnnotationModuleDeclaration annotationModuleDeclaration;
 
@@ -67,15 +69,17 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 	private Map<String, Boolean> resolved;
 	private Pattern[] taskPatterns;
 
-	public AnnotationValidatorVisitor(IValidatorContext context, IAnnotationModuleDeclaration moduleDeclaration) {
-		this.context = context;
+	public AnnotationValidatorVisitor(IBuildContext context, IValidatorVisitor validator,
+			IAnnotationModuleDeclaration moduleDeclaration) {
+		this.validator = validator;
 		this.sourceModule = context.getSourceModule();
 		this.annotationModuleDeclaration = moduleDeclaration;
 		String taskTagsKey = TASK_ATTRIBUTE_KEY + context.getSourceModule().getScriptProject().getElementName();
-		Object taskAttr = context.getRawContext().get(taskTagsKey);
+		Object taskAttr = context.get(taskTagsKey);
 		if (taskAttr == null) {
-			taskPatterns = TaskPatternsProvider.getInstance().getPatternsForProject(sourceModule.getScriptProject().getProject());
-			context.getRawContext().set(taskTagsKey, taskPatterns);
+			taskPatterns = TaskPatternsProvider.getInstance()
+					.getPatternsForProject(sourceModule.getScriptProject().getProject());
+			context.set(taskTagsKey, taskPatterns);
 		} else {
 			taskPatterns = (Pattern[]) taskAttr;
 		}
@@ -93,13 +97,14 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 				continue;
 			}
 			String fullName = part.getNamespace().getFullyQualifiedName();
-			parts.put(part.getAlias() == null ? part.getNamespace().getName().toLowerCase() : part.getAlias().getName().toLowerCase(), fullName);
+			parts.put(part.getAlias() == null ? part.getNamespace().getName().toLowerCase()
+					: part.getAlias().getName().toLowerCase(), fullName);
 
 		}
 
 		return false;
 	}
-	
+
 	@Override
 	public boolean visit(NamespaceDeclaration s) throws Exception {
 		parts = new HashMap<String, String>();
@@ -110,9 +115,9 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 	 * This could be used to parse Annotationclasses themselves to build up an
 	 * internal model about the annotation.
 	 *
-	 * However, there's no clean way at the moment as pretty much any class can
-	 * be used as an annotation and there's no proper way to detect the
-	 * semantics of the annotation from the php code.
+	 * However, there's no clean way at the moment as pretty much any class can be
+	 * used as an annotation and there's no proper way to detect the semantics of
+	 * the annotation from the php code.
 	 *
 	 * @see http://www.doctrine-project.org/jira/browse/DDC-1198
 	 */
@@ -166,8 +171,10 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 				}
 				String fullName;
 				if (node.hasNamespace() && !parts.containsKey(node.getFirstNamespacePart().toLowerCase())) {
-					context.registerProblem(DoctrineProblemIdentifier.UNRESOVABLE, String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
-							node.getSourcePosition().startOffset + 1, node.getSourcePosition().endOffset + 1);
+					validator.reportProblem(node.getSourcePosition().startOffset + 1,
+							node.getSourcePosition().endOffset + 1,
+							String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
+							DoctrineProblemIdentifier.UNRESOVABLE, ProblemSeverity.ERROR);
 					return true;
 				}
 				if (!node.hasNamespace()) {
@@ -183,23 +190,26 @@ public class AnnotationValidatorVisitor extends PHPASTVisitor {
 						if (DoctrineCoreConstants.ANNOTATION_TAG_NAME.equals(node.getClassName())) {
 							return true;
 						}
-						fullName = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE  + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
+						fullName = DoctrineCoreConstants.DEFAULT_ANNOTATION_NAMESPACE
+								+ NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 					}
 				} else {
-					fullName = parts.get(node.getFirstNamespacePart().toLowerCase()) + NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
+					fullName = parts.get(node.getFirstNamespacePart().toLowerCase())
+							+ NamespaceReference.NAMESPACE_SEPARATOR + node.getClassName();
 				}
 				String lower = fullName.toLowerCase();
 				if (!resolved.containsKey(lower)) {
 					IDLTKSearchScope searchScope = SearchEngine.createSearchScope(sourceModule.getScriptProject());
-					IType[] types = PHPModelAccess.getDefault().findTypes(fullName,
-							MatchRule.EXACT, 0, 0, searchScope, new NullProgressMonitor());
+					IType[] types = PHPModelAccess.getDefault().findTypes(fullName, MatchRule.EXACT, 0, 0, searchScope,
+							new NullProgressMonitor());
 
-					
 					resolved.put(lower, types.length > 0);
 				}
 				if (!resolved.get(lower)) {
-					context.registerProblem(DoctrineProblemIdentifier.UNRESOVABLE, String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
-							node.getSourcePosition().startOffset + 1, node.getSourcePosition().endOffset + 1);
+					validator.reportProblem(node.getSourcePosition().startOffset + 1,
+							node.getSourcePosition().endOffset + 1,
+							String.format(MESSAGE_CANNOT_RESOLVE_TYPE, node.getFullyQualifiedName()),
+							DoctrineProblemIdentifier.UNRESOVABLE, ProblemSeverity.ERROR);
 				}
 				return super.visit(node);
 			}

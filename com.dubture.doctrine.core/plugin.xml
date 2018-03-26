@@ -84,22 +84,6 @@
       </requestor>
    </extension>
    <extension
-         point="org.pdtextensions.semanticanalysis.validator">
-      <category
-            id="com.dubture.doctrine.core.validationCategory"
-            label="Doctrine validators">
-      </category>
-      <validator
-            categoryId="com.dubture.doctrine.core.validationCategory"
-            class="com.dubture.doctrine.internal.core.validation.factory.AnnotationValidatorFactory"
-            id="com.dubture.doctrine.core.annotationValidator">
-            <type
-                 id="use"
-                 label="Annotation not found"
-                 defaultSeverity="warning" />
-      </validator>
-   </extension>
-   <extension
           point="org.eclipse.dltk.core.problemFactory">
        <problemIdentifierFactory
              class="com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifierFactory"
@@ -119,19 +103,12 @@
       </initializer>
    </extension>
    <extension
-         point="org.eclipse.php.ui.problemConfiguration">
-      <category
-            id="com.dubture.doctrine.problem.category"
-            name="Doctrine"
-            priority="0">
-      </category>
-      <problem
-            category="com.dubture.doctrine.problem.category"
-            class="com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier">
-         <identifier
-               id="UNRESOVABLE"
-               name="Annotation not found">
-         </identifier>
-      </problem>
-   </extension>
+		id="problem"
+		name="Doctrine Problem"
+		point="org.eclipse.core.resources.markers">
+		<persistent
+			value="true" />
+		<super
+			type="org.eclipse.dltk.core.problem" />
+	</extension>
 </plugin>

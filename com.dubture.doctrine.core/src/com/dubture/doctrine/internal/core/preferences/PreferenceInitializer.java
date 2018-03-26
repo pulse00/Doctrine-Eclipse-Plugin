@@ -7,6 +7,7 @@ import org.eclipse.php.internal.core.PHPCorePlugin;
 
 import com.dubture.doctrine.internal.core.validation.DoctrineProblemIdentifier;
 
+@SuppressWarnings("restriction")
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	@Override
