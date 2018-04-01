@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Automatic-Module-Name: com.dubture.doctrine.test
 Bundle-ManifestVersion: 2
 Bundle-Name: Doctrine Tests
 Bundle-SymbolicName: com.dubture.doctrine.test;singleton:=true

@@ -11,7 +11,7 @@ package com.dubture.doctrine.annotation;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-public class SymfonyAnnotationPlugin implements BundleActivator {
+public class AnnotationPlugin implements BundleActivator {
 
 	private static BundleContext context;
 
@@ -24,7 +24,7 @@ public class SymfonyAnnotationPlugin implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		SymfonyAnnotationPlugin.context = bundleContext;
+		AnnotationPlugin.context = bundleContext;
 	}
 
 	/*
@@ -32,7 +32,7 @@ public class SymfonyAnnotationPlugin implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		SymfonyAnnotationPlugin.context = null;
+		AnnotationPlugin.context = null;
 	}
 
 }
