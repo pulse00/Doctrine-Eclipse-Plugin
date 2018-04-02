@@ -59,4 +59,9 @@ public class AnnotationModuleDeclaration implements IAnnotationModuleDeclaration
 	public AnnotationBlock[] getBlocks() {
 		return annotations.values().toArray(new AnnotationBlock[annotations.size()]);
 	}
+
+	@Override
+	public AnnotationBlock readAnnotations(int offset, int length) {
+		return read(offset);
+	}
 }

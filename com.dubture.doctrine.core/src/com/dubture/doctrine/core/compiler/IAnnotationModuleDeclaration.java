@@ -16,5 +16,7 @@ public interface IAnnotationModuleDeclaration {
 	
 	public AnnotationBlock readAnnotations(ISourceReference ref);
 	
+	public AnnotationBlock readAnnotations(int offset, int length);
+	
 	public AnnotationBlock[] getBlocks();
 }
