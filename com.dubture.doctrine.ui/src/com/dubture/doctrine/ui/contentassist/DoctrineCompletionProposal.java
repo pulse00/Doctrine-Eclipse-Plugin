@@ -8,6 +8,8 @@
  ******************************************************************************/
 package com.dubture.doctrine.ui.contentassist;
 
+import java.util.function.Supplier;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.core.CompletionProposal;
 import org.eclipse.dltk.core.ISourceModule;
@@ -15,6 +17,7 @@ import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.php.core.compiler.PHPFlags;
 import org.eclipse.php.internal.core.PHPCoreConstants;
 import org.eclipse.php.internal.core.PHPCorePlugin;
@@ -41,9 +44,13 @@ public class DoctrineCompletionProposal extends PHPCompletionProposal {
 	private ISourceModule sourceModule;
 
 	public DoctrineCompletionProposal(CompletionProposal typeProposal, IDocument document, ISourceModule cu,
-			String replacementString, int replacementOffset, int replacementLength, Image image, String displayString,
+			String replacementString, int replacementOffset, int replacementLength, final Image image, String displayString,
 			int relevance) {
-		super(replacementString, replacementOffset, replacementLength, image, displayString, relevance);
+		super(replacementString, replacementOffset, replacementLength, new Supplier<Image>() {
+			public Image get() {
+				return image;
+			}
+		}, new StyledString(displayString), relevance);
 		this.typeProposal = typeProposal;
 		this.sourceModule = cu;
 		this.document = document;
