@@ -3,7 +3,7 @@ Automatic-Module-Name: com.dubture.doctrine.annotation
 Bundle-ManifestVersion: 2
 Bundle-Name: Doctrine Annotation Plugin
 Bundle-SymbolicName: com.dubture.doctrine.annotation;singleton:=true
-Bundle-Version: 1.6.0.qualifier
+Bundle-Version: 1.7.0.qualifier
 Bundle-Activator: com.dubture.doctrine.annotation.AnnotationPlugin
 Bundle-Vendor: https://github.com/pulse00
 Require-Bundle: org.eclipse.core.runtime,
