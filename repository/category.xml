@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/com.dubture.doctrine.feature_1.7.0.qualifier.jar" id="com.dubture.doctrine.feature" version="1.7.0.qualifier">
+   <feature url="features/com.dubture.doctrine.feature_1.8.0.qualifier.jar" id="com.dubture.doctrine.feature" version="1.8.0.qualifier">
       <category name="com.dubture.doctrine"/>
    </feature>
    <category-def name="com.dubture.doctrine" label="Doctrine Feature"/>

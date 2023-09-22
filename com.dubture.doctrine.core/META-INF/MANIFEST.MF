@@ -3,7 +3,7 @@ Automatic-Module-Name: com.dubture.doctrine.core
 Bundle-ManifestVersion: 2
 Bundle-Name: Doctrine Core Plugin
 Bundle-SymbolicName: com.dubture.doctrine.core;singleton:=true
-Bundle-Version: 1.7.0.qualifier
+Bundle-Version: 1.8.0.qualifier
 Bundle-Activator: com.dubture.doctrine.core.DoctrineCorePlugin
 Bundle-Vendor: https://github.com/pulse00
 Bundle-Localization: plugin
