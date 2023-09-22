@@ -9,7 +9,7 @@ Bundle-Vendor: https://github.com/pulse00
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dltk.core,
  org.antlr.runtime;bundle-version="[3.2.0, 4.0.0)"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Export-Package: com.dubture.doctrine.annotation,com.dubture.doctrine.a
  nnotation.model,com.dubture.doctrine.annotation.parser,com.dubture.do
  ctrine.annotation.parser.antlr,com.dubture.doctrine.annotation.parser

@@ -7,7 +7,7 @@ Bundle-Activator: com.dubture.doctrine.test.DoctrineTestPlugin
 Bundle-Version: 1.7.0.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: https://github.com/pulse00
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.junit;bundle-version="4.8.2",
  org.eclipse.php.core.tests,
  org.eclipse.php.core,
